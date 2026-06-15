@@ -6,7 +6,228 @@
   <title>CardioResidente — Ferramentas para o residente de cardiologia</title>
   <meta name="description" content="Busca de evidências, transcrição de laudos por IA e modelos de evolução para o residente de cardiologia." />
   <link rel="preconnect" href="https://eutils.ncbi.nlm.nih.gov" />
-  <link rel="stylesheet" href="assets/css/styles.css" />
+  <style>
+:root {
+  --bg: #0f1620;
+  --bg-soft: #16202c;
+  --card: #1b2837;
+  --card-2: #213347;
+  --line: #2c3e52;
+  --text: #e9eef4;
+  --muted: #93a4b6;
+  --accent: #e2384d;
+  --accent-soft: #ff5167;
+  --blue: #3d9bff;
+  --green: #2bd47d;
+  --amber: #f5b942;
+  --radius: 14px;
+  --shadow: 0 6px 24px rgba(0,0,0,.28);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Topbar ---------- */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: linear-gradient(180deg, #131d28, #0f1620);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 20px 0;
+}
+.brand { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.creator-badge {
+  margin-left: auto; text-align: right; text-decoration: none;
+  display: flex; flex-direction: column; line-height: 1.3;
+  background: rgba(226,56,77,.08); border: 1px solid rgba(226,56,77,.3);
+  padding: 7px 14px; border-radius: 10px; transition: .15s;
+}
+.creator-badge:hover { background: rgba(226,56,77,.16); }
+.cb-by { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+.cb-name { font-size: 13.5px; color: var(--text); font-weight: 700; }
+.cb-ig { font-size: 12.5px; color: var(--accent-soft); font-weight: 600; }
+.logo {
+  font-size: 30px; color: var(--accent);
+  filter: drop-shadow(0 0 8px rgba(226,56,77,.5));
+}
+.brand h1 { font-size: 20px; margin: 0; letter-spacing: .3px; }
+.tagline { margin: 0; color: var(--muted); font-size: 12.5px; }
+
+.tabs { display: flex; gap: 4px; margin-top: 12px; flex-wrap: wrap; }
+.tab {
+  background: transparent; border: none; color: var(--muted);
+  padding: 10px 16px; font-size: 14.5px; cursor: pointer;
+  border-radius: 10px 10px 0 0; border-bottom: 2px solid transparent;
+  transition: .15s;
+}
+.tab:hover { color: var(--text); background: rgba(255,255,255,.03); }
+.tab.active { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
+
+/* ---------- Layout ---------- */
+main { max-width: 1180px; margin: 0 auto; padding: 26px 20px 60px; }
+.view { display: none; animation: fade .2s ease; }
+.view.active { display: block; }
+@keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.hero h2 { font-size: 24px; margin: 0 0 6px; }
+.hero p { color: var(--muted); margin: 0 0 22px; max-width: 720px; }
+
+/* ---------- Buttons ---------- */
+.btn-primary {
+  background: var(--accent); color: #fff; border: none;
+  padding: 12px 20px; border-radius: 10px; font-size: 14.5px;
+  font-weight: 600; cursor: pointer; transition: .15s;
+}
+.btn-primary:hover { background: var(--accent-soft); }
+.btn-primary:disabled { opacity: .55; cursor: default; }
+.btn-ghost {
+  background: var(--card-2); color: var(--text); border: 1px solid var(--line);
+  padding: 10px 16px; border-radius: 10px; font-size: 14px; cursor: pointer; transition: .15s;
+}
+.btn-ghost:hover:not(:disabled) { background: #2a4058; }
+.btn-ghost:disabled { opacity: .5; cursor: default; }
+
+/* ---------- Search ---------- */
+.search-box { display: flex; gap: 10px; margin-bottom: 12px; }
+.search-box input {
+  flex: 1; padding: 14px 16px; font-size: 15px;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 10px; color: var(--text);
+}
+.search-box input:focus { outline: none; border-color: var(--blue); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+.chip {
+  background: var(--card); border: 1px solid var(--line); color: var(--muted);
+  padding: 6px 12px; border-radius: 999px; font-size: 12.5px; cursor: pointer; transition: .15s;
+}
+.chip:hover { color: var(--text); border-color: var(--blue); }
+
+.evi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.col-title { font-size: 15px; margin: 0 0 12px; color: var(--text); }
+
+/* ---------- Curada cards ---------- */
+.curada-list, .pubmed-list { display: flex; flex-direction: column; gap: 12px; }
+.evi-card {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow);
+}
+.evi-card h4 { margin: 0 0 6px; font-size: 15.5px; }
+.evi-card .cat { font-size: 11.5px; color: var(--blue); text-transform: uppercase; letter-spacing: .6px; }
+.evi-card .bottom { margin: 8px 0; }
+.badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.badge {
+  font-size: 11.5px; padding: 3px 9px; border-radius: 999px; font-weight: 600;
+  border: 1px solid var(--line);
+}
+.badge.classe-I { background: rgba(43,212,125,.13); color: var(--green); border-color: rgba(43,212,125,.4); }
+.badge.classe-IIa { background: rgba(245,185,66,.12); color: var(--amber); border-color: rgba(245,185,66,.4); }
+.badge.classe-IIb { background: rgba(245,185,66,.08); color: var(--amber); border-color: rgba(245,185,66,.3); }
+.badge.classe-III { background: rgba(226,56,77,.12); color: var(--accent-soft); border-color: rgba(226,56,77,.4); }
+.badge.nivel { background: var(--card-2); color: var(--muted); }
+.evi-card .trials { font-size: 13px; color: var(--muted); }
+.evi-card .src { font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+.evi-card .pm-link {
+  display: inline-block; margin-top: 10px; font-size: 13px; color: var(--blue);
+  cursor: pointer; text-decoration: none; border-bottom: 1px dashed var(--blue);
+}
+.evi-card .pm-link:hover { color: #7bbcff; }
+
+/* ---------- PubMed cards ---------- */
+.pm-item {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 14px 16px;
+}
+.pm-item a.title { color: var(--text); font-weight: 600; font-size: 14.5px; text-decoration: none; }
+.pm-item a.title:hover { color: var(--blue); }
+.pm-item .meta { color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+.pm-item .links { margin-top: 8px; display: flex; gap: 14px; }
+.pm-item .links a { font-size: 12.5px; color: var(--blue); text-decoration: none; }
+.pm-item .links a:hover { text-decoration: underline; }
+
+.muted { color: var(--muted); }
+.small { font-size: 12.5px; }
+.spinner {
+  display: inline-block; width: 16px; height: 16px; border: 2px solid var(--line);
+  border-top-color: var(--blue); border-radius: 50%; animation: spin .7s linear infinite;
+  vertical-align: middle; margin-right: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- Transcrição ---------- */
+.transc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.field-label { display: block; font-size: 13px; color: var(--muted); margin: 14px 0 6px; font-weight: 600; }
+select, textarea {
+  width: 100%; background: var(--card); border: 1px solid var(--line);
+  border-radius: 10px; color: var(--text); padding: 12px 14px; font-size: 14px;
+  font-family: inherit; resize: vertical;
+}
+select:focus, textarea:focus { outline: none; border-color: var(--blue); }
+.transc-actions { display: flex; gap: 10px; margin-top: 12px; }
+.output-box {
+  background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+  padding: 14px; min-height: 360px; white-space: pre-wrap; font-size: 14px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; line-height: 1.6;
+}
+.output-box .placeholder { color: var(--muted); font-family: inherit; }
+
+/* ---------- Dropzone de imagem ---------- */
+.dropzone {
+  border: 2px dashed var(--line); border-radius: 12px; background: var(--card);
+  min-height: 200px; display: flex; align-items: center; justify-content: center;
+  text-align: center; cursor: pointer; padding: 18px; transition: .15s; overflow: hidden;
+}
+.dropzone:hover, .dropzone.dragover { border-color: var(--blue); background: var(--card-2); }
+.dz-icon { font-size: 34px; display: block; margin-bottom: 8px; }
+.dropzone p { margin: 4px 0; color: var(--muted); }
+#sv-preview { max-width: 100%; max-height: 320px; border-radius: 8px; }
+
+/* ---------- Evoluções ---------- */
+.evol-grid { display: grid; grid-template-columns: 280px 1fr; gap: 20px; }
+.evol-menu { display: flex; flex-direction: column; gap: 6px; }
+.evol-group-title { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; margin: 12px 4px 4px; }
+.evol-item {
+  text-align: left; background: var(--card); border: 1px solid var(--line);
+  color: var(--text); padding: 10px 12px; border-radius: 9px; font-size: 13.5px; cursor: pointer; transition: .15s;
+}
+.evol-item:hover { border-color: var(--blue); }
+.evol-item.active { background: var(--card-2); border-color: var(--accent); }
+.evol-editor-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.evol-editor-head h3 { margin: 0; font-size: 16px; }
+
+/* ---------- Sobre ---------- */
+.sobre { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; max-width: 820px; }
+.sobre h3 { margin: 18px 0 8px; font-size: 16px; }
+.sobre ul { margin: 0; padding-left: 20px; }
+.sobre li { margin-bottom: 8px; color: var(--text); }
+
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--green); color: #06270f; padding: 10px 18px; border-radius: 10px;
+  font-weight: 600; font-size: 14px; opacity: 0; pointer-events: none; transition: .25s; z-index: 100;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.footer { text-align: center; color: var(--muted); font-size: 12px; padding: 24px; border-top: 1px solid var(--line); }
+.footer-credit { font-size: 13.5px; color: var(--text); margin-bottom: 6px; }
+.footer-credit a { color: var(--accent-soft); text-decoration: none; font-weight: 600; }
+.footer-credit a:hover { text-decoration: underline; }
+.footer-note { font-size: 12px; color: var(--muted); }
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 860px) {
+  .evi-grid, .transc-grid, .evol-grid { grid-template-columns: 1fr; }
+  .evol-menu { flex-direction: row; flex-wrap: wrap; }
+  .brand h1 { font-size: 18px; }
+}
+
+</style>
 </head>
 <body>
   <header class="topbar">
@@ -193,13 +414,932 @@
     </div>
     <span class="footer-note">CardioResidente · ferramenta de apoio · não substitui julgamento clínico</span>
   </footer>
+<script>
+/* ===== data-diretrizes.js ===== */
+// Base curada de condutas cardiológicas consolidadas.
+// classe = classe de recomendação (I, IIa, IIb, III) | nivel = nível de evidência (A, B, C)
+// pubmedQuery = consulta usada para buscar os artigos reais ao vivo no PubMed.
+window.DIRETRIZES = [
+  // ---------------- SÍNDROME CORONARIANA AGUDA ----------------
+  {
+    cat: "Síndrome coronariana aguda",
+    title: "AAS na síndrome coronariana aguda",
+    keywords: ["aas", "aspirina", "antiagregante", "sca", "síndrome coronariana", "infarto", "iam", "antiplaquetário"],
+    bottom: "AAS deve ser administrado imediatamente a todos os pacientes com SCA (sem contraindicação): ataque de 150–300 mg VO (mastigado), seguido de manutenção 75–100 mg/dia indefinidamente.",
+    classe: "I", nivel: "A",
+    trials: "ISIS-2, Antithrombotic Trialists' Collaboration",
+    src: "Diretrizes ESC SCA 2023 · AHA/ACC · SBC",
+    pubmedQuery: "aspirin acute coronary syndrome guideline"
+  },
+  {
+    cat: "Síndrome coronariana aguda",
+    title: "Dupla antiagregação plaquetária (DAPT)",
+    keywords: ["dapt", "dupla antiagregação", "clopidogrel", "ticagrelor", "prasugrel", "p2y12", "stent"],
+    bottom: "AAS + inibidor de P2Y12 (preferir ticagrelor ou prasugrel ao clopidogrel na SCA) por 12 meses como padrão; individualizar duração conforme risco isquêmico vs. hemorrágico.",
+    classe: "I", nivel: "A",
+    trials: "PLATO (ticagrelor), TRITON-TIMI 38 (prasugrel), CURE (clopidogrel)",
+    src: "Diretrizes ESC SCA 2023",
+    pubmedQuery: "dual antiplatelet therapy acute coronary syndrome ticagrelor prasugrel"
+  },
+  {
+    cat: "Síndrome coronariana aguda",
+    title: "Reperfusão no IAMCSST — tempos-alvo",
+    keywords: ["iamcsst", "supra", "reperfusão", "angioplastia primária", "porta-balão", "trombólise", "fibrinólise", "stemi"],
+    bottom: "Angioplastia primária é a reperfusão preferida se exequível em ≤120 min do diagnóstico (meta porta-balão ≤90 min). Se indisponível nesse tempo, fibrinólise em ≤10 min do diagnóstico, seguida de transferência para ICP.",
+    classe: "I", nivel: "A",
+    trials: "DANAMI-2, PRAGUE-2, STREAM",
+    src: "Diretriz ESC IAMCSST 2017 · SBC",
+    pubmedQuery: "primary PCI STEMI reperfusion time guideline"
+  },
+  {
+    cat: "Síndrome coronariana aguda",
+    title: "Estratégia invasiva no IAMSSST / angina instável",
+    keywords: ["iamssst", "sca sem supra", "angina instável", "estratégia invasiva", "grace", "nstemi"],
+    bottom: "Estratégia invasiva precoce (≤24 h) em pacientes de alto risco (troponina elevada, alterações dinâmicas do ST, GRACE >140). Estratégia invasiva imediata se instabilidade/critérios de muito alto risco.",
+    classe: "I", nivel: "A",
+    trials: "TIMACS, FRISC-II, RITA-3",
+    src: "Diretrizes ESC SCA 2023",
+    pubmedQuery: "early invasive strategy NSTEMI GRACE score"
+  },
+  {
+    cat: "Síndrome coronariana aguda",
+    title: "Estatina de alta intensidade pós-SCA",
+    keywords: ["estatina", "atorvastatina", "rosuvastatina", "ldl", "dislipidemia", "prevenção secundária", "colesterol"],
+    bottom: "Iniciar estatina de alta intensidade precocemente em todos os pacientes pós-SCA, independentemente do LDL basal. Meta LDL <55 mg/dL (e redução ≥50%); associar ezetimiba/iPCSK9 se não atingir.",
+    classe: "I", nivel: "A",
+    trials: "PROVE-IT TIMI 22, IMPROVE-IT, FOURIER",
+    src: "Diretriz ESC Dislipidemia 2019 · SBC",
+    pubmedQuery: "high intensity statin acute coronary syndrome LDL target"
+  },
 
-  <script src="assets/js/data-diretrizes.js"></script>
-  <script src="assets/js/data-evolucoes.js"></script>
-  <script src="assets/js/evidencia.js"></script>
-  <script src="assets/js/transcricao.js"></script>
-  <script src="assets/js/sinaisvitais.js"></script>
-  <script src="assets/js/evolucoes.js"></script>
-  <script src="assets/js/app.js"></script>
+  // ---------------- INSUFICIÊNCIA CARDÍACA ----------------
+  {
+    cat: "Insuficiência cardíaca (FEr)",
+    title: "Os 4 pilares da ICFEr",
+    keywords: ["insuficiência cardíaca", "icfer", "fer", "fevr", "quatro pilares", "gdmt", "fração de ejeção reduzida"],
+    bottom: "Tratamento de base da IC com FE reduzida: (1) IECA/BRA ou sacubitril-valsartana, (2) betabloqueador, (3) antagonista mineralocorticoide, (4) inibidor de SGLT2. Iniciar e titular as quatro classes precocemente.",
+    classe: "I", nivel: "A",
+    trials: "PARADIGM-HF, MERIT-HF, RALES/EMPHASIS-HF, DAPA-HF/EMPEROR-Reduced",
+    src: "Diretriz ESC IC 2021 (atualização 2023) · SBC",
+    pubmedQuery: "heart failure reduced ejection fraction four pillars guideline directed therapy"
+  },
+  {
+    cat: "Insuficiência cardíaca (FEr)",
+    title: "Sacubitril-valsartana (ARNI)",
+    keywords: ["sacubitril", "valsartana", "arni", "entresto", "neprilisina"],
+    bottom: "Sacubitril-valsartana é recomendado em substituição ao IECA na ICFEr sintomática para reduzir hospitalização e mortalidade. Respeitar washout de 36 h após IECA (risco de angioedema).",
+    classe: "I", nivel: "B",
+    trials: "PARADIGM-HF, PIONEER-HF",
+    src: "Diretriz ESC IC 2021 · SBC",
+    pubmedQuery: "sacubitril valsartan heart failure reduced ejection fraction"
+  },
+  {
+    cat: "Insuficiência cardíaca (FEr)",
+    title: "Inibidores de SGLT2 na IC",
+    keywords: ["isglt2", "dapagliflozina", "empagliflozina", "sglt2", "gliflozina"],
+    bottom: "Dapagliflozina ou empagliflozina recomendadas na ICFEr (e benefício também na IC com FE levemente reduzida/preservada), reduzindo hospitalização e morte cardiovascular, independentemente de diabetes.",
+    classe: "I", nivel: "A",
+    trials: "DAPA-HF, EMPEROR-Reduced, DELIVER, EMPEROR-Preserved",
+    src: "Diretriz ESC IC 2023 (focused update)",
+    pubmedQuery: "SGLT2 inhibitor heart failure dapagliflozin empagliflozin"
+  },
+  {
+    cat: "Insuficiência cardíaca (FEr)",
+    title: "CDI / TRC na ICFEr",
+    keywords: ["cdi", "desfibrilador", "trc", "ressincronizador", "ressincronização", "qrs", "bloqueio de ramo"],
+    bottom: "CDI para prevenção primária se FEVE ≤35% sintomática apesar de TMO ≥3 meses e sobrevida esperada >1 ano. TRC se FEVE ≤35%, ritmo sinusal e QRS ≥150 ms com morfologia de BRE (considerar 130–149 ms).",
+    classe: "I", nivel: "A",
+    trials: "SCD-HeFT, MADIT-CRT, CARE-HF",
+    src: "Diretriz ESC IC 2021 · ESC Pacing 2021",
+    pubmedQuery: "implantable cardioverter defibrillator cardiac resynchronization heart failure guideline"
+  },
+
+  // ---------------- FIBRILAÇÃO ATRIAL ----------------
+  {
+    cat: "Fibrilação atrial",
+    title: "Anticoagulação na FA (CHA₂DS₂-VASc)",
+    keywords: ["fibrilação atrial", "fa", "anticoagulação", "chads", "cha2ds2-vasc", "doac", "varfarina", "avc"],
+    bottom: "Anticoagulação oral indicada em CHA₂DS₂-VASc ≥2 (homens) ou ≥3 (mulheres); considerar se ≥1/≥2. Preferir DOAC à varfarina (exceto valvopatia mitral reumática moderada/grave ou prótese mecânica).",
+    classe: "I", nivel: "A",
+    trials: "RE-LY, ROCKET-AF, ARISTOTLE, ENGAGE AF-TIMI 48",
+    src: "Diretriz ESC FA 2024 · SBC",
+    pubmedQuery: "atrial fibrillation anticoagulation CHA2DS2-VASc DOAC guideline"
+  },
+  {
+    cat: "Fibrilação atrial",
+    title: "Controle de ritmo vs. frequência",
+    keywords: ["controle de ritmo", "controle de frequência", "cardioversão", "ablação", "amiodarona", "fa"],
+    bottom: "Controle precoce de ritmo (em até ~1 ano do diagnóstico) reduz desfechos cardiovasculares. Ablação por cateter é 1ª linha para controle de ritmo na FA paroxística sintomática e superior a fármacos em casos selecionados.",
+    classe: "I", nivel: "A",
+    trials: "EAST-AFNET 4, CABANA, CASTLE-AF",
+    src: "Diretriz ESC FA 2024",
+    pubmedQuery: "rhythm control rate control atrial fibrillation early ablation"
+  },
+
+  // ---------------- DISLIPIDEMIA / PREVENÇÃO ----------------
+  {
+    cat: "Prevenção / dislipidemia",
+    title: "Metas de LDL por risco cardiovascular",
+    keywords: ["ldl", "meta", "colesterol", "risco cardiovascular", "prevenção", "estatina", "dislipidemia"],
+    bottom: "Metas de LDL: muito alto risco <55 mg/dL; alto risco <70 mg/dL; moderado <100; baixo <116. Em muito alto risco, redução adicional <40 mg/dL após novo evento em 2 anos é razoável.",
+    classe: "I", nivel: "A",
+    trials: "CTT meta-analysis, FOURIER, ODYSSEY OUTCOMES",
+    src: "Diretriz ESC/EAS Dislipidemia 2019 · SBC",
+    pubmedQuery: "LDL cholesterol targets cardiovascular risk guideline"
+  },
+  {
+    cat: "Prevenção / dislipidemia",
+    title: "AAS em prevenção primária",
+    keywords: ["aas", "aspirina", "prevenção primária", "antiagregante"],
+    bottom: "NÃO se recomenda AAS de rotina em prevenção primária por aumento do risco de sangramento que supera o benefício. Considerar apenas em casos selecionados de alto risco e baixo risco hemorrágico, individualizando.",
+    classe: "III", nivel: "A",
+    trials: "ASPREE, ASCEND, ARRIVE",
+    src: "USPSTF 2022 · ACC/AHA Prevenção 2019",
+    pubmedQuery: "aspirin primary prevention cardiovascular disease bleeding"
+  },
+
+  // ---------------- HIPERTENSÃO ----------------
+  {
+    cat: "Hipertensão arterial",
+    title: "Alvos pressóricos e início de tratamento",
+    keywords: ["hipertensão", "has", "pressão arterial", "alvo pressórico", "anti-hipertensivo"],
+    bottom: "Meta geral PA <130/80 mmHg na maioria dos adultos tratados (se tolerado). Iniciar com combinação dupla em comprimido único (IECA/BRA + BCC ou diurético tiazídico) na maioria dos hipertensos estágio 2.",
+    classe: "I", nivel: "A",
+    trials: "SPRINT, ACCORD, STEP",
+    src: "Diretriz ESC/ESH HAS 2023/2024 · SBC",
+    pubmedQuery: "blood pressure target hypertension treatment guideline SPRINT"
+  },
+
+  // ---------------- VALVOPATIAS ----------------
+  {
+    cat: "Valvopatias",
+    title: "Estenose aórtica grave — TAVI vs. cirurgia",
+    keywords: ["estenose aórtica", "tavi", "valva aórtica", "troca valvar", "savr", "valvopatia"],
+    bottom: "Intervenção indicada na estenose aórtica grave sintomática (e assintomática selecionada). Escolha entre TAVI e cirurgia (SAVR) pelo Heart Team conforme idade, risco e anatomia: TAVI favorecida em idosos/alto risco.",
+    classe: "I", nivel: "A",
+    trials: "PARTNER, Evolut, SURTAVI",
+    src: "Diretriz ESC/EACTS Valvopatias 2021",
+    pubmedQuery: "severe aortic stenosis TAVI surgical aortic valve replacement guideline"
+  },
+
+  // ---------------- TROMBOEMBOLISMO ----------------
+  {
+    cat: "Tromboembolismo pulmonar",
+    title: "Estratificação e anticoagulação no TEP",
+    keywords: ["tep", "embolia pulmonar", "tromboembolismo", "anticoagulação", "trombólise", "psi"],
+    bottom: "Estratificar risco precoce (instabilidade hemodinâmica, VD, biomarcadores). Anticoagulação imediata; DOAC preferido na maioria. TEP de alto risco (choque): trombólise sistêmica. Risco intermediário-alto: monitorar e considerar reperfusão de resgate.",
+    classe: "I", nivel: "A",
+    trials: "PEITHO, Hokusai-VTE, EINSTEIN-PE",
+    src: "Diretriz ESC TEP 2019",
+    pubmedQuery: "pulmonary embolism risk stratification anticoagulation guideline"
+  },
+
+  // ---------------- PERICARDITE ----------------
+  {
+    cat: "Doenças do pericárdio",
+    title: "Pericardite aguda — AINE + colchicina",
+    keywords: ["pericardite", "colchicina", "aine", "pericárdio", "derrame pericárdico"],
+    bottom: "Tratamento de 1ª linha da pericardite aguda: AINE/AAS em dose plena + colchicina por 3 meses (reduz recorrência). Corticoide reservado a casos selecionados (contraindicação a AINE, etiologia autoimune).",
+    classe: "I", nivel: "A",
+    trials: "ICAP, COPE, CORP",
+    src: "Diretriz ESC Pericárdio 2015",
+    pubmedQuery: "acute pericarditis colchicine NSAID guideline"
+  },
+
+  // ---------------- BRADIARRITMIA ----------------
+  {
+    cat: "Arritmias / dispositivos",
+    title: "Marcapasso em bradiarritmias",
+    keywords: ["marcapasso", "bradicardia", "bav", "bloqueio atrioventricular", "doença do nó sinusal", "síncope"],
+    bottom: "Marcapasso definitivo indicado em BAV de 2º grau Mobitz II, BAV total/avançado e doença do nó sinusal sintomática. Em bradicardia, descartar e tratar causas reversíveis antes do implante.",
+    classe: "I", nivel: "C",
+    trials: "—",
+    src: "Diretriz ESC Estimulação Cardíaca 2021",
+    pubmedQuery: "pacemaker bradycardia atrioventricular block guideline indication"
+  }
+];
+
+
+/* ===== data-evolucoes.js ===== */
+// Modelos de evolução editáveis. Use [colchetes] para campos a preencher.
+window.EVOLUCOES = [
+  {
+    grupo: "Geral",
+    nome: "Evolução geral (SOAP)",
+    texto: `EVOLUÇÃO CARDIOLOGIA — [data]
+DH: [dia de internação] · DPO/DIM: [se aplicável]
+
+S) Paciente [estável/queixa]. Nega dor torácica, dispneia, palpitações, síncope ou edema. [outras queixas].
+O) REG/BEG, [consciente, orientado], acianótico, anictérico, afebril.
+   SSVV: PA [x/x] mmHg · FC [x] bpm · FR [x] irpm · SatO2 [x]% em [ar ambiente/O2] · Tax [x]°C · diurese [x].
+   ACV: RCR 2T BNF, sopros [ausentes/descrever], sem turgência jugular.
+   AR: MV+ bilateral, [sem ruídos adventícios].
+   ABD: flácido, indolor, RHA+.
+   MMII: [sem edema], panturrilhas livres, pulsos presentes e simétricos.
+A) [Diagnóstico principal] — [estável/em melhora/em investigação].
+   [Comorbidades relevantes].
+P) - Manter [terapia atual].
+   - [Exames/condutas do dia].
+   - [Ajustes].
+   - Seguimento.`
+  },
+  {
+    grupo: "Coronariopatia",
+    nome: "Pós-SCA / IAM (unidade coronariana)",
+    texto: `EVOLUÇÃO — PÓS-SCA — [data]
+DH: [x] · D[x] pós-[IAMCSST/IAMSSST/AI] · [pós-ICP em vaso/dia]
+
+S) [Assintomático]/refere [dor torácica? dispneia?]. Sem novos episódios anginosos. Tolerando deambulação/dieta.
+O) Estável hemodinamicamente. PA [x/x] · FC [x] · SatO2 [x]%.
+   ACV: RCR 2T, sem sopros novos, sem B3/B4, sem sinais de congestão.
+   AR: MV+, sem estertores.
+   MMII: sem edema. Sítio de punção [radial/femoral]: sem hematoma/sangramento, pulso distal presente.
+   ECG: [ritmo, sem novas alterações isquêmicas].
+   Curva de troponina: [pico/queda]. [outros exames].
+A) [IAM] Killip [I/II/III/IV], pós-[ICP primária/CRM/tto clínico]. [FEVE se conhecida].
+P) - DAPT: AAS 100 mg/dia + [ticagrelor 90 mg 12/12h / clopidogrel 75 mg/dia].
+   - Estatina alta intensidade: [atorvastatina 80 / rosuvastatina 40].
+   - Betabloqueador: [carvedilol/metoprolol] — titular.
+   - IECA/BRA: [enalapril/losartana] — titular.
+   - [iSGLT2 / antagonista mineralocorticoide se indicado].
+   - Controle de FR, reabilitação, eco se ainda não realizado.`
+  },
+  {
+    grupo: "Insuficiência cardíaca",
+    nome: "IC descompensada (internação)",
+    texto: `EVOLUÇÃO — IC DESCOMPENSADA — [data]
+DH: [x] · IC [FEr/FEp], etiologia [x] · perfil [B quente-úmido / C frio-úmido]
+
+S) [Melhora/piora] da dispneia (atual [classe NYHA]). [ortopneia/DPN]. Refere [redução do edema].
+O) PA [x/x] · FC [x] · SatO2 [x]% em [O2/AA] · peso [x] kg ([variação] vs ontem).
+   Balanço hídrico 24h: [x] mL · diurese: [x] mL.
+   ACV: [turgência jugular?], RCR/ritmo [x], [B3?], sopros [x].
+   AR: estertores em [bases/ até x].
+   MMII: edema [+/4+], [perfusão].
+   Labs: Cr [x] · U [x] · Na [x] · K [x] · BNP/NT-proBNP [x].
+A) IC [FEr] descompensada em [melhora/estabilização]. Congestão [em redução].
+P) - Diurético: furosemida [x mg EV] — ajustar conforme balanço/peso/congestão.
+   - Restrição hídrica [x mL] e de sódio.
+   - Otimizar GDMT conforme tolerância (PA/FC/função renal/K): IECA-BRA-ARNI / BB / antag. mineralocorticoide / iSGLT2.
+   - Monitorar função renal e eletrólitos.
+   - Investigar/tratar fator descompensante.
+   - Pesar diariamente.`
+  },
+  {
+    grupo: "Arritmia",
+    nome: "Fibrilação atrial",
+    texto: `EVOLUÇÃO — FIBRILAÇÃO ATRIAL — [data]
+DH: [x] · FA [paroxística/persistente/permanente] · [primeiro episódio?]
+
+S) [Assintomático]/refere palpitações/[dispneia]. [estável].
+O) PA [x/x] · FC [x] bpm. ECG: FA com RV [controlada/elevada], FC média [x].
+   ACV: ritmo irregular, sem sopros novos, sem congestão.
+   [TSH, eletrólitos, função renal: x].
+A) FA [tipo]. CHA₂DS₂-VASc = [x] · HAS-BLED = [x].
+P) - Anticoagulação: [DOAC — apixabana/rivaroxabana/dabigatrana/edoxabana, dose] (indicada por CHA₂DS₂-VASc).
+   - Controle de [frequência: BB/BCC não di-hidropiridínico / ritmo: cardioversão/antiarrítmico/ablação].
+   - Investigar e tratar causas (tireoide, distúrbio HE, ICC, valvopatia).
+   - [Eco TT].`
+  },
+  {
+    grupo: "Pré e pós-operatório",
+    nome: "Pós-operatório de cirurgia cardíaca",
+    texto: `EVOLUÇÃO — PÓS-OP CIRURGIA CARDÍACA — [data]
+[DPO x] de [CRM / troca valvar / outro]
+
+S) [Estável], dor [controlada], [deambulando]. Nega dispneia/palpitações.
+O) PA [x/x] · FC [x] · SatO2 [x]% · Tax [x]°C · diurese [x].
+   ACV: RCR, [ritmo], sopros [x], sem atrito.
+   AR: MV+, [base x], drenos: [débito/aspecto/retirados].
+   Ferida operatória esternal/safenectomia: [limpa, sem secreção/deiscência].
+   MMII: [edema/perfusão].
+   Labs: Hb [x] · plaq [x] · Cr [x] · K [x] · [outros].
+A) DPO [x] de [cirurgia], evolução [satisfatória].
+P) - Analgesia, profilaxia de TVP, controle glicêmico.
+   - [Betabloqueador / AAS conforme cirurgia], [anticoagulação se prótese].
+   - Fisioterapia respiratória e motora.
+   - Cuidados com ferida, retirada de drenos/fios conforme protocolo.
+   - Monitorar arritmias (FA pós-op) e derrame pericárdico.`
+  },
+  {
+    grupo: "Pré e pós-operatório",
+    nome: "Avaliação pré-operatória cardiológica",
+    texto: `AVALIAÇÃO CARDIOLÓGICA PRÉ-OPERATÓRIA — [data]
+Cirurgia proposta: [x] (risco cirúrgico [baixo/intermediário/alto]).
+
+Antecedentes: [HAS, DM, DAC, IC, valvopatia, tabagismo...].
+Capacidade funcional: [≥/< 4 METs].
+Exame: PA [x/x] · FC [x] · ACV [x] · AR [x] · MMII [x].
+ECG: [ritmo/alterações]. [Eco/outros].
+Índices: [RCRI/Lee = x] · [risco por calculadora].
+
+CONCLUSÃO: Risco cardiovascular perioperatório [baixo/intermediário/alto].
+CONDUTA:
+- [Liberado / liberado com ressalvas / necessita investigação adicional].
+- Manter [BB/estatina/AAS conforme caso]; [suspender/manter anticoagulante — orientar].
+- [Otimização clínica recomendada].
+- Monitorização perioperatória conforme risco.`
+  },
+  {
+    grupo: "Geral",
+    nome: "Dor torácica em investigação",
+    texto: `EVOLUÇÃO — DOR TORÁCICA EM INVESTIGAÇÃO — [data]
+
+S) Dor torácica [típica/atípica], início [x], caráter [x], irradiação [x], duração [x], fatores [desencadeantes/alívio]. [Atualmente sem dor].
+O) PA [x/x] (MMSS simétrica?) · FC [x] · SatO2 [x]%.
+   ACV: RCR, sopros [x], sem atrito. AR: [x]. MMII: [x].
+   ECG seriado: [sem alterações isquêmicas dinâmicas].
+   Troponina seriada: [x → x].
+A) Dor torácica — [provável origem]. HEART score = [x]. Baixa/intermediária/alta probabilidade de SCA.
+P) - [Seriar ECG e troponina].
+   - [AAS/anticoagulação se SCA provável].
+   - [Teste provocativo de isquemia / angio-TC de coronárias / CATE conforme risco].
+   - Analgesia e controle de FR; reavaliar.`
+  },
+  {
+    grupo: "Geral",
+    nome: "Alta hospitalar (resumo)",
+    texto: `RESUMO DE ALTA — CARDIOLOGIA — [data]
+
+Paciente [iniciais], [idade], internado em [data] por [motivo].
+Diagnósticos: [principal] + [secundários].
+Resumo da internação: [eventos, procedimentos, intercorrências].
+Exames relevantes: [eco, CATE, labs].
+FEVE: [x]% · ritmo: [x].
+
+MEDICAÇÕES DE ALTA:
+- [medicação — dose — posologia]
+- ...
+
+ORIENTAÇÕES:
+- Dieta [x], atividade [x], controle de FR (PA, glicemia, lipídios, cessação tabágica).
+- Sinais de alarme: dor torácica, dispneia, edema, síncope → procurar emergência.
+
+RETORNO/SEGUIMENTO:
+- [Especialidade] em [prazo]. Exames a trazer: [x].`
+  },
+
+  // ===== Hemodinâmica · modelos da equipe (Dante Pazzanese) =====
+  {
+    grupo: "Hemodinâmica (Dante Pazzanese)",
+    nome: "Admissão pós-ATC (angioplastia)",
+    texto: `Admito paciente após angioplastia coronariana transluminal percutânea (ATC).
+
+Assintomático no momento, nega desconforto torácico, dispneia, palpitações ou sintomas neurológicos. Estável hemodinamicamente, em monitorização contínua.
+
+Sítio de punção [radial direita / radial esquerda / femoral direita / femoral esquerda] com bom aspecto, sem sangramento ativo, hematoma ou expansão. Pulsos distais presentes e simétricos; extremidade bem perfundida, sem sinais de isquemia.
+
+[Acesso radial: pulseira pneumática instalada, em retirada gradual da pressão pela enfermagem conforme protocolo.]
+[Acesso femoral: introdutor ____F (____) — compressão manual/mecânica realizada por ____ min; curativo compressivo em bom estado.]
+
+ECG pós-procedimento sem novos sinais de isquemia em relação ao prévio.
+
+Dados do procedimento:
+- Vaso/lesão tratada: ____
+- Stent: ____ (tipo/quantidade)
+- Heparina administrada às ____ h
+- Contraste utilizado: ____ mL
+
+Conduta: mantenho monitorização, hidratação e medicações conforme prescrição. Reavaliações seriadas do sítio de punção e do estado clínico.`
+  },
+  {
+    grupo: "Hemodinâmica (Dante Pazzanese)",
+    nome: "Admissão pós-CATE (diagnóstico)",
+    texto: `Admito paciente após cateterismo cardíaco diagnóstico.
+
+Assintomático no momento, nega desconforto torácico, dispneia ou palpitações. Estável hemodinamicamente.
+
+Sítio de punção [radial direita / radial esquerda / femoral direita / femoral esquerda] com bom aspecto, sem sangramento ativo, hematoma ou expansão. Pulsos distais presentes e simétricos; extremidade bem perfundida.
+
+[Acesso radial: pulseira pneumática em retirada gradual pela enfermagem conforme protocolo.]
+[Acesso femoral: introdutor ____F (____) — compressão por ____ min; curativo compressivo em bom estado.]
+
+ECG pós-procedimento sem alterações isquêmicas agudas em relação ao prévio.
+Contraste utilizado: ____ mL.
+
+Resultado/Plano: ____ (ex.: coronárias sem lesões obstrutivas / lesão em ____ — programar ATC / encaminhar para CRM / seguimento clínico).`
+  },
+  {
+    grupo: "Hemodinâmica (Dante Pazzanese)",
+    nome: "Exame físico (masc./fem.)",
+    texto: `Sinais vitais: PA ____ x ____ mmHg | FC ____ bpm | FR ____ irpm | SatO2 ____% em ar ambiente | Tax ____ °C | HGT ____ mg/dL.
+
+>> Masculino:
+Bom estado geral, consciente e orientado, corado, hidratado, acianótico, anictérico, afebril.
+AR: murmúrio vesicular presente bilateralmente, sem ruídos adventícios; eupneico em ar ambiente.
+ACV: ritmo cardíaco regular, bulhas normofonéticas em 2 tempos, sem sopros.
+Abdome: plano, flácido, indolor à palpação, sem visceromegalias.
+Extremidades: bem perfundidas, sem edema de membros inferiores, panturrilhas livres; pulsos periféricos presentes e simétricos.
+Sítio de punção: sem sangramento, hematoma ou sinais flogísticos.
+
+>> Feminino:
+Bom estado geral, consciente e orientada, corada, hidratada, acianótica, anictérica, afebril.
+AR: murmúrio vesicular presente bilateralmente, sem ruídos adventícios; eupneica em ar ambiente.
+ACV: ritmo cardíaco regular, bulhas normofonéticas em 2 tempos, sem sopros.
+Abdome: plano, flácido, indolor à palpação, sem visceromegalias.
+Extremidades: bem perfundidas, sem edema de membros inferiores, panturrilhas livres; pulsos periféricos presentes e simétricos.
+Sítio de punção: sem sangramento, hematoma ou sinais flogísticos.`
+  },
+  {
+    grupo: "Hemodinâmica (Dante Pazzanese)",
+    nome: "Orientações pós-procedimento",
+    texto: `ORIENTAÇÕES GERAIS PÓS-PROCEDIMENTO
+
+- Não realizar esforços físicos com o membro por onde foi feito o exame por 48 horas.
+- Alimentar-se normalmente ou conforme orientação médica e da enfermagem.
+- Manter o local da punção limpo e seco; retirar o curativo após 12 horas da alta hospitalar.
+- Observar o local da punção quanto a: saída de secreção, endurecimento, coloração arroxeada, inchaço, dor ou sangramento.
+- Em caso de sangramento ativo, comprimir o local com firmeza e procurar atendimento imediatamente.
+- Caso apresente qualquer dos sinais acima — ou dor torácica, falta de ar, palpitações, desmaio ou febre — procurar atendimento médico próximo à residência ou o Pronto-Socorro de referência.
+- Não dirigir por 72 horas após o exame.
+- Não pegar peso (acima de 5 kg) por 3 dias com o membro utilizado no exame.
+- Não ter relações sexuais por 24 horas após o exame.
+- Ingerir bastante líquido (água) nas próximas horas, salvo contraindicação, para auxiliar na eliminação do contraste.
+- Tomar as medicações normalmente, conforme orientação médica; não suspender a dupla antiagregação por conta própria.`
+  },
+  {
+    grupo: "Hemodinâmica (Dante Pazzanese)",
+    nome: "Conduta / discussão com preceptoria",
+    texto: `Conforme discutido com a preceptoria:
+- Prescrevo dupla antiagregação plaquetária (DAPT) + estatina de alta potência.
+- Mantenho demais medicamentos de uso habitual.
+- Oriento paciente e familiares; reforço mudanças de estilo de vida (cessação do tabagismo, dieta, atividade física e adesão medicamentosa).
+- Oriento sinais de alarme e retorno ao Pronto-Socorro se necessário.
+- Coletados dados de contato; entraremos em contato após agendamento de ATC da lesão em ____.
+  Telefone(s) do paciente: ____`
+  },
+  {
+    grupo: "Hemodinâmica (Dante Pazzanese)",
+    nome: "Alta pós-angioplastia (fluxo)",
+    texto: `ALTA — PÓS-ANGIOPLASTIA NO MESMO DIA (lembrete de fluxo)
+
+- Coletar telefone do paciente.
+- Entregar papel para coleta de exames.
+- Avisar no grupo de altas (enfermagem liga no dia seguinte e agenda retorno).
+- Entregar receita + laudo do procedimento.
+- Reforçar orientações e sinais de alarme.`
+  },
+  {
+    grupo: "Hemodinâmica (Dante Pazzanese)",
+    nome: "Receita básica",
+    texto: `USO ORAL E CONTÍNUO
+
+1) Losartana 50 mg --------------------------------------------
+Tomar 01 comprimido de 12 em 12 horas
+
+2) Atorvastatina 80 mg ---------------------------------------
+Tomar 01 comprimido à noite
+
+3) Anlodipino 10 mg ------------------------------------------
+Tomar 01 comprimido à noite
+
+4) AAS 100 mg -----------------------------------------------
+Tomar 01 comprimido no almoço
+
+5) Clopidogrel 75 mg ----------------------------------------
+Tomar 01 comprimido ao dia por ____
+
+6) Succinato de Metoprolol 25 mg ----------------------------
+Tomar 01 comprimido ao dia
+
+[Ajustar fármacos e doses conforme cada paciente.]`
+  }
+];
+
+
+/* ===== evidencia.js ===== */
+// Módulo de busca de evidências: base curada + PubMed ao vivo (NCBI E-utilities)
+(function () {
+  const form = document.getElementById('busca-form');
+  const input = document.getElementById('busca-input');
+  const chipsEl = document.getElementById('busca-chips');
+  const curadaEl = document.getElementById('curada-results');
+  const pubEl = document.getElementById('pubmed-results');
+  const pubStatus = document.getElementById('pubmed-status');
+
+  const EUTILS = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils';
+
+  const exemplos = [
+    "AAS na síndrome coronariana aguda",
+    "iSGLT2 na insuficiência cardíaca",
+    "Anticoagulação na fibrilação atrial",
+    "TAVI estenose aórtica",
+    "Colchicina pericardite",
+    "Metas de LDL"
+  ];
+
+  // ---------- Chips de exemplo ----------
+  exemplos.forEach(ex => {
+    const c = document.createElement('button');
+    c.type = 'button'; c.className = 'chip'; c.textContent = ex;
+    c.addEventListener('click', () => { input.value = ex; doSearch(ex); });
+    chipsEl.appendChild(c);
+  });
+
+  // ---------- Base curada ----------
+  function normaliza(s) {
+    return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+
+  function scoreCurada(item, q) {
+    const nq = normaliza(q);
+    const termos = nq.split(/\s+/).filter(t => t.length > 2);
+    let score = 0;
+    const hay = normaliza(item.title + ' ' + item.cat + ' ' + item.keywords.join(' ') + ' ' + item.bottom);
+    termos.forEach(t => { if (hay.includes(t)) score += 1; });
+    item.keywords.forEach(k => { if (nq.includes(normaliza(k))) score += 2; });
+    return score;
+  }
+
+  function renderCurada(q) {
+    const ranked = window.DIRETRIZES
+      .map(it => ({ it, s: scoreCurada(it, q) }))
+      .filter(x => x.s > 0)
+      .sort((a, b) => b.s - a.s)
+      .slice(0, 6)
+      .map(x => x.it);
+
+    if (!ranked.length) {
+      curadaEl.innerHTML = '<p class="muted small">Nenhuma conduta na base curada para esse termo. Veja os resultados do PubMed ao lado.</p>';
+      return;
+    }
+    curadaEl.innerHTML = ranked.map(cardCurada).join('');
+    curadaEl.querySelectorAll('.pm-link').forEach(el => {
+      el.addEventListener('click', () => {
+        const q = el.dataset.q;
+        input.value = el.dataset.title;
+        searchPubMed(q);
+        document.getElementById('view-evidencia').scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  }
+
+  function cardCurada(it) {
+    return `
+      <div class="evi-card">
+        <span class="cat">${esc(it.cat)}</span>
+        <h4>${esc(it.title)}</h4>
+        <p class="bottom">${esc(it.bottom)}</p>
+        <div class="badges">
+          <span class="badge classe-${it.classe.replace(/[^IVab]/g,'')}">Classe ${esc(it.classe)}</span>
+          <span class="badge nivel">Nível ${esc(it.nivel)}</span>
+        </div>
+        ${it.trials && it.trials !== '—' ? `<div class="trials"><strong>Ensaios:</strong> ${esc(it.trials)}</div>` : ''}
+        <div class="src">${esc(it.src)}</div>
+        <a class="pm-link" data-q="${esc(it.pubmedQuery)}" data-title="${esc(it.title)}">→ Ver artigos no PubMed</a>
+      </div>`;
+  }
+
+  // ---------- PubMed ao vivo ----------
+  async function searchPubMed(query) {
+    pubEl.innerHTML = '';
+    pubStatus.innerHTML = '<span class="spinner"></span> Buscando no PubMed...';
+    try {
+      // 1) esearch -> lista de PMIDs
+      const term = encodeURIComponent(query);
+      const sUrl = `${EUTILS}/esearch.fcgi?db=pubmed&retmode=json&retmax=12&sort=relevance&term=${term}`;
+      const sRes = await fetch(sUrl);
+      if (!sRes.ok) throw new Error('esearch ' + sRes.status);
+      const sData = await sRes.json();
+      const ids = (sData.esearchresult && sData.esearchresult.idlist) || [];
+      if (!ids.length) {
+        pubStatus.textContent = 'Nenhum artigo encontrado no PubMed para esse termo.';
+        return;
+      }
+      // 2) esummary -> metadados
+      const sumUrl = `${EUTILS}/esummary.fcgi?db=pubmed&retmode=json&id=${ids.join(',')}`;
+      const sumRes = await fetch(sumUrl);
+      if (!sumRes.ok) throw new Error('esummary ' + sumRes.status);
+      const sumData = await sumRes.json();
+      const result = sumData.result || {};
+      const items = (result.uids || ids).map(id => result[id]).filter(Boolean);
+      renderPubMed(items, query);
+    } catch (err) {
+      console.error(err);
+      pubStatus.innerHTML = 'Não foi possível consultar o PubMed agora. '
+        + `<a href="https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(query)}" target="_blank" rel="noopener">Abrir busca no PubMed →</a>`;
+    }
+  }
+
+  function renderPubMed(items, query) {
+    pubStatus.innerHTML = `${items.length} artigos mais relevantes · `
+      + `<a href="https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(query)}" target="_blank" rel="noopener">ver todos no PubMed →</a>`;
+    pubEl.innerHTML = items.map(it => {
+      const pmid = it.uid;
+      const journal = it.fulljournalname || it.source || '';
+      const year = (it.pubdate || '').split(' ')[0] || '';
+      const authors = (it.authors || []).slice(0, 3).map(a => a.name).join(', ')
+        + ((it.authors || []).length > 3 ? ', et al.' : '');
+      const doi = extractDOI(it);
+      const pmLink = `https://pubmed.ncbi.nlm.nih.gov/${pmid}/`;
+      const doiLink = doi ? `https://doi.org/${doi}` : null;
+      return `
+        <div class="pm-item">
+          <a class="title" href="${doiLink || pmLink}" target="_blank" rel="noopener">${esc(it.title || '(sem título)')}</a>
+          <div class="meta">${esc(authors)} · <em>${esc(journal)}</em> ${esc(year)}</div>
+          <div class="links">
+            ${doiLink ? `<a href="${doiLink}" target="_blank" rel="noopener">DOI →</a>` : ''}
+            <a href="${pmLink}" target="_blank" rel="noopener">PubMed (PMID ${esc(String(pmid))}) →</a>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function extractDOI(it) {
+    if (it.elocationid && /10\.\d{4,}/.test(it.elocationid)) {
+      const m = it.elocationid.match(/(10\.\d{4,}\/[^\s]+)/);
+      if (m) return m[1];
+    }
+    if (Array.isArray(it.articleids)) {
+      const d = it.articleids.find(a => a.idtype === 'doi');
+      if (d) return d.value;
+    }
+    return null;
+  }
+
+  // ---------- util ----------
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+
+  function doSearch(q) {
+    if (!q || !q.trim()) return;
+    renderCurada(q);
+    searchPubMed(q);
+  }
+
+  form.addEventListener('submit', e => { e.preventDefault(); doSearch(input.value); });
+
+  // Render inicial da base curada (amostra)
+  curadaEl.innerHTML = window.DIRETRIZES.slice(0, 4).map(cardCurada).join('');
+  curadaEl.querySelectorAll('.pm-link').forEach(el => {
+    el.addEventListener('click', () => { input.value = el.dataset.title; searchPubMed(el.dataset.q); });
+  });
+})();
+
+
+/* ===== transcricao.js ===== */
+// Módulo de transcrição de laudos por IA (chama a função serverless /api/transcrever)
+(function () {
+  const tipoSel = document.getElementById('transc-tipo');
+  const input = document.getElementById('transc-input');
+  const btn = document.getElementById('transc-btn');
+  const clearBtn = document.getElementById('transc-clear');
+  const copyBtn = document.getElementById('transc-copy');
+  const out = document.getElementById('transc-output');
+  const hint = document.getElementById('transc-hint');
+
+  const dicas = {
+    ecocardiograma: "Gera 1 linha de medidas em siglas (Ao, AE, DDVE, DSVE, Septo, PP, FEVE/método) + contratilidade, valvas e conclusão.",
+    ressonancia: "Resume função biventricular, volumes, realce tardio (fibrose/isquemia) e conclusão.",
+    ergometria: "Resume protocolo, METs, FC/PA, motivo de interrupção, alterações de ST/sintomas e conclusão (Duke se possível).",
+    cintilografia: "Resume perfusão (isquemia/fibrose por território), FEVE de repouso/estresse e conclusão.",
+    cateterismo: "Lista cada vaso em sigla com % de lesão e localização (óstio/proximal/médio/distal) + dominância e conduta.",
+    laboratorio: "Organiza os exames laboratoriais em linha compacta com valores e unidades, destacando alterações.",
+    holter: "Resume ritmo de base, FC média/mín/máx, arritmias, pausas e correlação com sintomas (ou cargas pressóricas no MAPA).",
+    generico: "Resume os principais achados do laudo de forma objetiva para o prontuário."
+  };
+
+  function updateHint() { hint.textContent = dicas[tipoSel.value] || ''; }
+  tipoSel.addEventListener('change', updateHint);
+  updateHint();
+
+  clearBtn.addEventListener('click', () => {
+    input.value = '';
+    out.innerHTML = '<span class="placeholder">O resumo aparecerá aqui.</span>';
+    copyBtn.disabled = true;
+    input.focus();
+  });
+
+  copyBtn.addEventListener('click', () => window.copyText(out.textContent));
+
+  btn.addEventListener('click', async () => {
+    const texto = input.value.trim();
+    if (!texto) { window.toast('Cole o laudo primeiro.'); return; }
+
+    btn.disabled = true;
+    out.innerHTML = '<span class="spinner"></span> Resumindo o laudo...';
+    copyBtn.disabled = true;
+
+    try {
+      const res = await fetch('/api/transcrever', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tipo: tipoSel.value, texto })
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`Servidor respondeu ${res.status}: ${errText}`);
+      }
+      const data = await res.json();
+      const resumo = (data.resumo || '').trim();
+      if (!resumo) throw new Error('Resposta vazia da IA.');
+      out.textContent = resumo;
+      copyBtn.disabled = false;
+    } catch (err) {
+      console.error(err);
+      out.innerHTML = '<span class="placeholder">⚠️ Não foi possível gerar o resumo.\n\n'
+        + esc(err.message) + '\n\nVerifique se a função /api/transcrever está publicada e se a chave de API está configurada (veja o README).</span>';
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  function esc(s) {
+    return String(s).replace(/[&<>]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[c]));
+  }
+})();
+
+
+/* ===== sinaisvitais.js ===== */
+// Aba "Sinais vitais": envia foto da tabela (e/ou texto) à IA e gera a linha padronizada.
+(function () {
+  const drop = document.getElementById('sv-drop');
+  const fileInput = document.getElementById('sv-file');
+  const empty = document.getElementById('sv-drop-empty');
+  const preview = document.getElementById('sv-preview');
+  const textEl = document.getElementById('sv-text');
+  const btn = document.getElementById('sv-btn');
+  const clearBtn = document.getElementById('sv-clear');
+  const copyBtn = document.getElementById('sv-copy');
+  const out = document.getElementById('sv-output');
+
+  let imagem = null; // { mimeType, data(base64 sem prefixo) }
+
+  function setImage(file) {
+    if (!file || !file.type.startsWith('image/')) { window.toast('Selecione um arquivo de imagem.'); return; }
+    if (file.size > 6 * 1024 * 1024) { window.toast('Imagem muito grande (máx. 6 MB).'); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      preview.src = dataUrl;
+      preview.hidden = false;
+      empty.hidden = true;
+      imagem = { mimeType: file.type, data: dataUrl.split(',')[1] };
+    };
+    reader.readAsDataURL(file);
+  }
+
+  drop.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', e => setImage(e.target.files[0]));
+
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('dragover'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('dragover'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.classList.remove('dragover');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) setImage(e.dataTransfer.files[0]);
+  });
+
+  // Colar imagem (Ctrl+V) quando a aba estiver ativa
+  document.addEventListener('paste', e => {
+    if (!document.getElementById('view-sinaisvitais').classList.contains('active')) return;
+    const items = (e.clipboardData && e.clipboardData.items) || [];
+    for (const it of items) {
+      if (it.type.startsWith('image/')) { setImage(it.getAsFile()); break; }
+    }
+  });
+
+  clearBtn.addEventListener('click', () => {
+    imagem = null; fileInput.value = '';
+    preview.hidden = true; preview.src = ''; empty.hidden = false;
+    textEl.value = '';
+    out.innerHTML = '<span class="placeholder">A linha de sinais vitais aparecerá aqui.</span>';
+    copyBtn.disabled = true;
+  });
+
+  copyBtn.addEventListener('click', () => window.copyText(out.textContent));
+
+  btn.addEventListener('click', async () => {
+    const texto = textEl.value.trim();
+    if (!imagem && !texto) { window.toast('Envie a foto ou cole os valores.'); return; }
+
+    btn.disabled = true;
+    out.innerHTML = '<span class="spinner"></span> Processando os sinais vitais...';
+    copyBtn.disabled = true;
+
+    try {
+      const res = await fetch('/api/transcrever', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tipo: 'controles', texto, imagem })
+      });
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`Servidor respondeu ${res.status}: ${errText}`);
+      }
+      const data = await res.json();
+      const resumo = (data.resumo || '').trim();
+      if (!resumo) throw new Error('Resposta vazia da IA.');
+      out.textContent = resumo;
+      copyBtn.disabled = false;
+    } catch (err) {
+      console.error(err);
+      out.innerHTML = '<span class="placeholder">⚠️ Não foi possível processar.\n\n'
+        + esc(err.message) + '\n\nVerifique se a função /api/transcrever está publicada e se a GEMINI_API_KEY está configurada.</span>';
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  function esc(s) {
+    return String(s).replace(/[&<>]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[c]));
+  }
+})();
+
+
+/* ===== evolucoes.js ===== */
+// Módulo de modelos de evolução
+(function () {
+  const menu = document.getElementById('evol-menu');
+  const title = document.getElementById('evol-title');
+  const text = document.getElementById('evol-text');
+  const copyBtn = document.getElementById('evol-copy');
+
+  let current = null;
+
+  // Agrupa por "grupo"
+  const grupos = {};
+  window.EVOLUCOES.forEach((m, i) => {
+    (grupos[m.grupo] = grupos[m.grupo] || []).push({ ...m, i });
+  });
+
+  Object.keys(grupos).forEach(g => {
+    const gt = document.createElement('div');
+    gt.className = 'evol-group-title'; gt.textContent = g;
+    menu.appendChild(gt);
+    grupos[g].forEach(m => {
+      const b = document.createElement('button');
+      b.className = 'evol-item'; b.textContent = m.nome; b.dataset.i = m.i;
+      b.addEventListener('click', () => select(m.i, b));
+      menu.appendChild(b);
+    });
+  });
+
+  function select(i, el) {
+    const m = window.EVOLUCOES[i];
+    current = i;
+    title.textContent = m.nome;
+    text.value = m.texto;
+    copyBtn.disabled = false;
+    menu.querySelectorAll('.evol-item').forEach(x => x.classList.toggle('active', x === el));
+  }
+
+  copyBtn.addEventListener('click', () => {
+    if (text.value.trim()) window.copyText(text.value);
+  });
+
+  // Seleciona o primeiro por padrão
+  const first = menu.querySelector('.evol-item');
+  if (first) select(parseInt(first.dataset.i, 10), first);
+})();
+
+
+/* ===== app.js ===== */
+// Navegação entre abas + utilidades compartilhadas
+(function () {
+  const tabs = document.querySelectorAll('.tab');
+  const views = document.querySelectorAll('.view');
+
+  function show(view) {
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.view === view));
+    views.forEach(v => v.classList.toggle('active', v.id === 'view-' + view));
+    history.replaceState(null, '', '#' + view);
+  }
+
+  tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.view)));
+
+  const initial = (location.hash || '#evidencia').slice(1);
+  if (document.getElementById('view-' + initial)) show(initial);
+
+  // Toast global
+  let toastEl;
+  window.toast = function (msg) {
+    if (!toastEl) {
+      toastEl = document.createElement('div');
+      toastEl.className = 'toast';
+      document.body.appendChild(toastEl);
+    }
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastEl._t);
+    toastEl._t = setTimeout(() => toastEl.classList.remove('show'), 1800);
+  };
+
+  // Copiar para a área de transferência
+  window.copyText = async function (text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      window.toast('Copiado!');
+    } catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      window.toast('Copiado!');
+    }
+  };
+})();
+
+</script>
 </body>
 </html>
