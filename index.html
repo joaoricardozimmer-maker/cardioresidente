@@ -1707,7 +1707,7 @@ window.ENSAIOS = [
           <div class="ens-d">${esc(tr.d)}</div>
           <div class="ens-x"><strong>Resultado:</strong> ${esc(tr.x)}</div>
           <div class="ens-i"><strong>Impacto:</strong> ${esc(tr.i)}</div>
-          <button class="ens-doi" data-q="${esc(tr.n)}" data-y="${esc(String(tr.a))}">📄 Abrir artigo (DOI)</button>
+          <button class="ens-doi" data-q="${esc(tr.n)}" data-y="${esc(String(tr.a))}" data-j="${esc(tr.r)}">📄 Abrir artigo (DOI)</button>
         </div>`;
       });
       html+='</div></div>';
@@ -1718,16 +1718,29 @@ window.ENSAIOS = [
     root.querySelectorAll('.ens-doi').forEach(b=>b.addEventListener('click',()=>abrirDOI(b)));
   }
 
-  // Resolve o DOI ao vivo: esearch (nome+ano) -> PMID -> esummary -> DOI -> doi.org
+  // mapeia a sigla da revista para o nome reconhecido pelo PubMed (melhora a precisão da busca)
+  const REV={"NEJM":"N Engl J Med","Lancet":"Lancet","JAMA":"JAMA","Circulation":"Circulation",
+    "JACC":"J Am Coll Cardiol","Eur Heart J":"Eur Heart J","BMJ":"BMJ","AHA":"","ACC.26":"","ESC":"",
+    "ESC/NEJM":"N Engl J Med","Lancet/JACC":"Lancet","BMJ/JACC":"BMJ","Circ Arrhythm Electrophysiol":"Circ Arrhythm Electrophysiol"};
+
+  // Resolve o DOI ao vivo: esearch (nome+ano+revista) -> PMID -> esummary -> DOI -> doi.org
   async function abrirDOI(btn){
-    const nome=btn.dataset.q, ano=btn.dataset.y;
+    const nome=btn.dataset.q, ano=btn.dataset.y, rev=btn.dataset.j||'';
     const original=btn.textContent;
     btn.disabled=true; btn.textContent='Buscando DOI...';
     try{
-      const term=encodeURIComponent(`${nome} ${ano}`);
-      const s=await fetch(`${EUTILS}/esearch.fcgi?db=pubmed&retmode=json&retmax=3&sort=relevance&term=${term}`);
-      const sd=await s.json();
-      const ids=(sd.esearchresult&&sd.esearchresult.idlist)||[];
+      const jornal=REV[rev]!==undefined?REV[rev]:rev;
+      const termStr = jornal ? `${nome} ${ano} ${jornal}[journal]` : `${nome} ${ano}`;
+      const term=encodeURIComponent(termStr);
+      let s=await fetch(`${EUTILS}/esearch.fcgi?db=pubmed&retmode=json&retmax=3&sort=relevance&term=${term}`);
+      let sd=await s.json();
+      let ids=(sd.esearchresult&&sd.esearchresult.idlist)||[];
+      // fallback sem filtro de revista se não achar nada
+      if(!ids.length){
+        s=await fetch(`${EUTILS}/esearch.fcgi?db=pubmed&retmode=json&retmax=3&sort=relevance&term=${encodeURIComponent(nome+' '+ano)}`);
+        sd=await s.json();
+        ids=(sd.esearchresult&&sd.esearchresult.idlist)||[];
+      }
       if(!ids.length) throw new Error('sem PMID');
       const sum=await fetch(`${EUTILS}/esummary.fcgi?db=pubmed&retmode=json&id=${ids.join(',')}`);
       const smd=(await sum.json()).result||{};
