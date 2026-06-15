@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CardioResidente — Ferramentas para o residente de cardiologia</title>
+  <meta name="description" content="Busca de evidências, transcrição de laudos por IA e modelos de evolução para o residente de cardiologia." />
+  <link rel="preconnect" href="https://eutils.ncbi.nlm.nih.gov" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">♥</span>
+      <div>
+        <h1>CardioResidente</h1>
+        <p class="tagline">Evidências · Laudos · Evoluções</p>
+      </div>
+      <a class="creator-badge" href="https://instagram.com/joaozimmer_" target="_blank" rel="noopener">
+        <span class="cb-by">Criado por</span>
+        <span class="cb-name">Dr. João Ricardo Cambruzzi Zimmer</span>
+        <span class="cb-ig">📷 @joaozimmer_</span>
+      </a>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-view="evidencia">🔎 Evidências</button>
+      <button class="tab" data-view="transcricao">📝 Transcrever laudo</button>
+      <button class="tab" data-view="sinaisvitais">🩺 Sinais vitais</button>
+      <button class="tab" data-view="evolucoes">🗂️ Evoluções</button>
+      <button class="tab" data-view="sobre">ℹ️ Sobre</button>
+    </nav>
+  </header>
+
+  <main id="app">
+    <!-- ============ EVIDÊNCIAS ============ -->
+    <section class="view active" id="view-evidencia">
+      <div class="hero">
+        <h2>Busca de evidências</h2>
+        <p>Pesquise a evidência por trás de uma conduta. Resultados da literatura ao vivo (PubMed) com link direto para o DOI, e uma base curada das principais condutas cardiológicas.</p>
+      </div>
+
+      <form id="busca-form" class="search-box">
+        <input type="text" id="busca-input" autocomplete="off"
+               placeholder="Ex: AAS na síndrome coronariana aguda, iSGLT2 na insuficiência cardíaca..." />
+        <button type="submit" class="btn-primary">Pesquisar</button>
+      </form>
+
+      <div class="chips" id="busca-chips"></div>
+
+      <div class="evi-grid">
+        <div class="evi-col">
+          <h3 class="col-title">📌 Base curada (condutas-chave)</h3>
+          <div id="curada-results" class="curada-list"></div>
+        </div>
+        <div class="evi-col">
+          <h3 class="col-title">🌐 PubMed — artigos ao vivo</h3>
+          <div id="pubmed-status" class="muted">Digite uma pergunta e clique em Pesquisar para buscar artigos no PubMed.</div>
+          <div id="pubmed-results" class="pubmed-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TRANSCRIÇÃO ============ -->
+    <section class="view" id="view-transcricao">
+      <div class="hero">
+        <h2>Transcrição de laudos por IA</h2>
+        <p>Cole o laudo completo, escolha o tipo de exame e receba um resumo padronizado pronto para colar no prontuário.</p>
+      </div>
+
+      <div class="transc-grid">
+        <div>
+          <label class="field-label" for="transc-tipo">Tipo de exame</label>
+          <select id="transc-tipo">
+            <option value="ecocardiograma">Ecocardiograma</option>
+            <option value="ressonancia">Ressonância cardíaca</option>
+            <option value="ergometria">Teste ergométrico</option>
+            <option value="cintilografia">Cintilografia miocárdica</option>
+            <option value="cateterismo">Cateterismo / Cinecoronariografia</option>
+            <option value="laboratorio">Exames laboratoriais</option>
+            <option value="holter">Holter / MAPA</option>
+            <option value="generico">Outro laudo cardiológico</option>
+          </select>
+
+          <label class="field-label" for="transc-input">Cole o laudo aqui</label>
+          <textarea id="transc-input" rows="16" placeholder="Cole o texto completo do laudo..."></textarea>
+
+          <div class="transc-actions">
+            <button id="transc-btn" class="btn-primary">Resumir laudo</button>
+            <button id="transc-clear" class="btn-ghost">Limpar</button>
+          </div>
+          <p class="muted small" id="transc-hint"></p>
+        </div>
+
+        <div>
+          <label class="field-label">Resumo para o prontuário</label>
+          <div id="transc-output" class="output-box" aria-live="polite">
+            <span class="placeholder">O resumo aparecerá aqui.</span>
+          </div>
+          <div class="transc-actions">
+            <button id="transc-copy" class="btn-ghost" disabled>📋 Copiar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SINAIS VITAIS ============ -->
+    <section class="view" id="view-sinaisvitais">
+      <div class="hero">
+        <h2>Controles de sinais vitais</h2>
+        <p>Envie a <strong>foto da tabela</strong> de sinais vitais (ou cole os valores em texto) e receba uma linha pronta para o prontuário: <em>Temperatura / FC / FR / PAS / PAD / SatO₂ / Glicemia / Diurese / Balanço hídrico</em>.</p>
+      </div>
+
+      <div class="transc-grid">
+        <div>
+          <label class="field-label">Foto da tabela de sinais vitais</label>
+          <div id="sv-drop" class="dropzone">
+            <input type="file" id="sv-file" accept="image/*" hidden />
+            <div id="sv-drop-empty">
+              <span class="dz-icon">🖼️</span>
+              <p>Clique para escolher uma imagem<br>ou arraste e solte aqui</p>
+              <p class="muted small">PNG, JPG · ou tire foto pelo celular</p>
+            </div>
+            <img id="sv-preview" alt="Pré-visualização" hidden />
+          </div>
+
+          <label class="field-label" for="sv-text">Ou cole os valores em texto (opcional)</label>
+          <textarea id="sv-text" rows="5" placeholder="Ex.: 14h PA 135x80 FC 92 FR 18 SatO2 95% Tax 36,4 HGT 180..."></textarea>
+
+          <div class="transc-actions">
+            <button id="sv-btn" class="btn-primary">Gerar linha</button>
+            <button id="sv-clear" class="btn-ghost">Limpar</button>
+          </div>
+          <p class="muted small">A imagem é enviada apenas para a IA processar e não é armazenada. Evite incluir dados que identifiquem o paciente.</p>
+        </div>
+
+        <div>
+          <label class="field-label">Resultado</label>
+          <div id="sv-output" class="output-box" aria-live="polite">
+            <span class="placeholder">A linha de sinais vitais aparecerá aqui.</span>
+          </div>
+          <div class="transc-actions">
+            <button id="sv-copy" class="btn-ghost" disabled>📋 Copiar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ EVOLUÇÕES ============ -->
+    <section class="view" id="view-evolucoes">
+      <div class="hero">
+        <h2>Modelos de evolução</h2>
+        <p>Modelos prontos e editáveis para agilizar a evolução diária. Selecione, ajuste e copie.</p>
+      </div>
+
+      <div class="evol-grid">
+        <aside class="evol-menu" id="evol-menu"></aside>
+        <div class="evol-editor">
+          <div class="evol-editor-head">
+            <h3 id="evol-title">Selecione um modelo</h3>
+            <button id="evol-copy" class="btn-ghost" disabled>📋 Copiar</button>
+          </div>
+          <textarea id="evol-text" rows="22" placeholder="O modelo aparecerá aqui para edição."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SOBRE ============ -->
+    <section class="view" id="view-sobre">
+      <div class="hero">
+        <h2>Sobre & avisos</h2>
+      </div>
+      <div class="sobre">
+        <p><strong>CardioResidente</strong> reúne ferramentas práticas para o dia a dia do residente: busca de evidências, transcrição de laudos por IA e modelos de evolução.</p>
+        <h3>Avisos importantes</h3>
+        <ul>
+          <li><strong>Apoio à decisão, não substitui o julgamento clínico.</strong> Sempre confira condutas nas diretrizes vigentes e individualize para o paciente.</li>
+          <li><strong>Privacidade:</strong> evite colar dados que identifiquem o paciente (nome, registro, CPF) nas ferramentas de IA. Use apenas o conteúdo técnico do laudo.</li>
+          <li>A base curada reflete recomendações consolidadas das diretrizes (ESC, AHA/ACC, SBC). Verifique a versão mais recente de cada diretriz.</li>
+          <li>Os artigos do PubMed vêm da API pública do NCBI e abrem no DOI/PubMed original.</li>
+        </ul>
+        <p class="muted small">Esta ferramenta não armazena os textos digitados em servidores além da chamada necessária à IA para a transcrição.</p>
+        <h3>Criador</h3>
+        <p><strong>Dr. João Ricardo Cambruzzi Zimmer</strong><br>
+        Instagram: <a href="https://instagram.com/joaozimmer_" target="_blank" rel="noopener">@joaozimmer_</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-credit">
+      Criado por <strong>Dr. João Ricardo Cambruzzi Zimmer</strong> ·
+      <a href="https://instagram.com/joaozimmer_" target="_blank" rel="noopener">📷 @joaozimmer_</a>
+    </div>
+    <span class="footer-note">CardioResidente · ferramenta de apoio · não substitui julgamento clínico</span>
+  </footer>
+
+  <script src="assets/js/data-diretrizes.js"></script>
+  <script src="assets/js/data-evolucoes.js"></script>
+  <script src="assets/js/evidencia.js"></script>
+  <script src="assets/js/transcricao.js"></script>
+  <script src="assets/js/sinaisvitais.js"></script>
+  <script src="assets/js/evolucoes.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

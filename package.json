@@ -1,0 +1,9 @@
+{
+  "name": "cardioresidente",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ferramentas para o residente de cardiologia: busca de evidências, transcrição de laudos por IA e modelos de evolução.",
+  "engines": {
+    "node": ">=18"
+  }
+}
