@@ -201,6 +201,27 @@ select:focus, textarea:focus { outline: none; border-color: var(--blue); }
 .evol-editor-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .evol-editor-head h3 { margin: 0; font-size: 16px; }
 
+/* ---------- Ensaios pivotais ---------- */
+.ens-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 22px; }
+.ens-controls input { flex: 1; min-width: 240px; padding: 12px 14px; font-size: 14.5px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; color: var(--text); }
+.ens-controls input:focus, .ens-controls select:focus { outline: none; border-color: var(--blue); }
+.ens-controls select { width: auto; }
+.ens-sec { margin-bottom: 26px; }
+.ens-sec-title { font-size: 15.5px; margin: 0 0 12px; color: var(--text); border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.ens-sec-n { color: var(--muted); font-weight: 400; font-size: 13px; }
+.ens-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 12px; }
+.ens-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; }
+.ens-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.ens-nome { font-weight: 700; font-size: 15px; }
+.ens-stars { color: var(--amber); font-size: 13px; white-space: nowrap; }
+.ens-meta { font-size: 12px; color: var(--blue); margin: 2px 0 8px; }
+.ens-d { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.ens-x, .ens-i { font-size: 13.5px; margin-bottom: 5px; }
+.ens-i { color: var(--text); }
+.ens-doi { margin-top: 8px; align-self: flex-start; background: var(--card-2); color: var(--text); border: 1px solid var(--line); padding: 7px 13px; border-radius: 9px; font-size: 13px; cursor: pointer; transition: .15s; }
+.ens-doi:hover:not(:disabled) { background: #2a4058; border-color: var(--blue); }
+.ens-doi:disabled { opacity: .6; cursor: default; }
+
 /* ---------- Sobre ---------- */
 .sobre { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; max-width: 820px; }
 .sobre h3 { margin: 18px 0 8px; font-size: 16px; }
@@ -248,6 +269,7 @@ select:focus, textarea:focus { outline: none; border-color: var(--blue); }
       <button class="tab" data-view="transcricao">📝 Transcrever laudo</button>
       <button class="tab" data-view="sinaisvitais">🩺 Sinais vitais</button>
       <button class="tab" data-view="evolucoes">🗂️ Evoluções</button>
+      <button class="tab" data-view="ensaios">🧪 Ensaios pivotais</button>
       <button class="tab" data-view="sobre">ℹ️ Sobre</button>
     </nav>
   </header>
@@ -383,6 +405,29 @@ select:focus, textarea:focus { outline: none; border-color: var(--blue); }
           <textarea id="evol-text" rows="22" placeholder="O modelo aparecerá aqui para edição."></textarea>
         </div>
       </div>
+    </section>
+
+    <!-- ============ ENSAIOS PIVOTAIS ============ -->
+    <section class="view" id="view-ensaios">
+      <div class="hero">
+        <h2>Ensaios pivotais da cardiologia</h2>
+        <p>Os trials que mudaram a prática, organizados por área. Filtre por tema ou peso (★/★★/★★★) e clique para abrir o artigo direto no DOI. Compilado por Dr. João Ricardo Cambruzzi Zimmer.</p>
+      </div>
+
+      <div class="ens-controls">
+        <input type="text" id="ensaios-busca" placeholder="Buscar por nome, fármaco, tema... (ex: ticagrelor, TAVR, SGLT2)" />
+        <select id="ensaios-area">
+          <option value="all">Todas as áreas</option>
+        </select>
+        <select id="ensaios-peso">
+          <option value="1">Todos os pesos</option>
+          <option value="2">★★ e ★★★ (mais relevantes)</option>
+          <option value="3">★★★ (marcos)</option>
+        </select>
+        <span id="ensaios-count" class="muted small"></span>
+      </div>
+
+      <div id="ensaios-root"></div>
     </section>
 
     <!-- ============ SOBRE ============ -->
@@ -907,6 +952,324 @@ Tomar 01 comprimido ao dia
 ];
 
 
+/* ===== data-ensaios.js ===== */
+// Ensaios pivotais da cardiologia — compilado por Dr. João Ricardo Cambruzzi Zimmer.
+// Campos: n=nome, a=ano, r=revista, p=peso(1-3 estrelas), d=desenho/população, x=resultado, i=impacto/conduta.
+// O link PubMed é gerado ao vivo a partir do nome+ano.
+window.ENSAIOS = [
+{ sec: "1. SCA com supra de ST (STEMI) — reperfusão e adjuvantes", t: [
+ {n:"GISSI-1",a:1986,r:"Lancet",p:1,d:"Estreptoquinase IV vs controle no IAM (n=11.806)",x:"Mortalidade 21d 10,7% vs 13,0%; maior benefício se <6h.",i:"Estabeleceu a trombólise no IAM."},
+ {n:"ISIS-2",a:1988,r:"Lancet",p:3,d:"Fatorial 2x2: AAS e/ou estreptoquinase (n=17.187)",x:"AAS ~23% e SK ~25% de redução; juntos ~42% (8,0% vs 13,2%).",i:"Consagrou o AAS no IAM."},
+ {n:"GUSTO-1",a:1993,r:"NEJM",p:3,d:"tPA acelerado vs estreptoquinase (n=41.021)",x:"Mortalidade 30d 6,3% vs 7,3% a favor do tPA.",i:"Fibrino-específico de escolha onde disponível."},
+ {n:"Keeley (metanálise)",a:2003,r:"Lancet",p:2,d:"23 RCTs: ICP primária vs fibrinólise",x:"ICP reduz morte, reinfarto e AVC (morte 7% vs 9%).",i:"Base da preferência por ICP primária."},
+ {n:"DANAMI-2",a:2003,r:"NEJM",p:2,d:"ICP primária com transferência vs fibrinólise local (n=1.572)",x:"Reduz o composto morte/reinfarto/AVC (por menos reinfarto).",i:"Validou transferir para centro de hemodinâmica."},
+ {n:"CLARITY-TIMI 28",a:2005,r:"NEJM",p:2,d:"Clopidogrel vs placebo + fibrinólise no STEMI (n=3.491)",x:"Melhora patência da artéria e reduz eventos.",i:"Clopidogrel adjuvante à fibrinólise."},
+ {n:"COMMIT (clopidogrel)",a:2005,r:"Lancet",p:3,d:"Clopidogrel vs placebo no IAM, amplo (n=45.852)",x:"Reduz morte/reinfarto/AVC (9,2% vs 10,1%).",i:"Clopidogrel de rotina no IAM."},
+ {n:"COMMIT (betabloqueador)",a:2005,r:"Lancet",p:2,d:"Metoprolol IV/VO precoce vs placebo no IAM (n=45.852)",x:"Sem redução de mortalidade; menos reinfarto/FV, mais choque cardiogênico.",i:"Evitar betabloqueador IV precoce em risco de choque."},
+ {n:"EXTRACT-TIMI 25",a:2006,r:"NEJM",p:1,d:"Enoxaparina vs HNF com fibrinólise no STEMI (n=20.506)",x:"Reduz morte/reinfarto (9,9% vs 12,0%), mais sangramento.",i:"Enoxaparina preferida com fibrinolítico."},
+ {n:"OASIS-6",a:2006,r:"JAMA",p:1,d:"Fondaparinux vs usual no STEMI (n=12.092)",x:"Reduz morte/reinfarto; sem benefício (e risco de trombo) na ICP primária.",i:"Útil com fibrinolítico; não na ICP primária isolada."},
+ {n:"OAT",a:2006,r:"NEJM",p:1,d:"ICP de artéria ocluída 3-28d pós-IAM, estável (n=2.166)",x:"Sem redução de morte/reinfarto/IC vs TMO.",i:"Não reabrir artéria ocluída tardia em assintomático."},
+ {n:"STREAM",a:2013,r:"NEJM",p:2,d:"Fibrinólise pré-hospitalar + ICP vs ICP primária quando atraso (n=1.892)",x:"Desfechos semelhantes.",i:"Apoia o fármaco-invasivo se transporte demorado."},
+ {n:"PRAMI",a:2013,r:"NEJM",p:2,d:"STEMI multiarterial: ICP preventiva vs só culprit (n=465)",x:"Redução expressiva de MACE com revasc completa.",i:"Primeiro sinal forte pró-revasc completa."},
+ {n:"COMPLETE",a:2019,r:"NEJM",p:3,d:"STEMI multiarterial estável: completa (estagiada) vs só culprit (n=4.041)",x:"Morte CV/novo IAM 7,8% vs 10,5% (HR 0,74).",i:"Marco: revasc completa de rotina."},
+ {n:"FULL REVASC",a:2023,r:"NEJM",p:2,d:"Revasc completa guiada por FFR vs só culprit (n=1.542)",x:"Neutro para morte/IAM/revasc.",i:"Tempera o ganho da estratégia guiada por FFR."},
+ {n:"TOTAL",a:2015,r:"NEJM",p:2,d:"Tromboaspiração de rotina vs ICP isolada (n=10.732)",x:"Sem benefício; tendência a mais AVC.",i:"Aspirado só seletivo (bailout)."},
+ {n:"ISIS-1",a:1986,r:"Lancet",p:1,d:"Atenolol IV/VO precoce vs controle no IAM (n=16.027)",x:"Redução modesta de mortalidade vascular precoce.",i:"Betabloqueador na era pré-trombólise."},
+ {n:"MIAMI",a:1985,r:"Eur Heart J",p:1,d:"Metoprolol precoce vs placebo no IAM suspeito (n=5.778)",x:"Tendência não significativa a menor mortalidade.",i:"Betabloqueador precoce — dado histórico."},
+ {n:"ISIS-3",a:1992,r:"Lancet",p:1,d:"SK vs tPA vs APSAC, +/- heparina (n=41.299)",x:"Sem diferença de mortalidade entre os fibrinolíticos.",i:"Contexto pré-GUSTO."},
+ {n:"ASSENT-2",a:1999,r:"Lancet",p:1,d:"Tenecteplase vs alteplase no STEMI (n=16.949)",x:"Mortalidade 30d equivalente; menos sangramento não cerebral com TNK.",i:"TNK em bólus único = tPA."},
+ {n:"BRAVE-2",a:2005,r:"JAMA",p:1,d:"ICP vs conservador no STEMI tardio (12-48h) assintomático (n=365)",x:"Reduz o tamanho do infarto.",i:"Reperfundir STEMI tardio ainda viável."},
+ {n:"DANAMI-3 (PRIMULTI)",a:2015,r:"Lancet",p:1,d:"STEMI multiarterial: completa guiada por FFR vs só culprit (n=627)",x:"Reduz revasc futura; neutro p/ morte/IAM.",i:"Apoia completar guiado por FFR."},
+ {n:"CvLPRIT",a:2015,r:"JACC",p:1,d:"STEMI multiarterial: completa vs só culprit (n=296)",x:"Reduz o composto pró-revasc completa.",i:"Reforça a revascularização completa."}
+]},
+{ sec: "2. SCA sem supra de ST (NSTEMI / angina instável)", t: [
+ {n:"Aspirina na angina instável (Theroux)",a:1988,r:"NEJM",p:1,d:"AAS vs placebo na angina instável (e VA Cooperative 1983)",x:"Reduz IAM e morte em ~50%.",i:"Fundou o AAS na SCA."},
+ {n:"FRISC II",a:1999,r:"Lancet",p:2,d:"Invasiva precoce vs conservadora (n=2.457)",x:"Reduz morte/IAM com a invasiva.",i:"Primeiro grande trial pró-invasiva."},
+ {n:"TACTICS-TIMI 18",a:2001,r:"NEJM",p:2,d:"Invasiva vs conservadora com tirofiban (n=2.220)",x:"Reduz MACE, sobretudo se troponina+.",i:"Benefício no alto risco."},
+ {n:"ESSENCE",a:1997,r:"NEJM",p:2,d:"Enoxaparina vs HNF na NSTEMI/angina instável (n=3.171)",x:"Reduz morte/IAM/angina recorrente (16,6% vs 19,8%).",i:"HBPM como anticoagulante na SCASSST."},
+ {n:"RITA-3",a:2002,r:"Lancet",p:2,d:"Invasiva vs conservadora na SCASSST (n=1.810)",x:"Reduz angina refratária/IAM; benefício mantido no longo prazo.",i:"Consolida invasiva no risco alto/intermediário."},
+ {n:"ICTUS",a:2005,r:"NEJM",p:2,d:"Invasiva precoce vs seletiva (n=1.200)",x:"Sem redução do composto.",i:"Muito baixo risco pode ir conservador."},
+ {n:"TIMACS",a:2009,r:"NEJM",p:2,d:"Invasiva precoce (<24h) vs tardia (n=3.031)",x:"Benefício do precoce no alto risco (GRACE>140).",i:"Define a urgência pelo risco."},
+ {n:"SENIOR-RITA",a:2024,r:"NEJM",p:2,d:"Invasiva vs conservadora em idosos ≥75 com NSTEMI (n=1.518)",x:"Reduz IAM não fatal/revasc; neutro p/ morte CV.",i:"Idosos também se beneficiam de estratégia invasiva."},
+ {n:"CAIRNS et al",a:1985,r:"NEJM",p:1,d:"AAS e/ou sulfimpirazona na angina instável (n=555)",x:"AAS reduz IAM/morte ~50%.",i:"Confirmou o AAS na SCA."},
+ {n:"TIMI 11B",a:1999,r:"Circulation",p:1,d:"Enoxaparina vs HNF na UA/NSTEMI (n=3.910)",x:"Reduz morte/IAM/revasc urgente.",i:"HBPM na SCASSST."},
+ {n:"FRIC",a:1997,r:"Circulation",p:1,d:"Dalteparina vs HNF na UA/NSTEMI (n=1.482)",x:"Sem superioridade clara.",i:"HBPM — dado histórico."},
+ {n:"FRAXIS",a:1999,r:"Eur Heart J",p:1,d:"Nadroparina vs HNF na SCASSST (n=3.468)",x:"Sem benefício; tendência a mais sangramento.",i:"HBPM — resultado neutro."},
+ {n:"SYNERGY",a:2004,r:"JAMA",p:1,d:"Enoxaparina vs HNF na NSTEMI de alto risco com invasiva (n=10.027)",x:"Não inferior; mais sangramento.",i:"HBPM ok na estratégia invasiva."},
+ {n:"ACUTE II",a:2002,r:"Am Heart J",p:1,d:"Tirofiban + enoxaparina vs + HNF (n=525)",x:"Segurança semelhante.",i:"Compatibilidade HBPM + inibidor IIb/IIIa."},
+ {n:"FAMOUS-NSTEMI",a:2015,r:"Circulation",p:1,d:"FFR vs angiografia para guiar conduta na NSTEMI (n=350)",x:"Mais tratamento clínico no grupo FFR, desfechos semelhantes.",i:"FFR também útil na NSTEMI."}
+]},
+{ sec: "3. Antiplaquetários e antitrombóticos na SCA / pós-ICP", t: [
+ {n:"CURE",a:2001,r:"NEJM",p:3,d:"Clopidogrel + AAS vs AAS na NSTEMI (n=12.562)",x:"Morte CV/IAM/AVC 9,3% vs 11,4% (RRR 20%).",i:"Nasce a dupla antiagregação (DAPT)."},
+ {n:"CURRENT-OASIS 7",a:2010,r:"NEJM",p:2,d:"Clopidogrel dose dobrada vs padrão e AAS alta vs baixa (n=25.086)",x:"Dose dobrada só beneficiou o subgrupo com ICP; dose de AAS indiferente.",i:"Sem ganho de rotina; AAS em dose baixa."},
+ {n:"TRITON-TIMI 38",a:2007,r:"NEJM",p:2,d:"Prasugrel vs clopidogrel na SCA com ICP (n=13.608)",x:"Reduz isquemia (9,9% vs 12,1%), mais sangramento.",i:"Potente; contraindicado se AVC/AIT prévio."},
+ {n:"PLATO",a:2009,r:"NEJM",p:3,d:"Ticagrelor vs clopidogrel na SCA (n=18.624)",x:"Morte CV/IAM/AVC 9,8% vs 11,7%; reduz mortalidade.",i:"Marco: ticagrelor preferido na SCA."},
+ {n:"DAPT (study)",a:2014,r:"NEJM",p:3,d:"30 vs 12 meses de DAPT após stent farmacológico (n=9.961)",x:"Menos trombose de stent/IAM, mais sangramento e leve sinal de mortalidade.",i:"Individualizar duração por risco isquêmico x hemorrágico."},
+ {n:"PEGASUS-TIMI 54",a:2015,r:"NEJM",p:2,d:"Ticagrelor estendido (>1 ano) pós-IAM (n=21.162)",x:"Reduz MACE, mais sangramento.",i:"DAPT prolongada em alto risco isquêmico."},
+ {n:"TWILIGHT",a:2019,r:"NEJM",p:2,d:"Após 3m: ticagrelor isolado vs +AAS (n=7.119)",x:"Metade do sangramento, sem aumento isquêmico.",i:"DAPT curta + monoterapia P2Y12."},
+ {n:"MASTER DAPT",a:2021,r:"NEJM",p:2,d:"DAPT abreviada (1 mês) em alto risco de sangramento (n=4.434)",x:"Não inferior p/ eventos, menos sangramento.",i:"DAPT de 1 mês no risco hemorrágico alto."},
+ {n:"OASIS-5",a:2006,r:"NEJM",p:2,d:"Fondaparinux vs enoxaparina na SCA (n=20.078)",x:"Isquemia igual, metade do sangramento maior.",i:"Melhor segurança na SCA conservadora."},
+ {n:"COMPASS",a:2017,r:"NEJM",p:2,d:"Rivaroxabana 2,5mg 2x + AAS vs AAS na DAC/DAP (n=27.395)",x:"MACE 4,1% vs 5,4% (HR 0,76); reduz mortalidade.",i:"Dupla via na DAC crônica de alto risco."},
+ {n:"AUGUSTUS",a:2019,r:"NEJM",p:2,d:"FA + SCA/ICP: apixabana vs varfarina e AAS vs placebo (n=4.614)",x:"Apixabana sem AAS = menos sangramento, sem custo isquêmico.",i:"Terapia dupla (DOAC+P2Y12), 'largar a aspirina'."}
+]},
+{ sec: "4. DAC crônica (SCC) — revascularizar ou tratar clinicamente?", t: [
+ {n:"SAPAT",a:1992,r:"Lancet",p:2,d:"AAS vs placebo na angina estável (n=2.035)",x:"Reduz IAM/morte súbita 34%.",i:"AAS na DAC estável."},
+ {n:"TIME",a:2001,r:"Lancet",p:2,d:"Invasiva vs TMO em idosos >75 com angina crônica (n=301)",x:"Melhora sintomática precoce com a invasiva.",i:"Revasc alivia sintomas no idoso."},
+ {n:"COURAGE",a:2007,r:"NEJM",p:3,d:"ICP + TMO vs TMO na DAC estável (n=2.287)",x:"Sem redução de morte/IAM; alívio que se atenua.",i:"Marco: revasc não reduz eventos duros."},
+ {n:"BARI 2D",a:2009,r:"NEJM",p:2,d:"Diabéticos: revasc precoce vs TMO (n=2.368)",x:"Sem diferença de mortalidade; CRM melhor na doença grave.",i:"TMO inicial; CRM no multiarterial diabético."},
+ {n:"FAME",a:2009,r:"NEJM",p:3,d:"ICP guiada por FFR vs por angiografia (n=1.005)",x:"MACE 1 ano 13,2% vs 18,3%; menos stents.",i:"Fisiologia (FFR) para decidir cada lesão."},
+ {n:"FAME 2",a:2012,r:"NEJM",p:3,d:"FFR≤0,80: ICP+TMO vs TMO (n=888, interrompido)",x:"Reduz revasc urgente; sem redução de morte/IAM.",i:"Lesão isquêmica por FFR: ICP alivia/urgência."},
+ {n:"PROSPECT",a:2011,r:"NEJM",p:2,d:"História natural por IVUS pós-SCA, 3 vasos (n=697)",x:"Placas não-culpado com grande carga/TCFA predizem eventos.",i:"Conceito de placa vulnerável."},
+ {n:"ORBITA",a:2018,r:"Lancet",p:2,d:"ICP vs sham na angina estável uniarterial (n=200)",x:"Sem diferença no tempo de exercício.",i:"Provocador: parte do alívio é placebo."},
+ {n:"ORBITA-2",a:2023,r:"NEJM",p:2,d:"ICP vs placebo sem antianginosos na angina estável (n=301)",x:"Melhora escore de angina e tempo de exercício.",i:"Reabilita o efeito antianginoso da ICP."},
+ {n:"ISCHEMIA",a:2020,r:"NEJM",p:3,d:"Isquemia moderada-grave: invasiva vs conservadora (n=5.179)",x:"Sem redução de eventos CV; melhora a angina.",i:"Marco moderno: TMO primeiro na SCC."},
+ {n:"REVIVED-BCIS2",a:2022,r:"NEJM",p:2,d:"ICP vs TMO em disfunção VE isquêmica (FE≤35%, n=700)",x:"Sem redução de morte/hospitalização por IC.",i:"ICP não melhora prognóstico na MCP isquêmica."},
+ {n:"DEFINE-FLAIR / iFR-SWEDEHEART",a:2017,r:"NEJM",p:2,d:"iFR vs FFR para guiar revasc (n=2.492 / 2.037)",x:"iFR não inferior, sem adenosina.",i:"iFR validado como alternativa ao FFR."},
+ {n:"ACME",a:1992,r:"NEJM",p:1,d:"ICP vs TMO na DAC uniarterial com angina (n=212)",x:"ICP melhora sintomas e tempo de exercício.",i:"Primeiro RCT ICP vs clínico."},
+ {n:"DEFER",a:2001,r:"Circulation",p:1,d:"Adiar vs realizar ICP se FFR>0,75 (n=325)",x:"Adiar é seguro (baixa taxa de eventos).",i:"Base do conceito de adiar lesão não isquêmica."},
+ {n:"LESSER-EARTH",a:2012,r:"Circulation",p:1,d:"Ivabradina vs placebo na DAC estável sem IC (n=104, interrompido)",x:"Sem melhora de sintomas/exercício.",i:"Ivabradina não ajuda na angina estável sem IC."}
+]},
+{ sec: "5. Revascularização: CRM (CABG) vs ICP e técnica cirúrgica", t: [
+ {n:"CASS",a:1983,r:"Circulation",p:3,d:"CRM vs TMO na DAC estável (n=780 RCT)",x:"Sem ganho de sobrevida global; benefício no 3 vasos + FE baixa.",i:"Selecionar quem ganha com cirurgia."},
+ {n:"MASS II",a:2007,r:"Circulation",p:2,d:"TMO vs ICP vs CRM no multiarterial estável (n=611)",x:"CRM com menos eventos no longo prazo.",i:"Compara as 3 estratégias de frente."},
+ {n:"SYNTAX",a:2009,r:"NEJM",p:3,d:"CRM vs ICP (DES) em triarterial/TCE (n=1.800)",x:"MACE 1 ano 17,8% vs 12,4%; piora com SYNTAX score alto.",i:"Criou o SYNTAX score; CRM na doença complexa."},
+ {n:"FREEDOM",a:2012,r:"NEJM",p:3,d:"Diabéticos multiarteriais: CRM vs ICP (n=1.900)",x:"Morte/IAM/AVC 18,7% vs 26,6% pró-CRM (5 anos).",i:"Marco: CRM padrão no diabético multiarterial."},
+ {n:"BEST",a:2015,r:"NEJM",p:2,d:"ICP (everolimus) vs CRM no multiarterial (n=880)",x:"CRM com menos morte/IAM/revasc no longo prazo.",i:"Reforça CRM na doença extensa."},
+ {n:"EXCEL",a:2016,r:"NEJM",p:2,d:"TCE baixo/intermediário: ICP vs CRM (n=1.905)",x:"Não inferioridade em 3 anos; debate em 5 anos.",i:"ICP no TCE selecionado."},
+ {n:"NOBLE",a:2016,r:"Lancet",p:2,d:"TCE: ICP vs CRM (n=1.201)",x:"CRM com menos MACE (oposto ao EXCEL).",i:"Decidir TCE no Heart Team."},
+ {n:"FAME 3",a:2021,r:"NEJM",p:2,d:"Triarterial: ICP guiada por FFR vs CRM (n=1.500)",x:"ICP não foi não-inferior (10,6% vs 6,9%).",i:"CRM superior no triarterial complexo."},
+ {n:"CORONARY",a:2012,r:"NEJM",p:2,d:"CRM off-pump vs on-pump (n=4.752)",x:"Sem diferença de morte/AVC/IAM/diálise em 30d e 1 ano.",i:"Off-pump não é superior de rotina."},
+ {n:"NORSTENT",a:2016,r:"NEJM",p:2,d:"Stent farmacológico vs metálico (n=9.013)",x:"Sem diferença de morte/IAM; menos nova revasc com DES.",i:"DES pela menor reestenose."},
+ {n:"STICH / STICHES",a:2011,r:"NEJM",p:3,d:"CRM + TMO vs TMO na IC isquêmica (FE≤35%, n=1.212)",x:"Mortalidade total menor em 10 anos (58,9% vs 66,1%).",i:"CRM melhora sobrevida na MCP isquêmica."},
+ {n:"ART",a:2019,r:"NEJM",p:2,d:"Dupla vs única mamária na CRM (n=3.102)",x:"Sem diferença de sobrevida em 10 anos.",i:"Tempera a dupla mamária de rotina."},
+ {n:"VACS",a:1984,r:"NEJM",p:1,d:"CRM vs TMO na DAC estável (VA, n=686)",x:"Ganho de sobrevida no tronco/3 vasos de alto risco.",i:"Histórico: define quem opera."},
+ {n:"RITA-1",a:1993,r:"Lancet",p:1,d:"PTCA vs CRM (n=1.011)",x:"Sobrevida semelhante; mais reintervenção com PTCA.",i:"Era pré-stent."},
+ {n:"GABI",a:1994,r:"NEJM",p:1,d:"PTCA vs CRM no multiarterial (n=359)",x:"Sintomas semelhantes em 1 ano; mais reintervenção PTCA.",i:"Histórico (pré-stent)."},
+ {n:"CABRI",a:1995,r:"Lancet",p:1,d:"PTCA vs CRM (n=1.054)",x:"Sobrevida semelhante; mais reintervenção PTCA.",i:"Histórico (pré-stent)."},
+ {n:"BARI",a:1996,r:"NEJM",p:1,d:"PTCA vs CRM no multiarterial (n=1.829)",x:"Sobrevida global igual; CRM melhor no diabético.",i:"Origem do conceito 'diabético opera'."},
+ {n:"ERACI II",a:2001,r:"JACC",p:1,d:"Stent vs CRM no multiarterial (n=450)",x:"Menos eventos precoces com stent; mais reintervenção.",i:"Era do stent convencional."},
+ {n:"ARTS",a:2001,r:"NEJM",p:1,d:"Stent vs CRM no multiarterial (n=1.205)",x:"Morte/AVC/IAM semelhante; mais nova revasc com stent.",i:"Stent x cirurgia (pré-DES)."},
+ {n:"SoS",a:2002,r:"Lancet",p:1,d:"Stent vs CRM no multiarterial (n=988)",x:"Menos reintervenção e tendência a menor mortalidade com CRM.",i:"Stent x cirurgia."},
+ {n:"AWESOME",a:2001,r:"JACC",p:1,d:"ICP vs CRM em alto risco cirúrgico (n=454)",x:"Sobrevida semelhante.",i:"Opção percutânea no alto risco cirúrgico."},
+ {n:"CARDia",a:2010,r:"JACC",p:1,d:"ICP vs CRM em diabéticos multiarteriais (n=510)",x:"Tendência a mais eventos com ICP (subdimensionado).",i:"Antecede o FREEDOM."},
+ {n:"VA CARDS",a:2013,r:"JACC",p:1,d:"CRM vs ICP em diabéticos (VA, n=198, interrompido)",x:"Tendência a favor da CRM.",i:"Reforça CRM no diabético."},
+ {n:"PRECOMBAT",a:2011,r:"NEJM",p:1,d:"ICP vs CRM no tronco (n=600)",x:"Não inferioridade em 2 anos; mais revasc com ICP.",i:"ICP no TCE selecionado."},
+ {n:"ROOBY",a:2009,r:"NEJM",p:1,d:"CRM off-pump vs on-pump (VA, n=2.203)",x:"Pior patência/desfecho composto 1 ano off-pump.",i:"Cautela com off-pump."},
+ {n:"GOPCABE",a:2013,r:"NEJM",p:1,d:"Off-pump vs on-pump em idosos ≥75 (n=2.539)",x:"Sem diferença de MACE em 30d/1 ano.",i:"Off-pump aceitável no idoso."},
+ {n:"DOORS",a:2012,r:"Circulation",p:1,d:"Stent farmacológico vs metálico em octogenários (n=999)",x:"Sem diferença significativa de desfechos.",i:"DES também no muito idoso."}
+]},
+{ sec: "6. Choque cardiogênico, parada e suporte circulatório", t: [
+ {n:"SHOCK",a:1999,r:"NEJM",p:3,d:"Revasc precoce vs estabilização no choque pós-IAM (n=302)",x:"Mortalidade 6m 50,3% vs 63,1%.",i:"Marco: revascularizar precocemente."},
+ {n:"IABP-SHOCK II",a:2012,r:"NEJM",p:2,d:"Balão intra-aórtico vs controle no choque (n=600)",x:"Sem redução de mortalidade 30d (39,7% vs 41,3%).",i:"Derrubou o balão de rotina."},
+ {n:"CULPRIT-SHOCK",a:2017,r:"NEJM",p:3,d:"Choque multiarterial: só culprit vs multivaso (n=706)",x:"Morte/diálise 30d 45,9% vs 55,4% pró-culprit.",i:"Tratar só a culpada na fase aguda."},
+ {n:"COACT",a:2019,r:"NEJM",p:2,d:"Angiografia imediata vs tardia após PCR sem supra (n=552)",x:"Sem diferença de sobrevida em 90 dias.",i:"Sem supra: pode adiar a coronariografia."},
+ {n:"ECLS-SHOCK",a:2023,r:"NEJM",p:2,d:"ECMO V-A de rotina vs controle no choque por IAM (n=420)",x:"Sem redução de mortalidade 30d; mais complicações.",i:"ECMO de rotina não recomendado."},
+ {n:"DanGer Shock",a:2024,r:"NEJM",p:3,d:"Bomba microaxial (Impella) vs padrão no STEMI em choque (n=355)",x:"Mortalidade 180d 45,8% vs 58,5% (HR 0,74); mais eventos adversos.",i:"1º suporte mecânico a reduzir mortalidade."}
+]},
+{ sec: "7. IC com fração de ejeção reduzida (ICFEr) — pilares e pós-IAM", t: [
+ {n:"CONSENSUS",a:1987,r:"NEJM",p:3,d:"Enalapril vs placebo na IC classe IV (n=253)",x:"Mortalidade ~40% menor em 6 meses.",i:"IECA prolonga vida na IC grave."},
+ {n:"SOLVD-Treatment",a:1991,r:"NEJM",p:3,d:"Enalapril vs placebo, FE≤35% (n=2.569)",x:"Reduz mortalidade e hospitalização.",i:"IECA como base da ICFEr."},
+ {n:"V-HeFT II",a:1991,r:"NEJM",p:2,d:"Enalapril vs hidralazina-dinitrato (n=804)",x:"Enalapril com menor mortalidade.",i:"IECA superior a vasodilatador direto."},
+ {n:"SAVE",a:1992,r:"NEJM",p:2,d:"Captopril pós-IAM com FE<40% (n=2.231)",x:"Reduz mortalidade e IC.",i:"IECA pós-IAM com disfunção de VE."},
+ {n:"MERIT-HF",a:1999,r:"Lancet",p:3,d:"Metoprolol succinato vs placebo (n=3.991)",x:"Mortalidade total -34%.",i:"Betabloqueador (succinato) como pilar."},
+ {n:"CIBIS-II",a:1999,r:"Lancet",p:3,d:"Bisoprolol vs placebo (n=2.647)",x:"Mortalidade -34%.",i:"Efeito de classe dos betabloqueadores."},
+ {n:"COPERNICUS",a:2001,r:"NEJM",p:3,d:"Carvedilol na IC avançada (FE<25%, n=2.289)",x:"Mortalidade -35%.",i:"Betabloqueador seguro na IC grave estável."},
+ {n:"COMET",a:2003,r:"Lancet",p:2,d:"Carvedilol vs metoprolol tartarato (n=3.029)",x:"Carvedilol com menor mortalidade.",i:"Preferir carvedilol/succinato ao tartarato."},
+ {n:"RALES",a:1999,r:"NEJM",p:3,d:"Espironolactona, classe III-IV (n=1.663)",x:"Mortalidade -30%.",i:"Antagonista mineralocorticoide como pilar."},
+ {n:"EPHESUS",a:2003,r:"NEJM",p:2,d:"Eplerenona pós-IAM com disfunção VE (n=6.632)",x:"Reduz morte e morte súbita.",i:"Estende ARM ao pós-IAM."},
+ {n:"EMPHASIS-HF",a:2011,r:"NEJM",p:2,d:"Eplerenona na IC classe II (n=2.737)",x:"Reduz morte CV/hospitalização.",i:"ARM também em sintomas leves."},
+ {n:"A-HeFT",a:2004,r:"NEJM",p:2,d:"Hidralazina+dinitrato em afro-americanos (n=1.050)",x:"Reduz mortalidade.",i:"Adjuvante; opção se intolerância a IECA/BRA."},
+ {n:"DIG",a:1997,r:"NEJM",p:3,d:"Digoxina vs placebo na ICFEr em ritmo sinusal (n=6.800)",x:"Sem mudança de mortalidade; menos hospitalização por IC.",i:"Digoxina para sintomas, não para sobreviver."},
+ {n:"SHIFT",a:2010,r:"Lancet",p:2,d:"Ivabradina se sinusal e FC≥70 (n=6.505)",x:"Reduz morte CV/hospitalização por IC.",i:"Controle de FC como alvo adicional."},
+ {n:"PARADIGM-HF",a:2014,r:"NEJM",p:3,d:"Sacubitril/valsartana vs enalapril (n=8.442)",x:"Morte CV/hospitalização 21,8% vs 26,5% (HR 0,80).",i:"Marco: ARNI substitui o IECA."},
+ {n:"DAPA-HF",a:2019,r:"NEJM",p:3,d:"Dapagliflozina na ICFEr (n=4.744)",x:"Piora de IC/morte CV -26%, com ou sem DM.",i:"iSGLT2 como 4º pilar."},
+ {n:"EMPEROR-Reduced",a:2020,r:"NEJM",p:3,d:"Empagliflozina na ICFEr (n=3.730)",x:"Morte CV/hospitalização -25%.",i:"Confirma o efeito de classe dos iSGLT2."},
+ {n:"VICTORIA",a:2020,r:"NEJM",p:2,d:"Vericiguat na ICFEr com piora recente (n=5.050)",x:"Morte CV/hospitalização 35,5% vs 38,5% (HR 0,90).",i:"Opção após descompensação."},
+ {n:"VICTOR",a:2025,r:"ESC/NEJM",p:2,d:"Vericiguat na ICFEr estável, sem piora recente (n=6.105)",x:"Não atingiu o primário (18,0% vs 19,1%); menos morte CV (secundário).",i:"Sem benefício claro na ICFEr estável."},
+ {n:"PARADISE-MI",a:2021,r:"NEJM",p:2,d:"Sac/valsartana vs ramipril pós-IAM com disfunção/congestão (n=5.661)",x:"Sem redução significativa de morte CV/IC.",i:"ARNI sem ganho sobre IECA no pós-IAM."},
+ {n:"REDUCE-AMI",a:2024,r:"NEJM",p:2,d:"Betabloqueador vs nenhum pós-IAM com FE≥50% (n=5.020)",x:"Sem redução de morte/novo IAM.",i:"Questiona o betabloqueador de rotina se FE preservada (REBOOT-CNIC concordou em 2025)."},
+ {n:"TRED-HF",a:2019,r:"Lancet",p:2,d:"Retirar terapia na MCP dilatada recuperada (n=51)",x:"~44% recaem em 6 meses.",i:"Não suspender terapia na FE 'recuperada'."},
+ {n:"V-HeFT 1",a:1986,r:"NEJM",p:1,d:"Hidralazina-dinitrato vs prazosina vs placebo (n=642)",x:"Hidralazina-nitrato reduz mortalidade vs placebo.",i:"1ª terapia a melhorar sobrevida na IC."},
+ {n:"US Carvedilol",a:1996,r:"NEJM",p:1,d:"Carvedilol vs placebo na ICFEr (programa, n=1.094)",x:"Redução marcante de mortalidade (interrompido).",i:"Primeiros dados de betabloqueador na IC."},
+ {n:"CAPRICORN",a:2001,r:"Lancet",p:1,d:"Carvedilol pós-IAM com FE≤40% (n=1.959)",x:"Reduz mortalidade total.",i:"Betabloqueador pós-IAM com disfunção de VE."},
+ {n:"ELITE II",a:2000,r:"Lancet",p:1,d:"Losartana vs captopril na IC idosa (n=3.152)",x:"Sem superioridade do BRA; captopril não inferior.",i:"BRA não supera IECA — usar se intolerância."},
+ {n:"Val-HeFT",a:2001,r:"NEJM",p:1,d:"Valsartana add-on vs placebo na ICFEr (n=5.010)",x:"Reduz hospitalização por IC.",i:"BRA adicionado ao IECA (uso seletivo)."},
+ {n:"SENIORS",a:2005,r:"Eur Heart J",p:1,d:"Nebivolol em idosos ≥70 com IC (n=2.128)",x:"Reduz morte/hospitalização CV.",i:"Betabloqueador no idoso (incl. FEp)."},
+ {n:"CIBIS-III",a:2005,r:"Circulation",p:1,d:"Bisoprolol-primeiro vs enalapril-primeiro (n=1.010)",x:"Estratégias equivalentes.",i:"Pode iniciar pelo betabloqueador."}
+]},
+{ sec: "8. IC avançada e descompensada", t: [
+ {n:"REMATCH",a:2001,r:"NEJM",p:2,d:"DAV de longa permanência vs TMO na IC terminal sem transplante (n=129)",x:"Sobrevida 1 ano 52% vs 25%.",i:"Estabeleceu o DAV como terapia de destino."},
+ {n:"LIDO",a:2002,r:"Lancet",p:1,d:"Levosimendana vs dobutamina na IC de baixo débito (n=203)",x:"Melhor hemodinâmica; sinal de menor mortalidade.",i:"Inotrópico inodilatador no baixo débito."},
+ {n:"ESCAPE",a:2005,r:"JAMA",p:1,d:"Cateter de artéria pulmonar de rotina na IC avançada (n=433)",x:"Sem benefício; mais eventos adversos.",i:"Não usar Swan-Ganz de rotina."},
+ {n:"B-CONVINCED",a:2009,r:"Eur Heart J",p:1,d:"Manter vs suspender betabloqueador na IC descompensada (n=147)",x:"Seguro manter; sem piora da compensação.",i:"Não suspender o betabloqueador na descompensação leve/moderada."},
+ {n:"DOSE",a:2011,r:"NEJM",p:1,d:"Furosemida: bólus vs contínua, alta vs baixa dose na IC aguda (n=308)",x:"Alta dose: mais descongestão, disfunção renal transitória.",i:"Guia a dose do diurético na IC aguda."},
+ {n:"GUIDE-IT",a:2017,r:"JAMA",p:2,d:"Terapia guiada por NT-proBNP vs usual na ICFEr (n=894)",x:"Sem benefício; interrompido.",i:"Titular pela clínica/diretriz, não pelo BNP."},
+ {n:"TRANSFORM-HF",a:2023,r:"JAMA",p:2,d:"Torsemida vs furosemida após internação por IC (n=2.859)",x:"Sem diferença de mortalidade.",i:"Escolha do diurético de alça é indiferente p/ desfecho."},
+ {n:"STRONG-HF",a:2022,r:"Lancet",p:2,d:"Titulação rápida pós-alta vs usual (n=1.078)",x:"Reduz morte/readmissão em 180 dias.",i:"Otimizar e titular cedo, com seguimento estreito."},
+ {n:"SURVIVE",a:2007,r:"JAMA",p:1,d:"Levosimendana vs dobutamina na IC aguda grave (n=1.327)",x:"Sem redução de mortalidade em 180 dias.",i:"Inotrópico não melhora sobrevida."},
+ {n:"REVIVE II",a:2007,r:"AHA",p:1,d:"Levosimendana vs placebo na IC aguda (n=600)",x:"Melhora sintomas; mais hipotensão/arritmia.",i:"Benefício sintomático, com cautela."},
+ {n:"HeartMate II",a:2009,r:"NEJM",p:1,d:"DAV de fluxo contínuo vs pulsátil (n=200)",x:"Melhor sobrevida livre de evento com fluxo contínuo.",i:"Consolidou o DAV de fluxo contínuo."},
+ {n:"MOMENTUM 3",a:2019,r:"NEJM",p:2,d:"HeartMate 3 (centrífugo) vs HeartMate II (n=1.028)",x:"Menos trombose de bomba/AVC; melhor sobrevida livre de evento.",i:"DAV de levitação magnética como padrão."},
+ {n:"TIME-CHF",a:2009,r:"JAMA",p:1,d:"Terapia guiada por BNP vs sintomas no idoso (n=499)",x:"Sem benefício global da estratégia guiada por BNP.",i:"Antecede o GUIDE-IT."}
+]},
+{ sec: "9. IC com FE preservada / levemente reduzida", t: [
+ {n:"CHARM (programa)",a:2003,r:"Lancet",p:2,d:"Candesartana vs placebo na IC (Alternative/Added/Preserved, n=7.601)",x:"Reduz morte CV/hospitalização; modesto no Preserved.",i:"BRA na IC, incl. intolerantes a IECA."},
+ {n:"TOPCAT",a:2014,r:"NEJM",p:2,d:"Espironolactona na ICFEp (n=3.445)",x:"Neutro global; sinal de benefício nas Américas.",i:"ARM em FEp selecionada."},
+ {n:"PARAGON-HF",a:2019,r:"NEJM",p:2,d:"Sac/valsartana vs valsartana na ICFEp (n=4.822)",x:"Quase positivo (p=0,06); ganho em FE mais baixa/mulheres.",i:"ARNI útil na faixa 'levemente reduzida'."},
+ {n:"EMPEROR-Preserved",a:2021,r:"NEJM",p:3,d:"Empagliflozina, FE>40% (n=5.988)",x:"Morte CV/hospitalização -21%.",i:"1º tratamento claramente positivo na ICFEp."},
+ {n:"DELIVER",a:2022,r:"NEJM",p:3,d:"Dapagliflozina, FE>40% (n=6.263)",x:"Piora de IC/morte CV -18%.",i:"Consolida iSGLT2 na FEp."},
+ {n:"FINEARTS-HF",a:2024,r:"NEJM",p:2,d:"Finerenona na IC FE≥40% (n=6.001)",x:"Reduz piora de IC/morte CV (HR 0,84).",i:"ARM não esteroide entra na FEp/FEmr."},
+ {n:"STEP-HFpEF",a:2023,r:"NEJM",p:2,d:"Semaglutida na ICFEp com obesidade (n=529)",x:"Melhora sintomas (KCCQ) e capacidade; perda de peso.",i:"Aborda o fenótipo obeso da ICFEp."},
+ {n:"PEP-CHF",a:2006,r:"Eur Heart J",p:1,d:"Perindopril na ICFEp idosa (n=850)",x:"Benefício precoce que se diluiu (muitos cruzaram).",i:"IECA sintomático na FEp."},
+ {n:"I-PRESERVE",a:2008,r:"NEJM",p:1,d:"Irbesartana na ICFEp (n=4.128)",x:"Sem redução de desfechos.",i:"BRA neutro na FEp."}
+]},
+{ sec: "10. Fibrilação atrial — anticoagulação, ritmo e ablação", t: [
+ {n:"AFASAK",a:1989,r:"Lancet",p:1,d:"Varfarina vs AAS vs placebo na FA (n=1.007)",x:"Varfarina reduz AVC/embolia.",i:"1º RCT de anticoagulação na FA."},
+ {n:"AFFIRM",a:2002,r:"NEJM",p:3,d:"Controle de ritmo vs frequência (n=4.060)",x:"Sem diferença de mortalidade.",i:"Controle de FC aceitável em muitos."},
+ {n:"RACE II",a:2010,r:"NEJM",p:2,d:"FC permissiva (<110) vs estrita (n=614)",x:"Não inferior p/ eventos.",i:"Meta de FC permissiva se assintomático."},
+ {n:"RE-LY",a:2009,r:"NEJM",p:3,d:"Dabigatrana vs varfarina (n=18.113)",x:"150mg reduz AVC; 110mg menos sangramento.",i:"1º DOAC a desafiar a varfarina."},
+ {n:"ROCKET-AF",a:2011,r:"NEJM",p:2,d:"Rivaroxabana vs varfarina (n=14.264)",x:"Não inferior; menos AVC hemorrágico.",i:"DOAC de dose única diária."},
+ {n:"ARISTOTLE",a:2011,r:"NEJM",p:3,d:"Apixabana vs varfarina (n=18.201)",x:"Reduz AVC, sangramento e mortalidade.",i:"Melhor perfil de segurança demonstrado."},
+ {n:"ENGAGE AF-TIMI 48",a:2013,r:"NEJM",p:2,d:"Edoxabana vs varfarina (n=21.105)",x:"Não inferior; menos sangramento/morte CV.",i:"Completa a classe dos DOACs."},
+ {n:"PROTECT AF / PREVAIL",a:2014,r:"Lancet/JACC",p:2,d:"Oclusão do apêndice (Watchman) vs varfarina",x:"Não inferioridade do composto.",i:"Alternativa se contraindicação a anticoagulação."},
+ {n:"ARTESIA",a:2023,r:"NEJM",p:2,d:"Apixabana vs AAS em FA subclínica (dispositivo) (n=4.012)",x:"Reduz AVC, mais sangramento maior.",i:"Anticoagular FA subclínica de maior risco."},
+ {n:"NOAH-AFNET 6",a:2023,r:"NEJM",p:2,d:"Edoxabana vs placebo em AHRE/FA subclínica (n=2.536)",x:"Interrompido; sem ganho claro, mais sangramento/morte.",i:"Nem todo episódio curto deve ser anticoagulado."},
+ {n:"CASTLE-AF",a:2018,r:"NEJM",p:3,d:"Ablação vs droga na FA com IC (FE≤35%, n=363)",x:"Reduz morte/hospitalização por IC (28,5% vs 44,6%).",i:"Ablação com impacto prognóstico na FA+ICFEr."},
+ {n:"CAMTAF",a:2014,r:"Circ Arrhythm Electrophysiol",p:2,d:"Ablação vs controle de FC na FA persistente + IC (n=50)",x:"Melhora FE, sintomas e capacidade funcional.",i:"Suporte inicial à ablação na FA+IC."},
+ {n:"CABANA",a:2019,r:"JAMA",p:3,d:"Ablação vs antiarrítmico (n=2.204)",x:"Neutro por intenção de tratar; ganho na análise por tratamento.",i:"Ablação eficaz p/ sintomas/recorrência."},
+ {n:"EAST-AFNET 4",a:2020,r:"NEJM",p:3,d:"Controle de ritmo precoce vs usual na FA recente (n=2.789)",x:"Morte CV/AVC/hospitalização -21% (HR 0,79).",i:"Mudou o paradigma: ritmo precoce."},
+ {n:"STAF",a:2002,r:"JACC",p:1,d:"Controle de ritmo vs frequência na FA persistente (n=200)",x:"Sem diferença de desfechos.",i:"Histórico (com AFFIRM/RACE)."},
+ {n:"AF-CHF",a:2008,r:"NEJM",p:1,d:"Controle de ritmo vs frequência na FA + IC (n=1.376)",x:"Sem diferença de morte CV.",i:"Ritmo (farmacológico) não supera frequência na FA+IC."},
+ {n:"PABA-CHF",a:2008,r:"NEJM",p:1,d:"Isolamento de veias vs ablação do nó AV + TRC na FA+IC (n=81)",x:"Isolamento melhora FE/sintomas/capacidade.",i:"Apoia o isolamento de veias na FA+IC."},
+ {n:"AATAC",a:2016,r:"Circulation",p:1,d:"Ablação vs amiodarona na FA persistente + IC/CDI (n=203)",x:"Menos recorrência e menos hospitalização/morte.",i:"Reforça a ablação na FA+IC."},
+ {n:"CAMERA-MRI",a:2017,r:"JACC",p:1,d:"Ablação vs controle de FC na FA persistente + MCP (n=68)",x:"Recuperação de FE (sobretudo sem fibrose na RM).",i:"FA pode causar MCP reversível."}
+]},
+{ sec: "11. Antiarrítmicos, morte súbita, CDI e ressincronização (TRC)", t: [
+ {n:"CAST",a:1989,r:"NEJM",p:3,d:"Encainida/flecainida vs placebo pós-IAM (supressão de EV) (n=1.498)",x:"Excesso de mortalidade com antiarrítmico (HR ~2,5).",i:"Marco da segurança: não suprimir EV pós-IAM."},
+ {n:"MADIT",a:1996,r:"NEJM",p:3,d:"CDI vs convencional: IAM prévio, FE baixa, TVNS induzível (n=196)",x:"Mortalidade -54%.",i:"1º trial de CDI profilático."},
+ {n:"AVID",a:1997,r:"NEJM",p:3,d:"CDI vs antiarrítmico após TV/FV (secundária) (n=1.016)",x:"CDI reduz mortalidade.",i:"CDI na prevenção secundária."},
+ {n:"MADIT-II",a:2002,r:"NEJM",p:3,d:"CDI profilático pós-IAM, FE≤30% (n=1.232)",x:"Mortalidade -31%.",i:"CDI primário na cardiopatia isquêmica."},
+ {n:"DINAMIT / IRIS",a:2004,r:"NEJM",p:1,d:"CDI precoce (<40 dias) pós-IAM",x:"Sem redução de mortalidade total.",i:"Aguardar ≥40 dias pós-IAM."},
+ {n:"MIRACLE",a:2002,r:"NEJM",p:1,d:"TRC vs controle na IC III-IV com QRS largo (n=453)",x:"Melhora sintomas, FE e capacidade.",i:"Primeiros dados sólidos de TRC."},
+ {n:"COMPANION",a:2004,r:"NEJM",p:3,d:"TRC +/- desfibrilador vs fármaco (n=1.520)",x:"TRC-D reduz morte/hospitalização.",i:"Estabelece a TRC na IC com QRS largo."},
+ {n:"CARE-HF",a:2005,r:"NEJM",p:3,d:"TRC vs fármaco, QRS largo (n=813)",x:"Mortalidade total -36%.",i:"TRC isolada melhora sobrevida."},
+ {n:"SCD-HeFT",a:2005,r:"NEJM",p:3,d:"CDI vs amiodarona vs placebo, FE≤35% (n=2.521)",x:"CDI -23% de mortalidade; amiodarona neutra.",i:"CDI na IC isquêmica e não isquêmica."},
+ {n:"MADIT-CRT",a:2009,r:"NEJM",p:3,d:"TRC-D vs CDI em IC leve, QRS largo (n=1.820)",x:"Reduz eventos de IC, sobretudo BRE ≥150ms.",i:"Amplia TRC a sintomas leves com BRE."},
+ {n:"BLOCK-HF",a:2013,r:"NEJM",p:2,d:"Estimulação biventricular vs VD no BAV + ICFEr (n=691)",x:"BiV reduz o composto morte/IC/remodelamento.",i:"Marca-passo: preferir biV se IC + BAV."},
+ {n:"DANISH",a:2016,r:"NEJM",p:2,d:"CDI primário na IC não isquêmica (n=1.116)",x:"Sem redução de mortalidade total (reduz morte súbita).",i:"Tempera o CDI na etiologia não isquêmica."},
+ {n:"MUSTT",a:1999,r:"NEJM",p:1,d:"Terapia guiada por EEF (incl. CDI) na DAC com TVNS/FE baixa (n=704)",x:"CDI reduz morte arrítmica/total.",i:"Reforça o CDI na isquemia."},
+ {n:"CIDS",a:2000,r:"Circulation",p:1,d:"CDI vs amiodarona após TV/FV (n=659)",x:"Tendência a benefício do CDI.",i:"Prevenção secundária (com AVID/CASH)."},
+ {n:"CASH",a:2000,r:"Circulation",p:1,d:"CDI vs antiarrítmico após PCR (n=288)",x:"CDI reduz mortalidade.",i:"Prevenção secundária."},
+ {n:"CAT",a:2002,r:"Circulation",p:1,d:"CDI profilático na MCP dilatada não isquêmica (n=104)",x:"Sem benefício (subdimensionado).",i:"Cautela no CDI não isquêmico precoce."},
+ {n:"AMIOVIRT",a:2003,r:"JACC",p:1,d:"Amiodarona vs CDI na MCP não isquêmica com TVNS (n=103)",x:"Sem diferença (subdimensionado).",i:"Dado histórico não isquêmico."},
+ {n:"DEFINITE",a:2004,r:"NEJM",p:1,d:"CDI vs TMO na MCP não isquêmica (n=458)",x:"Reduz morte súbita; mortalidade total não significativa.",i:"Sinal pró-CDI não isquêmico (antes do SCD-HeFT)."},
+ {n:"MUSTIC",a:2001,r:"NEJM",p:1,d:"TRC (cross-over) na IC com QRS largo (n=58)",x:"Melhora capacidade e qualidade de vida.",i:"Primeiros dados de TRC."},
+ {n:"MIRACLE ICD",a:2003,r:"JAMA",p:1,d:"TRC-D vs CDI na IC III-IV (n=369)",x:"Melhora sintomas/qualidade de vida.",i:"Estende TRC a quem tem indicação de CDI."},
+ {n:"REVERSE",a:2008,r:"JACC",p:1,d:"TRC na IC leve (I-II) com QRS largo (n=610)",x:"Melhora remodelamento; desfecho clínico modesto.",i:"Antecede MADIT-CRT/RAFT."},
+ {n:"RETHINQ",a:2007,r:"NEJM",p:1,d:"TRC na IC com QRS estreito (n=172)",x:"Sem benefício.",i:"Não ressincronizar QRS estreito."},
+ {n:"RAFT",a:2010,r:"NEJM",p:1,d:"TRC-D vs CDI na IC II-III com QRS largo (n=1.798)",x:"Reduz morte/hospitalização por IC.",i:"Confirma TRC em sintomas leves-moderados."}
+]},
+{ sec: "12. Valvopatias e cardiologia estrutural (TAVR, mitral, tricúspide)", t: [
+ {n:"PARTNER 1B",a:2010,r:"NEJM",p:3,d:"TAVR vs clínico na EAo inoperável (n=358)",x:"Mortalidade 1 ano 30,7% vs 50,7%.",i:"Marco: TAVR salva vidas no inoperável."},
+ {n:"PARTNER 1A",a:2011,r:"NEJM",p:3,d:"TAVR vs cirurgia em alto risco (n=699)",x:"Não inferioridade de mortalidade em 1 ano.",i:"TAVR alternativa no alto risco."},
+ {n:"US CoreValve High Risk",a:2014,r:"NEJM",p:2,d:"TAVR autoexpansível vs cirurgia, alto risco (n=795)",x:"TAVR superior em mortalidade 1 ano.",i:"Reforça TAVR no alto risco."},
+ {n:"PARTNER 2 / SURTAVI",a:2016,r:"NEJM",p:2,d:"TAVR vs cirurgia no risco intermediário",x:"Não inferioridade dos desfechos.",i:"Expande TAVR ao intermediário."},
+ {n:"PARTNER 3 / Evolut Low Risk",a:2019,r:"NEJM",p:3,d:"TAVR vs cirurgia no baixo risco (n=1.000 / 1.468)",x:"Não inferior/superior em 1 ano.",i:"TAVR opção no baixo risco selecionado."},
+ {n:"EVEREST II",a:2011,r:"NEJM",p:2,d:"MitraClip vs cirurgia na IM (n=279)",x:"Cirurgia mais eficaz; percutâneo mais seguro.",i:"Estabelece o reparo borda-a-borda."},
+ {n:"COAPT",a:2018,r:"NEJM",p:3,d:"MitraClip+TMO vs TMO na IM secundária com IC (n=614)",x:"Reduz hospitalização por IC (HR 0,53) e mortalidade.",i:"Marco da IM funcional (proporcionalidade)."},
+ {n:"MITRA-FR",a:2018,r:"NEJM",p:2,d:"MitraClip na IM secundária (n=304)",x:"Sem benefício (oposto ao COAPT).",i:"Seleção do paciente é crucial."},
+ {n:"TRILUMINATE",a:2023,r:"NEJM",p:2,d:"TEER tricúspide vs TMO na IT grave (n=350)",x:"Melhora qualidade de vida; neutro em desfechos duros.",i:"Abre o reparo percutâneo da tricúspide."},
+ {n:"EARLY TAVR",a:2024,r:"NEJM",p:3,d:"TAVR precoce vs vigilância na EAo grave assintomática (n=901)",x:"Reduz morte/AVC/hospitalização.",i:"Intervenção mais precoce na EAo assintomática."},
+ {n:"EASE (endocardite)",a:2012,r:"NEJM",p:1,d:"Cirurgia precoce (<48h) vs convencional na endocardite esquerda de alto risco embólico (n=76)",x:"Morte/embolia em 6 sem 3% vs 23%; menos embolia.",i:"Cirurgia precoce reduz embolia na EI de alto risco."}
+]},
+{ sec: "13. Miocardiopatias (hipertrófica e Chagas)", t: [
+ {n:"EXPLORER-HCM",a:2020,r:"Lancet",p:2,d:"Mavacamteno vs placebo na CMH obstrutiva (n=251)",x:"Melhora sintomas, obstrução e capacidade.",i:"1º inibidor de miosina na CMH obstrutiva."},
+ {n:"SEQUOIA-HCM",a:2024,r:"NEJM",p:2,d:"Aficamteno vs placebo na CMH obstrutiva (n=282)",x:"Melhora o pico de VO2 e a classe funcional.",i:"Novo inibidor de miosina."},
+ {n:"PARACHUTE-HF",a:2025,r:"ESC",p:2,d:"Sac/valsartana vs enalapril na cardiomiopatia chagásica crônica",x:"1º grande RCT na IC de Chagas (tolerabilidade/desfechos).",i:"Marco da IC chagásica — relevante no Brasil."}
+]},
+{ sec: "14. Lipídeos, inflamação e prevenção", t: [
+ {n:"4S",a:1994,r:"Lancet",p:3,d:"Sinvastatina vs placebo, prevenção secundária (n=4.444)",x:"Mortalidade total -30%.",i:"Marco fundador das estatinas."},
+ {n:"WOSCOPS",a:1995,r:"NEJM",p:2,d:"Pravastatina, prevenção primária (n=6.595)",x:"Reduz IAM/morte coronariana.",i:"Estatina previne o 1º evento."},
+ {n:"HPS",a:2002,r:"Lancet",p:3,d:"Sinvastatina em alto risco amplo (n=20.536)",x:"Reduz eventos independente do LDL basal.",i:"Trata o risco, não só o número."},
+ {n:"TNT",a:2005,r:"NEJM",p:2,d:"Atorvastatina 80 vs 10 na DAC estável (n=10.001)",x:"Reduz eventos (8,7% vs 10,9%).",i:"Alvo de LDL agressivo na DAC."},
+ {n:"PROVE-IT TIMI 22",a:2004,r:"NEJM",p:3,d:"Estatina intensiva vs moderada pós-SCA (n=4.162)",x:"Atorva 80 reduz eventos vs prava 40.",i:"Alvo de LDL agressivo após SCA."},
+ {n:"JUPITER",a:2008,r:"NEJM",p:3,d:"Rosuvastatina se LDL normal e PCR alta (n=17.802)",x:"Reduz eventos 44%.",i:"Inflamação (PCR) como marcador."},
+ {n:"IMPROVE-IT",a:2015,r:"NEJM",p:3,d:"Ezetimiba + sinvastatina pós-SCA (n=18.144)",x:"Redução adicional de MACE (32,7% vs 34,7%).",i:"'LDL quanto menor melhor', além da estatina."},
+ {n:"FOURIER",a:2017,r:"NEJM",p:3,d:"Evolocumabe (PCSK9) + estatina (n=27.564)",x:"Reduz MACE 15%; LDL ~30 mg/dL.",i:"PCSK9 p/ alvos muito baixos."},
+ {n:"ODYSSEY OUTCOMES",a:2018,r:"NEJM",p:2,d:"Alirocumabe pós-SCA (n=18.924)",x:"Reduz MACE e sinal de mortalidade.",i:"Confirma a classe PCSK9 após SCA."},
+ {n:"REDUCE-IT",a:2019,r:"NEJM",p:2,d:"Icosapent etil em alto risco com TG alto (n=8.179)",x:"Reduz MACE 25%.",i:"Adjuvante p/ risco residual."},
+ {n:"CLEAR Outcomes",a:2023,r:"NEJM",p:2,d:"Ácido bempedoico em intolerantes a estatina (n=13.970)",x:"Reduz MACE 13%.",i:"Alternativa oral sem estatina."},
+ {n:"CANTOS",a:2017,r:"NEJM",p:2,d:"Canaquinumabe (anti-IL-1b) vs placebo (n=10.061)",x:"Reduz MACE 15% sem mexer no LDL.",i:"Prova de conceito: inflamação como alvo."},
+ {n:"CARE",a:1996,r:"NEJM",p:1,d:"Pravastatina pós-IAM com colesterol médio (n=4.159)",x:"Reduz eventos coronarianos.",i:"Estatina mesmo com LDL 'normal'."},
+ {n:"LIPID",a:1998,r:"NEJM",p:1,d:"Pravastatina na DAC, amplo (n=9.014)",x:"Reduz mortalidade total e coronariana.",i:"Consolida estatina na prevenção secundária."},
+ {n:"PROSPER",a:2002,r:"Lancet",p:1,d:"Pravastatina em idosos 70-82 (n=5.804)",x:"Reduz eventos coronarianos; neutro p/ AVC.",i:"Estatina no idoso."},
+ {n:"IDEAL",a:2005,r:"JAMA",p:1,d:"Atorva 80 vs sinva 20-40 na DAC (n=8.888)",x:"Tendência a menos eventos com alta intensidade.",i:"Apoia estatina de alta intensidade."},
+ {n:"4D",a:2005,r:"NEJM",p:1,d:"Atorvastatina em diabéticos em diálise (n=1.255)",x:"Sem redução do composto CV.",i:"Estatina não ajuda na diálise."},
+ {n:"CORONA",a:2007,r:"NEJM",p:1,d:"Rosuvastatina na ICFEr isquêmica idosa (n=5.011)",x:"Neutro p/ desfecho CV maior.",i:"Estatina não indicada só pela IC."},
+ {n:"GISSI-HF",a:2008,r:"Lancet",p:1,d:"Rosuvastatina e n-3 PUFA na IC (n=6.975)",x:"Estatina neutra; n-3 com pequeno benefício.",i:"Confirma CORONA; n-3 modesto."},
+ {n:"SEAS",a:2008,r:"NEJM",p:1,d:"Sinva/ezetimiba na estenose aórtica (n=1.873)",x:"Sem redução de eventos da valva.",i:"Estatina não trata EAo."},
+ {n:"ENHANCE",a:2008,r:"NEJM",p:1,d:"Sinva/ezetimiba: IMT carotídeo (n=720)",x:"Sem redução da IMT apesar de menor LDL.",i:"Gerou dúvida sobre ezetimiba (resolvida no IMPROVE-IT)."},
+ {n:"SHARP",a:2011,r:"Lancet",p:1,d:"Sinva/ezetimiba na DRC (n=9.270)",x:"Reduz eventos ateroscleróticos.",i:"Reduzir LDL na DRC vale a pena."},
+ {n:"SEARCH",a:2010,r:"Lancet",p:1,d:"Sinva 80 vs 20 mg (n=12.064)",x:"Ganho pequeno; mais miopatia com 80mg.",i:"Cautela com sinva 80mg."},
+ {n:"A-to-Z",a:2004,r:"JAMA",p:1,d:"Sinvastatina intensiva precoce vs tardia pós-SCA (n=4.497)",x:"Tendência a benefício (não significativa isolada).",i:"Apoia estatina intensiva precoce (com PROVE-IT)."},
+ {n:"HOPE-3",a:2016,r:"NEJM",p:1,d:"Rosuvastatina +/- candesartana/HCTZ em risco intermediário (n=12.705)",x:"Estatina reduz eventos; anti-HAS só se PA alta.",i:"Estatina na prevenção primária de risco intermediário."},
+ {n:"OSLER",a:2015,r:"NEJM",p:1,d:"Evolocumabe (extensão aberta) (n=4.465)",x:"LDL ~-61%; sinal de menos eventos.",i:"Sinaliza benefício clínico do PCSK9 (confirmado no FOURIER)."},
+ {n:"ODYSSEY LONG TERM",a:2015,r:"NEJM",p:1,d:"Alirocumabe vs placebo (n=2.341)",x:"LDL muito baixo; menos MACE (post-hoc).",i:"Segurança/eficácia lipídica do PCSK9."},
+ {n:"GLAGOV",a:2016,r:"JAMA",p:1,d:"Evolocumabe e volume de placa por IVUS (n=968)",x:"Regressão do ateroma com LDL muito baixo.",i:"Imagem confirma 'lower is better'."}
+]},
+{ sec: "15. Hipertensão arterial", t: [
+ {n:"DASH",a:1997,r:"NEJM",p:2,d:"Dieta DASH vs controle na PA (n=459)",x:"Reduz PAS ~11 mmHg nos hipertensos.",i:"Base da terapia nutricional na HAS."},
+ {n:"HOT",a:1998,r:"Lancet",p:2,d:"Metas de PAD (≤80/85/90) + AAS (n=18.790)",x:"Maior benefício no diabético; AAS reduz IAM.",i:"Metas mais baixas no alto risco."},
+ {n:"HOPE",a:2000,r:"NEJM",p:3,d:"Ramipril vs placebo em alto risco vascular (n=9.297)",x:"Reduz morte CV/IAM/AVC.",i:"IECA além do controle pressórico."},
+ {n:"LIFE",a:2002,r:"Lancet",p:2,d:"Losartana vs atenolol na HAS com HVE (n=9.193)",x:"Losartana reduz mais AVC.",i:"BRA preferível ao betabloqueador na HVE."},
+ {n:"ALLHAT",a:2002,r:"JAMA",p:3,d:"Clortalidona vs anlodipino vs lisinopril (n=33.357)",x:"Tiazídico igual ou melhor em desfechos.",i:"Tiazídico como base de baixo custo."},
+ {n:"VALUE",a:2004,r:"Lancet",p:2,d:"Valsartana vs anlodipino (n=15.245)",x:"CV semelhante; anlodipino com melhor PA inicial.",i:"Controle precoce da PA importa."},
+ {n:"ONTARGET",a:2008,r:"NEJM",p:2,d:"Telmisartana vs ramipril vs ambos (n=25.620)",x:"Telmisartana não inferior; combinação com mais dano renal.",i:"Não combinar IECA + BRA."},
+ {n:"ACCOMPLISH",a:2008,r:"NEJM",p:2,d:"IECA+anlodipino vs IECA+tiazida (n=11.506)",x:"Combinação com anlodipino reduz mais eventos.",i:"Favorece IECA + BCC."},
+ {n:"HYVET",a:2008,r:"NEJM",p:2,d:"Tratar HAS em ≥80 anos (n=3.845)",x:"Reduz AVC e mortalidade.",i:"Tratar HAS no muito idoso."},
+ {n:"SPRINT",a:2015,r:"NEJM",p:3,d:"Meta PAS <120 vs <140 em alto risco não diabético (n=9.361)",x:"Eventos CV -25%, mortalidade -27%.",i:"Marco do controle intensivo."},
+ {n:"ACCORD-BP",a:2010,r:"NEJM",p:2,d:"Meta <120 vs <140 em diabéticos (n=4.733)",x:"Neutro no composto; reduz AVC.",i:"Tempera a meta intensiva no DM."},
+ {n:"BPROAD",a:2024,r:"NEJM",p:2,d:"Meta PAS <120 vs <140 em DM2 (n=12.821)",x:"Reduz eventos CV maiores.",i:"Reabre a meta intensiva no diabético."},
+ {n:"PATHWAY-2",a:2015,r:"Lancet",p:2,d:"Espironolactona na HAS resistente (n=335, crossover)",x:"Melhor redução pressórica que outros add-ons.",i:"Espironolactona como 4ª droga."}
+]},
+{ sec: "16. Cardiometabólico — diabetes, obesidade e risco CV", t: [
+ {n:"UKPDS 33",a:1998,r:"Lancet",p:3,d:"Controle glicêmico intensivo vs convencional no DM2 (n=3.867)",x:"Reduz desfechos microvasculares; macro não significativo.",i:"Controlar glicemia (micro); legado macro tardio."},
+ {n:"DIGAMI-1",a:1995,r:"BMJ/JACC",p:1,d:"Insulina-glicose e depois SC no IAM com DM (n=620)",x:"Mortalidade 1 ano 18,6% vs 26,1%.",i:"Controle glicêmico no IAM do diabético."},
+ {n:"ACCORD (glicemia)",a:2008,r:"NEJM",p:2,d:"Meta HbA1c <6,0% vs padrão no DM2 (n=10.251)",x:"Excesso de mortalidade no braço intensivo.",i:"Não perseguir HbA1c muito baixa."},
+ {n:"ADVANCE",a:2008,r:"NEJM",p:2,d:"Controle glicêmico intensivo no DM2 (n=11.140)",x:"Reduz nefropatia; macrovascular neutro.",i:"Meta razoável (~6,5%) sem excesso de risco."},
+ {n:"EMPA-REG OUTCOME",a:2015,r:"NEJM",p:3,d:"Empagliflozina no DM2 de alto risco CV (n=7.020)",x:"Morte CV -38% e menos hospitalização por IC.",i:"Abriu a era dos iSGLT2."},
+ {n:"LEADER",a:2016,r:"NEJM",p:2,d:"Liraglutida no DM2 (n=9.340)",x:"Reduz MACE e morte CV.",i:"1º GLP-1 com benefício CV robusto."},
+ {n:"DECLARE-TIMI 58",a:2019,r:"NEJM",p:2,d:"Dapagliflozina no DM2 (n=17.160)",x:"Reduz hospitalização por IC; seguro p/ MACE.",i:"Consolida iSGLT2 na prevenção de IC."},
+ {n:"DAPA-CKD / CREDENCE",a:2020,r:"NEJM",p:2,d:"iSGLT2 na doença renal crônica (n=4.304 / 4.401)",x:"Reduz progressão renal e eventos CV.",i:"Estende iSGLT2 à proteção renal."},
+ {n:"ASCEND",a:2018,r:"NEJM",p:2,d:"AAS vs placebo na prevenção primária no DM (n=15.480)",x:"Reduz eventos 12%, mas mais sangramento (anula o ganho).",i:"Não usar AAS de rotina na prevenção primária do DM."},
+ {n:"SELECT",a:2023,r:"NEJM",p:3,d:"Semaglutida na obesidade sem DM, com DCV (n=17.604)",x:"Reduz MACE 20%.",i:"Obesidade com benefício CV direto."},
+ {n:"UKPDS 34",a:1998,r:"Lancet",p:1,d:"Metformina vs convencional em DM2 com sobrepeso (n=753)",x:"Reduz IAM e mortalidade.",i:"Metformina como base no DM2."},
+ {n:"JPAD",a:2008,r:"JAMA",p:1,d:"AAS na prevenção primária do DM (Japão) (n=2.539)",x:"Sem redução significativa de eventos CV.",i:"AAS de pouco valor na prevenção primária do DM."},
+ {n:"POPADAD",a:2008,r:"BMJ",p:1,d:"AAS/antioxidante no DM + DAP (n=1.276)",x:"Sem benefício.",i:"Reforça o limite do AAS primário."},
+ {n:"ELIXA",a:2015,r:"NEJM",p:1,d:"Lixisenatida pós-SCA no DM2 (n=6.068)",x:"Neutro p/ MACE (seguro).",i:"1º GLP-1 CV (neutro)."},
+ {n:"SUSTAIN-6",a:2016,r:"NEJM",p:2,d:"Semaglutida SC no DM2 (n=3.297)",x:"Reduz MACE 26%.",i:"GLP-1 com benefício CV."},
+ {n:"EXSCEL",a:2017,r:"NEJM",p:1,d:"Exenatida semanal no DM2 (n=14.752)",x:"Neutro p/ MACE (limítrofe).",i:"GLP-1 de efeito modesto."},
+ {n:"CANVAS",a:2017,r:"NEJM",p:1,d:"Canagliflozina no DM2 (n=10.142)",x:"Reduz MACE; sinal de amputação/fratura.",i:"iSGLT2 com benefício CV e alerta de segurança."},
+ {n:"HARMONY OUTCOMES",a:2018,r:"Lancet",p:1,d:"Albiglutida no DM2 (n=9.463)",x:"Reduz MACE.",i:"Reforça a classe GLP-1."}
+]},
+{ sec: "17. Cardiologia perioperatória (cirurgia não cardíaca e cardíaca)", t: [
+ {n:"CARP",a:2004,r:"NEJM",p:2,d:"Revascularização coronária antes de cirurgia vascular vs não (n=510)",x:"Sem redução de morte/IAM.",i:"Não revascularizar só para 'proteger' a cirurgia."},
+ {n:"POISE",a:2008,r:"Lancet",p:2,d:"Metoprolol perioperatório vs placebo (n=8.351)",x:"Menos IAM, porém mais morte e AVC.",i:"Não iniciar betabloqueador em dose alta na véspera."},
+ {n:"POISE-2",a:2014,r:"NEJM",p:2,d:"AAS e clonidina perioperatórios (n=10.010)",x:"Sem benefício; AAS com mais sangramento.",i:"Suspender AAS/não iniciar clonidina de rotina."},
+ {n:"TRICS III",a:2017,r:"NEJM",p:2,d:"Transfusão restritiva vs liberal na cirurgia cardíaca (n=5.243)",x:"Restritiva não inferior nos desfechos.",i:"Limiar transfusional restritivo é seguro."}
+]},
+{ sec: "18. Destaques recentes (2024-2026)", t: [
+ {n:"REDUCE-AMI / REBOOT-CNIC",a:2024,r:"NEJM",p:2,d:"Betabloqueador após IAM com FE≥50% (n=5.020; pool ~18.000)",x:"Sem redução de morte/IAM/IC.",i:"Repensa o betabloqueador de rotina se FE preservada."},
+ {n:"VICTOR",a:2025,r:"ESC/NEJM",p:2,d:"Vericiguat na ICFEr estável (n=6.105)",x:"Não atingiu o primário (18,0% vs 19,1%).",i:"Sem benefício na ICFEr estável."},
+ {n:"CHAMPION-AF",a:2026,r:"NEJM",p:2,d:"Oclusão do apêndice (Watchman FLX) vs DOAC, 1ª linha (n=3.000)",x:"Não inferior (5,7% vs 4,8%); menos sangramento (10,9% vs 19,0%).",i:"Oclusão percutânea desafia o DOAC de 1ª linha."},
+ {n:"ADAPT AF-DES",a:2025,r:"AHA",p:2,d:"DOAC isolado vs DOAC+clopidogrel >12m pós-ICP na FA (n=960)",x:"Composto 9,6% vs 17,2% a favor da monoterapia.",i:"Manter só o DOAC além de 1 ano pós-stent."},
+ {n:"ALL-RISE",a:2026,r:"ACC.26",p:2,d:"FFR por angiografia (FFRangio) vs fio de pressão (n=~1.900)",x:"Não inferior em MACE 1 ano; menos tempo/recursos.",i:"Fisiologia não invasiva validada."},
+ {n:"HI-PEITHO",a:2026,r:"NEJM",p:2,d:"Trombólise dirigida por cateter + anticoag vs anticoag no TEP intermediário-alto (n=~400)",x:"Composto 4,0% vs 10,3% (-61%).",i:"Terapia por cateter no TEP de risco intermediário-alto."},
+ {n:"STEMI-DTU (Door To Unload)",a:2026,r:"ACC.26",p:2,d:"Descarga do VE (Impella) antes da ICP no STEMI anterior",x:"Sem redução do tamanho do infarto; mais sangramento/vascular.",i:"Não descarregar o VE de rotina pré-ICP."}
+]}
+];
+
+
 /* ===== evidencia.js ===== */
 // Módulo de busca de evidências: base curada + PubMed ao vivo (NCBI E-utilities)
 (function () {
@@ -1292,6 +1655,107 @@ Tomar 01 comprimido ao dia
   // Seleciona o primeiro por padrão
   const first = menu.querySelector('.evol-item');
   if (first) select(parseInt(first.dataset.i, 10), first);
+})();
+
+
+/* ===== ensaios.js ===== */
+// Aba "Ensaios pivotais": lista pesquisável + botão que resolve o DOI ao vivo (PubMed E-utilities).
+(function () {
+  const root = document.getElementById('ensaios-root');
+  if (!root) return;
+  const input = document.getElementById('ensaios-busca');
+  const pesoSel = document.getElementById('ensaios-peso');
+  const areaSel = document.getElementById('ensaios-area');
+  const countEl = document.getElementById('ensaios-count');
+  const EUTILS = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils';
+
+  function norm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');}
+  function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function stars(p){return '★'.repeat(p);}
+
+  // popular filtro de área
+  window.ENSAIOS.forEach((g,idx)=>{
+    const o=document.createElement('option'); o.value=String(idx); o.textContent=g.sec; areaSel.appendChild(o);
+  });
+
+  function render(){
+    const q=norm(input.value);
+    const termos=q.split(/\s+/).filter(t=>t.length>1);
+    const minPeso=parseInt(pesoSel.value,10);
+    const areaFiltro=areaSel.value;
+    let total=0;
+    let html='';
+
+    window.ENSAIOS.forEach((g,idx)=>{
+      if(areaFiltro!=='all' && areaFiltro!==String(idx)) return;
+      const trials=g.t.filter(tr=>{
+        if(tr.p<minPeso) return false;
+        if(!termos.length) return true;
+        const hay=norm(tr.n+' '+tr.d+' '+tr.x+' '+tr.i+' '+g.sec);
+        return termos.every(t=>hay.includes(t));
+      });
+      if(!trials.length) return;
+      total+=trials.length;
+      html+=`<div class="ens-sec"><h3 class="ens-sec-title">${esc(g.sec)} <span class="ens-sec-n">(${trials.length})</span></h3><div class="ens-list">`;
+      trials.forEach(tr=>{
+        html+=`<div class="ens-card">
+          <div class="ens-head">
+            <span class="ens-nome">${esc(tr.n)}</span>
+            <span class="ens-stars" title="peso didático">${stars(tr.p)}</span>
+          </div>
+          <div class="ens-meta">${esc(tr.r)} · ${esc(String(tr.a))}</div>
+          <div class="ens-d">${esc(tr.d)}</div>
+          <div class="ens-x"><strong>Resultado:</strong> ${esc(tr.x)}</div>
+          <div class="ens-i"><strong>Impacto:</strong> ${esc(tr.i)}</div>
+          <button class="ens-doi" data-q="${esc(tr.n)}" data-y="${esc(String(tr.a))}">📄 Abrir artigo (DOI)</button>
+        </div>`;
+      });
+      html+='</div></div>';
+    });
+
+    root.innerHTML = html || '<p class="muted">Nenhum ensaio encontrado para esse filtro.</p>';
+    countEl.textContent = total + ' ensaios';
+    root.querySelectorAll('.ens-doi').forEach(b=>b.addEventListener('click',()=>abrirDOI(b)));
+  }
+
+  // Resolve o DOI ao vivo: esearch (nome+ano) -> PMID -> esummary -> DOI -> doi.org
+  async function abrirDOI(btn){
+    const nome=btn.dataset.q, ano=btn.dataset.y;
+    const original=btn.textContent;
+    btn.disabled=true; btn.textContent='Buscando DOI...';
+    try{
+      const term=encodeURIComponent(`${nome} ${ano}`);
+      const s=await fetch(`${EUTILS}/esearch.fcgi?db=pubmed&retmode=json&retmax=3&sort=relevance&term=${term}`);
+      const sd=await s.json();
+      const ids=(sd.esearchresult&&sd.esearchresult.idlist)||[];
+      if(!ids.length) throw new Error('sem PMID');
+      const sum=await fetch(`${EUTILS}/esummary.fcgi?db=pubmed&retmode=json&id=${ids.join(',')}`);
+      const smd=(await sum.json()).result||{};
+      let doi=null, pmid=ids[0];
+      for(const id of ids){
+        const it=smd[id]; if(!it) continue;
+        const d=extractDOI(it);
+        if(d){doi=d; pmid=id; break;}
+      }
+      if(doi){ window.open('https://doi.org/'+doi,'_blank','noopener'); }
+      else { window.open('https://pubmed.ncbi.nlm.nih.gov/'+pmid+'/','_blank','noopener'); }
+    }catch(e){
+      window.open('https://pubmed.ncbi.nlm.nih.gov/?term='+encodeURIComponent(nome+' '+ano),'_blank','noopener');
+    }finally{
+      btn.disabled=false; btn.textContent=original;
+    }
+  }
+
+  function extractDOI(it){
+    if(it.elocationid){const m=it.elocationid.match(/(10\.\d{4,}\/[^\s]+)/); if(m) return m[1];}
+    if(Array.isArray(it.articleids)){const d=it.articleids.find(a=>a.idtype==='doi'); if(d) return d.value;}
+    return null;
+  }
+
+  input.addEventListener('input', render);
+  pesoSel.addEventListener('change', render);
+  areaSel.addEventListener('change', render);
+  render();
 })();
 
 
