@@ -1723,37 +1723,50 @@ window.ENSAIOS = [
     "JACC":"J Am Coll Cardiol","Eur Heart J":"Eur Heart J","BMJ":"BMJ","AHA":"","ACC.26":"","ESC":"",
     "ESC/NEJM":"N Engl J Med","Lancet/JACC":"Lancet","BMJ/JACC":"BMJ","Circ Arrhythm Electrophysiol":"Circ Arrhythm Electrophysiol"};
 
-  // Resolve o DOI ao vivo: esearch (nome+ano+revista) -> PMID -> esummary -> DOI -> doi.org
+  // limpa o nome do trial para a busca (remove parênteses e pega o 1º antes de " / ")
+  function cleanName(n){
+    return n.replace(/\([^)]*\)/g,' ').split('/')[0].replace(/\s+/g,' ').trim();
+  }
+  function abrirURL(u){ window.open(u,'_blank','noopener'); }
+  async function esearch(term){
+    const r=await fetch(`${EUTILS}/esearch.fcgi?db=pubmed&retmode=json&retmax=6&sort=relevance&term=${encodeURIComponent(term)}`);
+    const d=await r.json(); return (d.esearchresult&&d.esearchresult.idlist)||[];
+  }
+
+  // Resolve o DOI ao vivo, só abrindo o artigo se ano E revista conferirem.
+  // Sem certeza -> abre a lista do PubMed do próprio trial (nunca manda pro estudo errado).
   async function abrirDOI(btn){
     const nome=btn.dataset.q, ano=btn.dataset.y, rev=btn.dataset.j||'';
     const original=btn.textContent;
     btn.disabled=true; btn.textContent='Buscando DOI...';
+    const jornal = REV[rev]!==undefined ? REV[rev] : rev;
+    const cn = cleanName(nome);
+    const baseTerm = jornal ? `${cn} ${ano} ${jornal}[journal]` : `${cn} ${ano}`;
     try{
-      const jornal=REV[rev]!==undefined?REV[rev]:rev;
-      const termStr = jornal ? `${nome} ${ano} ${jornal}[journal]` : `${nome} ${ano}`;
-      const term=encodeURIComponent(termStr);
-      let s=await fetch(`${EUTILS}/esearch.fcgi?db=pubmed&retmode=json&retmax=3&sort=relevance&term=${term}`);
-      let sd=await s.json();
-      let ids=(sd.esearchresult&&sd.esearchresult.idlist)||[];
-      // fallback sem filtro de revista se não achar nada
-      if(!ids.length){
-        s=await fetch(`${EUTILS}/esearch.fcgi?db=pubmed&retmode=json&retmax=3&sort=relevance&term=${encodeURIComponent(nome+' '+ano)}`);
-        sd=await s.json();
-        ids=(sd.esearchresult&&sd.esearchresult.idlist)||[];
-      }
-      if(!ids.length) throw new Error('sem PMID');
+      let ids = await esearch(baseTerm);
+      if(!ids.length) ids = await esearch(`${cn} ${ano}`);
+      if(!ids.length){ abrirURL('https://pubmed.ncbi.nlm.nih.gov/?term='+encodeURIComponent(cn+' '+ano)); return; }
       const sum=await fetch(`${EUTILS}/esummary.fcgi?db=pubmed&retmode=json&id=${ids.join(',')}`);
       const smd=(await sum.json()).result||{};
-      let doi=null, pmid=ids[0];
+      // escolhe o 1º resultado cujo ANO (±1) e REVISTA conferem com o trial
+      let best=null;
       for(const id of ids){
         const it=smd[id]; if(!it) continue;
-        const d=extractDOI(it);
-        if(d){doi=d; pmid=id; break;}
+        const y=parseInt((it.pubdate||'').slice(0,4),10);
+        const yOk = !ano || Math.abs(y-parseInt(ano,10))<=1;
+        const src=(it.fulljournalname||it.source||'').toLowerCase();
+        const jOk = !jornal || src.includes(jornal.toLowerCase()) || (it.source&&jornal.toLowerCase().includes(it.source.toLowerCase()));
+        if(yOk && jOk){ best=it; break; }
       }
-      if(doi){ window.open('https://doi.org/'+doi,'_blank','noopener'); }
-      else { window.open('https://pubmed.ncbi.nlm.nih.gov/'+pmid+'/','_blank','noopener'); }
+      if(best){
+        const doi=extractDOI(best);
+        abrirURL(doi ? 'https://doi.org/'+doi : 'https://pubmed.ncbi.nlm.nih.gov/'+best.uid+'/');
+      } else {
+        // não deu match confiável: abre a lista do PubMed para o usuário escolher
+        abrirURL('https://pubmed.ncbi.nlm.nih.gov/?term='+encodeURIComponent(baseTerm));
+      }
     }catch(e){
-      window.open('https://pubmed.ncbi.nlm.nih.gov/?term='+encodeURIComponent(nome+' '+ano),'_blank','noopener');
+      abrirURL('https://pubmed.ncbi.nlm.nih.gov/?term='+encodeURIComponent(cn+' '+ano));
     }finally{
       btn.disabled=false; btn.textContent=original;
     }
