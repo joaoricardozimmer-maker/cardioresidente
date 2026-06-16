@@ -411,7 +411,7 @@ select:focus, textarea:focus { outline: none; border-color: var(--blue); }
     <section class="view" id="view-ensaios">
       <div class="hero">
         <h2>Ensaios pivotais da cardiologia</h2>
-        <p>Os trials que mudaram a prática, organizados por área. Filtre por tema ou peso (★/★★/★★★) e clique para abrir o artigo direto no DOI. Compilado por Dr. João Ricardo Cambruzzi Zimmer.</p>
+        <p>Os trials que mudaram a prática, organizados por área. Filtre por tema ou peso (★/★★/★★★) e clique para ver o artigo no PubMed (o trial aparece no topo, com link para o DOI/texto completo). Compilado por Dr. João Ricardo Cambruzzi Zimmer.</p>
       </div>
 
       <div class="ens-controls">
@@ -1707,7 +1707,7 @@ window.ENSAIOS = [
           <div class="ens-d">${esc(tr.d)}</div>
           <div class="ens-x"><strong>Resultado:</strong> ${esc(tr.x)}</div>
           <div class="ens-i"><strong>Impacto:</strong> ${esc(tr.i)}</div>
-          <button class="ens-doi" data-q="${esc(tr.n)}" data-y="${esc(String(tr.a))}" data-j="${esc(tr.r)}">📄 Abrir artigo (DOI)</button>
+          <button class="ens-doi" data-q="${esc(tr.n)}" data-y="${esc(String(tr.a))}" data-j="${esc(tr.r)}">🔎 Ver no PubMed</button>
         </div>`;
       });
       html+='</div></div>';
@@ -1733,38 +1733,15 @@ window.ENSAIOS = [
     const d=await r.json(); return (d.esearchresult&&d.esearchresult.idlist)||[];
   }
 
-  // Resolve o DOI ao vivo, só abrindo o artigo se ano E revista conferirem.
-  // Sem certeza -> abre a lista do PubMed do próprio trial (nunca manda pro estudo errado).
-  async function abrirDOI(btn){
+  // Abre a busca PRECISA do trial no PubMed (nome + ano + revista), ordenada por relevância.
+  // O artigo original aparece no topo; o usuário clica nele e segue para o DOI/texto completo.
+  // (Evita o erro de "adivinhar" um DOI e abrir editorial/sub-análise/estudo errado.)
+  function abrirDOI(btn){
     const nome=btn.dataset.q, ano=btn.dataset.y, rev=btn.dataset.j||'';
-    const original=btn.textContent;
-    btn.disabled=true; btn.textContent='Buscando DOI...';
     const jornal = REV[rev]!==undefined ? REV[rev] : rev;
     const cn = cleanName(nome);
-    // busca ESTRITA: exige a sigla no título/resumo [tiab], ano exato [dp] e revista [ta]
-    const strict = jornal
-      ? `${cn}[tiab] AND ${ano}[dp] AND "${jornal}"[ta]`
-      : `${cn}[tiab] AND ${ano}[dp]`;
-    const listURL = (term)=>'https://pubmed.ncbi.nlm.nih.gov/?term='+encodeURIComponent(term);
-    try{
-      let term=strict;
-      let ids = await esearch(term);
-      if(!ids.length){ term = `${cn} ${ano}`; ids = await esearch(term); } // fallback amplo
-      if(!ids.length){ abrirURL(listURL(cn+' '+ano)); return; }
-      // 1 resultado único e específico -> abre o DOI; vários -> abre a lista p/ o usuário escolher
-      if(ids.length===1){
-        const sum=await fetch(`${EUTILS}/esummary.fcgi?db=pubmed&retmode=json&id=${ids[0]}`);
-        const it=((await sum.json()).result||{})[ids[0]];
-        const doi=it?extractDOI(it):null;
-        abrirURL(doi ? 'https://doi.org/'+doi : 'https://pubmed.ncbi.nlm.nih.gov/'+ids[0]+'/');
-      } else {
-        abrirURL(listURL(term));
-      }
-    }catch(e){
-      abrirURL('https://pubmed.ncbi.nlm.nih.gov/?term='+encodeURIComponent(cn+' '+ano));
-    }finally{
-      btn.disabled=false; btn.textContent=original;
-    }
+    const term = jornal ? `${cn} ${ano} ${jornal}` : `${cn} ${ano}`;
+    window.open('https://pubmed.ncbi.nlm.nih.gov/?term='+encodeURIComponent(term)+'&sort=relevance','_blank','noopener');
   }
 
   function extractDOI(it){
