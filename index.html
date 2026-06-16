@@ -222,6 +222,17 @@ select:focus, textarea:focus { outline: none; border-color: var(--blue); }
 .ens-doi:hover:not(:disabled) { background: #2a4058; border-color: var(--blue); }
 .ens-doi:disabled { opacity: .6; cursor: default; }
 
+/* ---------- Diretrizes ---------- */
+#guias-root { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; }
+.gv-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+.gv-tema { font-size: 15.5px; margin: 0 0 12px; color: var(--text); }
+.gv-btns { display: flex; flex-direction: column; gap: 8px; }
+.gv-btn { display: block; padding: 9px 12px; border-radius: 9px; font-size: 13px; text-decoration: none; border: 1px solid var(--line); transition: .15s; }
+.gv-btn:hover { filter: brightness(1.15); }
+.gv-esc { background: rgba(61,155,255,.12); color: #7bbcff; border-color: rgba(61,155,255,.4); }
+.gv-aha { background: rgba(226,56,77,.12); color: var(--accent-soft); border-color: rgba(226,56,77,.4); }
+.gv-sbc { background: rgba(43,212,125,.12); color: var(--green); border-color: rgba(43,212,125,.4); }
+
 /* ---------- Sobre ---------- */
 .sobre { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; max-width: 820px; }
 .sobre h3 { margin: 18px 0 8px; font-size: 16px; }
@@ -270,6 +281,7 @@ select:focus, textarea:focus { outline: none; border-color: var(--blue); }
       <button class="tab" data-view="sinaisvitais">🩺 Sinais vitais</button>
       <button class="tab" data-view="evolucoes">🗂️ Evoluções</button>
       <button class="tab" data-view="ensaios">🧪 Ensaios pivotais</button>
+      <button class="tab" data-view="guias">📚 Diretrizes</button>
       <button class="tab" data-view="sobre">ℹ️ Sobre</button>
     </nav>
   </header>
@@ -431,6 +443,18 @@ select:focus, textarea:focus { outline: none; border-color: var(--blue); }
       </div>
 
       <div id="ensaios-root"></div>
+    </section>
+
+    <!-- ============ DIRETRIZES ============ -->
+    <section class="view" id="view-guias">
+      <div class="hero">
+        <h2>Diretrizes por tema</h2>
+        <p>As principais diretrizes da <strong>ESC</strong>, <strong>AHA/ACC</strong> e <strong>SBC</strong>, organizadas por tema. Os links da SBC abrem o <strong>PDF direto</strong>; ESC abre a página oficial da diretriz; AHA/ACC abre o hub oficial do ACC. Sempre confira a versão mais recente.</p>
+      </div>
+      <div class="ens-controls">
+        <input type="text" id="guias-busca" placeholder="Buscar tema... (ex: fibrilação, valvopatia, dislipidemia)" />
+      </div>
+      <div id="guias-root"></div>
     </section>
 
     <!-- ============ SOBRE ============ -->
@@ -1273,6 +1297,126 @@ window.ENSAIOS = [
 ];
 
 
+/* ===== data-guias.js ===== */
+// Diretrizes por tema — ESC, AHA/ACC e SBC. Links verificados (jun/2026).
+// SBC: PDF direto (abccardiol.org) quando disponível; senão portal oficial.
+// ESC: página oficial da diretriz/tema (escardio.org) — abre o texto completo/PDF.
+// AHA/ACC: hub oficial de diretrizes do ACC (acc.org/guidelines).
+window.GUIAS_AHA_HUB = "https://www.acc.org/guidelines";
+window.GUIAS_SBC_PORTAL = "https://www.portal.cardiol.br/diretrizes";
+
+window.GUIAS = [
+  {
+    t: "Síndrome coronariana aguda (SCA)",
+    esc: { t: "ESC 2023 — SCA", u: "https://www.escardio.org/topics/acute-cardiac-care/" },
+    aha: { t: "ACC/AHA 2025 — ACS", u: "https://www.acc.org/guidelines" },
+    sbc: { t: "SBC 2025 — Dor torácica na emergência", u: "https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-122-09-e20250620/0066-782X-abc-122-09-e20250620.x74770.pdf" }
+  },
+  {
+    t: "Síndrome coronariana crônica (DAC estável)",
+    esc: { t: "ESC 2024 — SCC", u: "https://www.escardio.org/topics/interventional-cardiology/" },
+    aha: { t: "ACC/AHA 2023 — CCD", u: "https://www.acc.org/guidelines" },
+    sbc: { t: "SBC 2025 — Síndrome Coronariana Crônica", u: "https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-122-09-e20250619/0066-782X-abc-122-09-e20250619.x74770.pdf" }
+  },
+  {
+    t: "Insuficiência cardíaca",
+    esc: { t: "ESC 2021/2023 — IC", u: "https://www.escardio.org/topics/heart-failure/" },
+    aha: { t: "AHA/ACC/HFSA 2022 — HF", u: "https://www.acc.org/guidelines" },
+    sbc: { t: "SBC — Diretrizes de IC (portal)", u: "https://www.portal.cardiol.br/diretrizes" }
+  },
+  {
+    t: "Fibrilação atrial",
+    esc: { t: "ESC 2024 — FA", u: "https://www.escardio.org/topics/arrythmias-and-device-therapy/" },
+    aha: { t: "ACC/AHA 2023 — AF", u: "https://www.acc.org/guidelines" },
+    sbc: { t: "SBC 2025 — Fibrilação Atrial", u: "https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-122-09-e20250618/0066-782X-abc-122-09-e20250618.x74770.pdf" }
+  },
+  {
+    t: "Arritmias e dispositivos (MP / CDI / TRC)",
+    esc: { t: "ESC 2021/2022 — Pacing/VA", u: "https://www.escardio.org/topics/arrythmias-and-device-therapy/" },
+    aha: { t: "ACC/AHA — Devices", u: "https://www.acc.org/guidelines" },
+    sbc: { t: "SBC 2023 — Dispositivos Eletrônicos Implantáveis", u: "https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-120-01-e20220892/0066-782X-abc-120-01-e20220892.x55156.pdf" }
+  },
+  {
+    t: "Valvopatias",
+    esc: { t: "ESC/EACTS 2025 — Valvopatias", u: "https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/valvular-heart-disease/" },
+    aha: { t: "ACC/AHA 2020 — VHD", u: "https://www.acc.org/guidelines" },
+    sbc: { t: "SBC — Valvopatias (portal)", u: "https://www.portal.cardiol.br/diretrizes" }
+  },
+  {
+    t: "Dislipidemia e prevenção",
+    esc: { t: "ESC/EAS 2025 — Dislipidemias", u: "https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/dyslipidaemias/" },
+    aha: { t: "ACC/AHA — Cholesterol", u: "https://www.acc.org/guidelines" },
+    sbc: { t: "SBC 2025 — Dislipidemias e Prevenção da Aterosclerose", u: "https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-122-09-e20250640/0066-782X-abc-122-09-e20250640.x74770.pdf" }
+  },
+  {
+    t: "Hipertensão arterial",
+    esc: { t: "ESC 2024 — Hipertensão", u: "https://www.escardio.org/topics/hypertension/" },
+    aha: { t: "ACC/AHA — Hypertension", u: "https://www.acc.org/guidelines" },
+    sbc: { t: "SBC 2025 — Hipertensão Arterial", u: "https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-122-09-e20250624/0066-782X-abc-122-09-e20250624.x74770.pdf" }
+  },
+  {
+    t: "Pericardite e miocardite",
+    esc: { t: "ESC 2025 — Miocardite/Pericardite", u: "https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/myocarditis-and-pericarditis/" },
+    aha: { t: "ACC/AHA — hub", u: "https://www.acc.org/guidelines" },
+    sbc: { t: "SBC 2022 — Miocardites", u: "https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-119-01-0143/0066-782X-abc-119-01-0143.x55156.pdf" }
+  },
+  {
+    t: "Tromboembolismo venoso / TEP",
+    esc: { t: "ESC 2019 — TEP (lista)", u: "https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/" },
+    aha: { t: "ACC/AHA — hub", u: "https://www.acc.org/guidelines" },
+    sbc: { t: "SBC 2022 — Tromboembolismo Venoso", u: "https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-118-04-0797/0066-782X-abc-118-04-0797.x27815.pdf" }
+  },
+  {
+    t: "Avaliação perioperatória",
+    esc: { t: "ESC 2022 — Cirurgia não cardíaca (lista)", u: "https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/" },
+    aha: { t: "ACC/AHA 2024 — Perioperatório", u: "https://www.acc.org/guidelines" },
+    sbc: { t: "SBC 2024 — Avaliação Perioperatória", u: "https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-121-09-e20240590/0066-782X-abc-121-09-e20240590.x81990.pdf" }
+  },
+  {
+    t: "Cardiomiopatias (hipertrófica / Chagas)",
+    esc: { t: "ESC 2023 — Cardiomiopatias (lista)", u: "https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/" },
+    aha: { t: "ACC/AHA 2024 — HCM", u: "https://www.acc.org/guidelines" },
+    sbc: { t: "SBC 2024 — Cardiomiopatia Hipertrófica", u: "https://drive.google.com/file/d/1UxQOcB5lq-7IhNW_7WtydSqMVfn2xbe-/view" }
+  },
+  {
+    t: "Imagem cardiovascular (RM/TC, eco, carótidas)",
+    esc: { t: "ESC — Imagem cardiovascular", u: "https://www.escardio.org/topics/cv-imaging-topic-landing-page/" },
+    aha: { t: "ACC/AHA — hub", u: "https://www.acc.org/guidelines" },
+    sbc: { t: "SBC 2024 — RM e TC Cardiovascular", u: "https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-121-09-e20240608/0066-782X-abc-121-09-e20240608.x81990.pdf" }
+  },
+  {
+    t: "Doppler de carótidas e vertebrais",
+    esc: { t: "ESC — Stroke/imagem", u: "https://www.escardio.org/topics/stroke/" },
+    aha: { t: "ACC/AHA — hub", u: "https://www.acc.org/guidelines" },
+    sbc: { t: "SBC 2023 — US de carótidas e vertebrais", u: "https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-120-10-e20230695/0066-782X-abc-120-10-e20230695.x55156.pdf" }
+  },
+  {
+    t: "Gravidez e cardiopatia",
+    esc: { t: "ESC 2025 — CVD na gravidez", u: "https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/cardiovascular-diseases-during-pregnancy-management-of/" },
+    aha: { t: "ACC/AHA — hub", u: "https://www.acc.org/guidelines" },
+    sbc: { t: "SBC 2024 — Climatério e Menopausa", u: "https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-121-07-e20240478/0066-782X-abc-121-07-e20240478.x47225.pdf" }
+  },
+  {
+    t: "Cardio-oncologia",
+    esc: { t: "ESC 2022 — Cardio-oncologia", u: "https://www.escardio.org/topics/cardio-oncology/" },
+    aha: { t: "ACC/AHA — hub", u: "https://www.acc.org/guidelines" },
+    sbc: { t: "SBC — Cardio-oncologia (portal)", u: "https://www.portal.cardiol.br/diretrizes" }
+  },
+  {
+    t: "Ergometria e reabilitação",
+    esc: { t: "ESC — Prevenção/esporte", u: "https://www.escardio.org/topics/risk-factors-and-prevention/" },
+    aha: { t: "ACC/AHA — hub", u: "https://www.acc.org/guidelines" },
+    sbc: { t: "SBC 2024 — Ergometria (adulto)", u: "https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-121-3-e20240110/0066-782X-abc-121-3-e20240110.x47225.pdf" }
+  },
+  {
+    t: "Prevenção / cardiometabólico (obesidade)",
+    esc: { t: "ESC — Fatores de risco e prevenção", u: "https://www.escardio.org/topics/risk-factors-and-prevention/" },
+    aha: { t: "ACC/AHA — hub", u: "https://www.acc.org/guidelines" },
+    sbc: { t: "SBC 2025 — Manejo da Obesidade", u: "https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-122-09-e20250621/0066-782X-abc-122-09-e20250621.x74770.pdf" }
+  }
+];
+
+
 /* ===== evidencia.js ===== */
 // Módulo de busca de evidências: base curada + PubMed ao vivo (NCBI E-utilities)
 (function () {
@@ -1759,6 +1903,46 @@ window.ENSAIOS = [
   input.addEventListener('input', render);
   pesoSel.addEventListener('change', render);
   areaSel.addEventListener('change', render);
+  render();
+})();
+
+
+/* ===== guias.js ===== */
+// Aba "Diretrizes": lista por tema com botões ESC / AHA-ACC / SBC que abrem o documento oficial.
+(function () {
+  const root = document.getElementById('guias-root');
+  if (!root) return;
+  const input = document.getElementById('guias-busca');
+
+  function norm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');}
+  function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+  function btn(cls, soc){
+    if(!soc) return '';
+    return `<a class="gv-btn ${cls}" href="${esc(soc.u)}" target="_blank" rel="noopener" title="${esc(soc.t)}">${esc(soc.t)} ↗</a>`;
+  }
+
+  function render(){
+    const q=norm(input.value);
+    const termos=q.split(/\s+/).filter(t=>t.length>1);
+    const items=window.GUIAS.filter(g=>{
+      if(!termos.length) return true;
+      const hay=norm(g.t+' '+(g.esc?g.esc.t:'')+' '+(g.aha?g.aha.t:'')+' '+(g.sbc?g.sbc.t:''));
+      return termos.every(t=>hay.includes(t));
+    });
+    if(!items.length){ root.innerHTML='<p class="muted">Nenhum tema encontrado.</p>'; return; }
+    root.innerHTML = items.map(g=>`
+      <div class="gv-card">
+        <h3 class="gv-tema">${esc(g.t)}</h3>
+        <div class="gv-btns">
+          ${btn('gv-esc', g.esc)}
+          ${btn('gv-aha', g.aha)}
+          ${btn('gv-sbc', g.sbc)}
+        </div>
+      </div>`).join('');
+  }
+
+  input.addEventListener('input', render);
   render();
 })();
 
