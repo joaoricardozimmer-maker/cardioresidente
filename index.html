@@ -319,7 +319,10 @@ select:focus, textarea:focus { outline: none; border-color: var(--blue); }
             <option value="ergometria">Teste ergométrico</option>
             <option value="cintilografia">Cintilografia miocárdica</option>
             <option value="cateterismo">Cateterismo / Cinecoronariografia</option>
-            <option value="laboratorio">Exames laboratoriais</option>
+            <option value="angiotc">Angio-TC de coronárias</option>
+            <option value="doppler">Doppler de carótidas/vertebrais</option>
+            <option value="laboratorio">Exames laboratoriais (AFIP)</option>
+            <option value="balanco">Balanço hídrico</option>
             <option value="holter">Holter / MAPA</option>
             <option value="generico">Outro laudo cardiológico</option>
           </select>
@@ -1458,7 +1461,10 @@ window.ENSAIOS = [
     ergometria: "Resume protocolo, METs, FC/PA, motivo de interrupção, alterações de ST/sintomas e conclusão (Duke se possível).",
     cintilografia: "Resume perfusão (isquemia/fibrose por território), FEVE de repouso/estresse e conclusão.",
     cateterismo: "Lista cada vaso em sigla com % de lesão e localização (óstio/proximal/médio/distal) + dominância e conduta.",
-    laboratorio: "Organiza os exames laboratoriais em linha compacta com valores e unidades, destacando alterações.",
+    angiotc: "Resume escore de cálcio (Agatston), dominância e placas/redução luminal por vaso + conclusão.",
+    doppler: "Resume estenose por segmento carotídeo (ACC/ACI/ACE D e E), placas, VPS e vertebrais.",
+    laboratorio: "Cole direto da tela do AFIP (Ctrl+A/Ctrl+C). A IA filtra o ruído e extrai só os valores atuais em siglas, destacando alterações.",
+    balanco: "Totaliza ganhos, perdas, diurese, drenos e o balanço hídrico final do período.",
     holter: "Resume ritmo de base, FC média/mín/máx, arritmias, pausas e correlação com sintomas (ou cargas pressóricas no MAPA).",
     generico: "Resume os principais achados do laudo de forma objetiva para o prontuário."
   };
