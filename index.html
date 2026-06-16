@@ -1741,29 +1741,24 @@ window.ENSAIOS = [
     btn.disabled=true; btn.textContent='Buscando DOI...';
     const jornal = REV[rev]!==undefined ? REV[rev] : rev;
     const cn = cleanName(nome);
-    const baseTerm = jornal ? `${cn} ${ano} ${jornal}[journal]` : `${cn} ${ano}`;
+    // busca ESTRITA: exige a sigla no título/resumo [tiab], ano exato [dp] e revista [ta]
+    const strict = jornal
+      ? `${cn}[tiab] AND ${ano}[dp] AND "${jornal}"[ta]`
+      : `${cn}[tiab] AND ${ano}[dp]`;
+    const listURL = (term)=>'https://pubmed.ncbi.nlm.nih.gov/?term='+encodeURIComponent(term);
     try{
-      let ids = await esearch(baseTerm);
-      if(!ids.length) ids = await esearch(`${cn} ${ano}`);
-      if(!ids.length){ abrirURL('https://pubmed.ncbi.nlm.nih.gov/?term='+encodeURIComponent(cn+' '+ano)); return; }
-      const sum=await fetch(`${EUTILS}/esummary.fcgi?db=pubmed&retmode=json&id=${ids.join(',')}`);
-      const smd=(await sum.json()).result||{};
-      // escolhe o 1º resultado cujo ANO (±1) e REVISTA conferem com o trial
-      let best=null;
-      for(const id of ids){
-        const it=smd[id]; if(!it) continue;
-        const y=parseInt((it.pubdate||'').slice(0,4),10);
-        const yOk = !ano || Math.abs(y-parseInt(ano,10))<=1;
-        const src=(it.fulljournalname||it.source||'').toLowerCase();
-        const jOk = !jornal || src.includes(jornal.toLowerCase()) || (it.source&&jornal.toLowerCase().includes(it.source.toLowerCase()));
-        if(yOk && jOk){ best=it; break; }
-      }
-      if(best){
-        const doi=extractDOI(best);
-        abrirURL(doi ? 'https://doi.org/'+doi : 'https://pubmed.ncbi.nlm.nih.gov/'+best.uid+'/');
+      let term=strict;
+      let ids = await esearch(term);
+      if(!ids.length){ term = `${cn} ${ano}`; ids = await esearch(term); } // fallback amplo
+      if(!ids.length){ abrirURL(listURL(cn+' '+ano)); return; }
+      // 1 resultado único e específico -> abre o DOI; vários -> abre a lista p/ o usuário escolher
+      if(ids.length===1){
+        const sum=await fetch(`${EUTILS}/esummary.fcgi?db=pubmed&retmode=json&id=${ids[0]}`);
+        const it=((await sum.json()).result||{})[ids[0]];
+        const doi=it?extractDOI(it):null;
+        abrirURL(doi ? 'https://doi.org/'+doi : 'https://pubmed.ncbi.nlm.nih.gov/'+ids[0]+'/');
       } else {
-        // não deu match confiável: abre a lista do PubMed para o usuário escolher
-        abrirURL('https://pubmed.ncbi.nlm.nih.gov/?term='+encodeURIComponent(baseTerm));
+        abrirURL(listURL(term));
       }
     }catch(e){
       abrirURL('https://pubmed.ncbi.nlm.nih.gov/?term='+encodeURIComponent(cn+' '+ano));
