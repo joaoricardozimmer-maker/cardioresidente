@@ -2065,6 +2065,208 @@ window.GUIAS = [
         else {cat='Obesidade grau III'; nivel='bad';}
         return { valor: r+' kg/m² — '+cat, nivel, conduta:'Classificação OMS. Avalie também circunferência abdominal e risco cardiometabólico global.' };
       }
+    },
+    {
+      id:'timi_nstemi', grupo:'Síndrome coronariana / dor torácica', nome:'TIMI (NSTEMI / angina instável)',
+      desc:'Risco de óbito, IAM ou revascularização urgente em 14 dias na SCA sem supra.',
+      campos:[
+        {id:'idade', tipo:'chk', label:'Idade ≥ 65 anos', p:1},
+        {id:'fr', tipo:'chk', label:'≥ 3 fatores de risco para DAC', p:1},
+        {id:'dac', tipo:'chk', label:'DAC conhecida (estenose ≥ 50%)', p:1},
+        {id:'aas', tipo:'chk', label:'Uso de AAS nos últimos 7 dias', p:1},
+        {id:'angina', tipo:'chk', label:'≥ 2 episódios de angina em 24h', p:1},
+        {id:'st', tipo:'chk', label:'Desvio de ST ≥ 0,5 mm', p:1},
+        {id:'marc', tipo:'chk', label:'Marcadores de necrose elevados', p:1}
+      ],
+      calc(v){
+        const pts=somaChk(v,this.campos);
+        const risco = pts<=1?'4,7%':pts===2?'8,3%':pts===3?'13,2%':pts===4?'19,9%':pts===5?'26,2%':'40,9%';
+        const nivel = pts>=5?'bad':(pts>=3?'warn':'ok');
+        const cond = pts>=3
+          ? '<b>Risco intermediário/alto</b> (evento ~'+risco+' em 14d). Favorece estratégia invasiva e terapia antitrombótica plena.'
+          : '<b>Risco baixo</b> (~'+risco+'). Estratégia conservadora pode ser adequada conforme contexto.';
+        return { valor: pts+'/7 · risco ~'+risco, nivel, conduta: cond };
+      }
+    },
+    {
+      id:'timi_stemi', grupo:'Síndrome coronariana / dor torácica', nome:'TIMI (STEMI)',
+      desc:'Risco de mortalidade em 30 dias no IAM com supra de ST.',
+      campos:[
+        {id:'idade', tipo:'sel', label:'Idade', opts:[{v:'0',t:'< 65 anos (0)'},{v:'2',t:'65–74 anos (2)'},{v:'3',t:'≥ 75 anos (3)'}]},
+        {id:'comorb', tipo:'chk', label:'DM, HAS ou angina', p:1},
+        {id:'pas', tipo:'chk', label:'PAS < 100 mmHg', p:3},
+        {id:'fc', tipo:'chk', label:'FC > 100 bpm', p:2},
+        {id:'killip', tipo:'chk', label:'Killip II–IV', p:2},
+        {id:'peso', tipo:'chk', label:'Peso < 67 kg', p:1},
+        {id:'ant', tipo:'chk', label:'Supra anterior ou BRE novo', p:1},
+        {id:'tempo', tipo:'chk', label:'Tempo até tratamento > 4h', p:1}
+      ],
+      calc(v){
+        const pts=(n(v.idade)||0)+somaChk(v,this.campos);
+        const tab={0:'0,8%',1:'1,6%',2:'2,2%',3:'4,4%',4:'7,3%',5:'12,4%',6:'16,1%',7:'23,4%',8:'26,8%'};
+        const risco = pts>8?'~35,9%':tab[pts];
+        const nivel = pts>=5?'bad':(pts>=3?'warn':'ok');
+        return { valor: pts+' pts · mortalidade 30d '+risco, nivel, conduta:'Reperfusão imediata. Escore alto identifica pacientes que mais se beneficiam de cuidado intensivo e monitorização.' };
+      }
+    },
+    {
+      id:'wells_tep', grupo:'Tromboembolismo', nome:'Wells (TEP)',
+      desc:'Probabilidade clínica de tromboembolismo pulmonar.',
+      campos:[
+        {id:'tvp', tipo:'chk', label:'Sinais clínicos de TVP', p:3},
+        {id:'dx', tipo:'chk', label:'TEP é o diagnóstico mais provável', p:3},
+        {id:'fc', tipo:'chk', label:'FC > 100 bpm', p:1.5},
+        {id:'imob', tipo:'chk', label:'Imobilização ou cirurgia recente (4 sem)', p:1.5},
+        {id:'previo', tipo:'chk', label:'TVP/TEP prévio', p:1.5},
+        {id:'hemo', tipo:'chk', label:'Hemoptise', p:1},
+        {id:'ca', tipo:'chk', label:'Câncer ativo', p:1}
+      ],
+      calc(v){
+        const pts=somaChk(v,this.campos);
+        let nivel,cond;
+        if(pts<=4){ nivel='ok'; cond='<b>TEP improvável</b> (≤4). Dosar D-dímero; se negativo, exclui TEP (com idade ajustada quando aplicável).'; }
+        else { nivel='warn'; cond='<b>TEP provável</b> (>4). Prosseguir direto para angio-TC de tórax (ou cintilografia V/Q).'; }
+        return { valor: (Math.round(pts*10)/10)+' pontos', nivel, conduta: cond };
+      }
+    },
+    {
+      id:'wells_tvp', grupo:'Tromboembolismo', nome:'Wells (TVP)',
+      desc:'Probabilidade clínica de trombose venosa profunda.',
+      campos:[
+        {id:'ca', tipo:'chk', label:'Câncer ativo', p:1},
+        {id:'paral', tipo:'chk', label:'Paralisia/paresia ou imobilização de MMII', p:1},
+        {id:'acam', tipo:'chk', label:'Acamado > 3 dias ou cirurgia (12 sem)', p:1},
+        {id:'dor', tipo:'chk', label:'Dor à palpação no trajeto venoso profundo', p:1},
+        {id:'edema', tipo:'chk', label:'Edema de todo o membro', p:1},
+        {id:'pant', tipo:'chk', label:'Panturrilha > 3 cm vs. contralateral', p:1},
+        {id:'cacifo', tipo:'chk', label:'Edema com cacifo no membro sintomático', p:1},
+        {id:'colat', tipo:'chk', label:'Veias colaterais superficiais (não varicosas)', p:1},
+        {id:'previo', tipo:'chk', label:'TVP prévia documentada', p:1},
+        {id:'altdx', tipo:'chk', label:'Diagnóstico alternativo tão ou mais provável', p:-2}
+      ],
+      calc(v){
+        const pts=somaChk(v,this.campos);
+        let nivel,cond;
+        if(pts<1){ nivel='ok'; cond='<b>TVP improvável</b> (<1). Dosar D-dímero; se negativo, exclui TVP.'; }
+        else { nivel='warn'; cond='<b>TVP provável</b> (≥1). Solicitar ultrassonografia com Doppler venoso.'; }
+        return { valor: pts+' pontos', nivel, conduta: cond };
+      }
+    },
+    {
+      id:'spesi', grupo:'Tromboembolismo', nome:'sPESI (PESI simplificado)',
+      desc:'Estratificação de risco/prognóstico no TEP confirmado.',
+      campos:[
+        {id:'idade', tipo:'chk', label:'Idade > 80 anos', p:1},
+        {id:'ca', tipo:'chk', label:'Câncer', p:1},
+        {id:'cardiopulm', tipo:'chk', label:'Doença cardiopulmonar crônica', p:1},
+        {id:'fc', tipo:'chk', label:'FC ≥ 110 bpm', p:1},
+        {id:'pas', tipo:'chk', label:'PAS < 100 mmHg', p:1},
+        {id:'sat', tipo:'chk', label:'SatO₂ < 90%', p:1}
+      ],
+      calc(v){
+        const pts=somaChk(v,this.campos);
+        let nivel,cond;
+        if(pts===0){ nivel='ok'; cond='<b>Baixo risco</b> (mortalidade 30d ~1%). Considerar tratamento ambulatorial/alta precoce se sem disfunção de VD e contexto favorável.'; }
+        else { nivel='warn'; cond='<b>Não baixo risco</b> (≥1). Internar; avaliar VD (eco/TC) e biomarcadores para definir risco intermediário-alto.'; }
+        return { valor: pts+' ponto'+(pts===1?'':'s'), nivel, conduta: cond };
+      }
+    },
+    {
+      id:'killip', grupo:'Síndrome coronariana / dor torácica', nome:'Classificação de Killip',
+      desc:'Gravidade da IC no IAM e mortalidade associada.',
+      campos:[
+        {id:'classe', tipo:'sel', label:'Classe', opts:[
+          {v:'1',t:'I — sem sinais de IC'},
+          {v:'2',t:'II — estertores, B3 ou turgência jugular'},
+          {v:'3',t:'III — edema agudo de pulmão'},
+          {v:'4',t:'IV — choque cardiogênico'}
+        ]}
+      ],
+      calc(v){
+        const c=n(v.classe)||1;
+        const tab={1:{m:'~6%',nv:'ok'},2:{m:'~17%',nv:'warn'},3:{m:'~38%',nv:'bad'},4:{m:'~67–80%',nv:'bad'}};
+        const t=tab[c];
+        const cond = c>=3 ? '<b>Killip III/IV.</b> Suporte intensivo, reperfusão imediata; no choque (IV) considerar suporte circulatório e revascularização precoce.'
+          : (c===2 ? 'Killip II: diuréticos/oxigênio conforme congestão; reperfusão e monitorização.' : 'Killip I: sem congestão; seguir manejo padrão do IAM.');
+        return { valor:'Classe '+c+' · mortalidade '+t.m, nivel:t.nv, conduta: cond };
+      }
+    },
+    {
+      id:'duke', grupo:'Síndrome coronariana / dor torácica', nome:'Escore de Duke (teste ergométrico)',
+      desc:'Prognóstico pelo teste de esforço (Bruce): tempo, ST e angina.',
+      campos:[
+        {id:'tempo', tipo:'num', label:'Tempo de exercício (protocolo de Bruce)', un:'min'},
+        {id:'st', tipo:'num', label:'Desvio máximo de ST', un:'mm'},
+        {id:'angina', tipo:'sel', label:'Angina no esforço', opts:[{v:'0',t:'Ausente (0)'},{v:'1',t:'Não limitante (1)'},{v:'2',t:'Limitante ao teste (2)'}]}
+      ],
+      calc(v){
+        const t=n(v.tempo), st=n(v.st), a=n(v.angina)||0;
+        if(t===null||st===null) return { valor:'—', nivel:'info', conduta:'Preencha o tempo de exercício e o desvio de ST.' };
+        const dts = t - 5*st - 4*a;
+        let nivel,cat,cond;
+        if(dts>=5){ nivel='ok'; cat='baixo risco'; cond='Sobrevida em 5 anos ~99%. Em geral, conduta conservadora.'; }
+        else if(dts>=-10){ nivel='warn'; cat='risco intermediário'; cond='Sobrevida em 5 anos ~95%. Considerar investigação adicional/imagem.'; }
+        else { nivel='bad'; cat='alto risco'; cond='Sobrevida em 5 anos ~79%. Favorece investigação invasiva.'; }
+        return { valor: (Math.round(dts*10)/10)+' — '+cat, nivel, conduta: cond };
+      }
+    },
+    {
+      id:'hfapeff', grupo:'Insuficiência cardíaca', nome:'HFA-PEFF',
+      desc:'Probabilidade diagnóstica de ICFEp (passo 2 — domínios funcional, morfológico e biomarcador).',
+      campos:[
+        {id:'func', tipo:'sel', label:'Funcional (E/eʹ, eʹ, velocidade de IT)', opts:[{v:'0',t:'Nenhum critério (0)'},{v:'1',t:'Critério menor (1)'},{v:'2',t:'Critério maior (2)'}]},
+        {id:'morf', tipo:'sel', label:'Morfológico (AEi, massa/ERP do VE)', opts:[{v:'0',t:'Nenhum critério (0)'},{v:'1',t:'Critério menor (1)'},{v:'2',t:'Critério maior (2)'}]},
+        {id:'bio', tipo:'sel', label:'Biomarcador (NT-proBNP / BNP)', opts:[{v:'0',t:'Nenhum critério (0)'},{v:'1',t:'Critério menor (1)'},{v:'2',t:'Critério maior (2)'}]}
+      ],
+      calc(v){
+        const pts=(n(v.func)||0)+(n(v.morf)||0)+(n(v.bio)||0);
+        let nivel,cond;
+        if(pts>=5){ nivel='bad'; cond='<b>≥5: diagnóstico de ICFEp confirmado.</b> Seguir para investigação etiológica (passo 3) e tratamento.'; }
+        else if(pts>=2){ nivel='warn'; cond='<b>2–4: intermediário.</b> Realizar teste de estresse diastólico (eco de esforço) ou medida invasiva das pressões de enchimento.'; }
+        else { nivel='ok'; cond='<b>≤1: ICFEp improvável.</b> Considerar outras causas de dispneia.'; }
+        return { valor: pts+'/6', nivel, conduta: cond };
+      }
+    },
+    {
+      id:'prevent', grupo:'Prevenção / risco cardiovascular', nome:'PREVENT (AHA 2023)',
+      desc:'Risco cardiovascular em 10/30 anos (ASCVD, IC e total) — equações AHA PREVENT.',
+      link:{ u:'https://professional.heart.org/en/guidelines-and-statements/prevent-calculator', t:'Abrir calculadora oficial PREVENT (AHA)' },
+      extra:'<b>Metas por categoria de risco</b> (após calcular o risco):'
+        +'<br>• <b>Muito alto risco</b> (DCV estabelecida ou equivalente): LDL <b>&lt;55 mg/dL</b> e redução ≥50%; PA &lt;130/80.'
+        +'<br>• <b>Alto risco</b> (PREVENT ≥20% ou alto risco clínico): LDL <b>&lt;70 mg/dL</b>; PA &lt;130/80.'
+        +'<br>• <b>Intermediário</b> (7,5–20%): LDL &lt;100 mg/dL; individualizar (considerar escore de cálcio).'
+        +'<br>• <b>Limítrofe/baixo</b> (&lt;7,5%): LDL &lt;116 mg/dL; mudança de estilo de vida.'
+        +'<br><span class="sc-extra">Categorias PREVENT 10 anos: &lt;5% baixo · 5–7,5% limítrofe · 7,5–20% intermediário · ≥20% alto. Metas de LDL conforme ESC/EAS e SBC.</span>'
+    },
+    {
+      id:'precisedapt', grupo:'Antiagregação', nome:'PRECISE-DAPT',
+      desc:'Risco de sangramento e duração da DAPT (nomograma: idade, ClCr, Hb, leucócitos, sangramento prévio).',
+      link:{ u:'https://www.precisedaptscore.com/predapt/webcalculator.html', t:'Abrir calculadora oficial PRECISE-DAPT' },
+      extra:'Interpretação: <b>≥ 25</b> = alto risco de sangramento → <b>DAPT curta</b> (3–6 meses). <b>&lt; 25</b> → DAPT padrão/prolongada (12 meses ou mais) se baixo risco hemorrágico. Combine com o risco isquêmico (ex.: DAPT score).'
+    },
+    {
+      id:'grace', grupo:'Síndrome coronariana / dor torácica', nome:'GRACE 2.0',
+      desc:'Risco de óbito intra-hospitalar e em 6–12 meses na SCA.',
+      link:{ u:'https://www.gracescore.org/WebSite/WebVersion.aspx', t:'Abrir calculadora oficial GRACE' },
+      extra:'Variáveis: idade, FC, PAS, creatinina, classe de Killip, PCR à admissão, desvio de ST e marcadores elevados. <b>GRACE &gt; 140</b> indica alto risco e favorece <b>estratégia invasiva precoce (&lt; 24h)</b> na SCA sem supra.'
+    },
+    {
+      id:'euroscore', grupo:'Risco cirúrgico', nome:'EuroSCORE II',
+      desc:'Mortalidade prevista em cirurgia cardíaca (modelo logístico com ~18 variáveis).',
+      link:{ u:'https://www.euroscore.org/index.php?id=17&lang=en', t:'Abrir calculadora oficial EuroSCORE II' },
+      extra:'Estima a mortalidade hospitalar em cirurgia cardíaca. Útil na discussão do Heart Team (ex.: TAVI vs. cirurgia na estenose aórtica).'
+    },
+    {
+      id:'sts', grupo:'Risco cirúrgico', nome:'STS Risk Score',
+      desc:'Risco de mortalidade e morbidade em cirurgia cardíaca (modelo proprietário da Society of Thoracic Surgeons).',
+      link:{ u:'https://acsdriskcalc.research.sts.org/', t:'Abrir calculadora oficial STS' },
+      extra:'Modelo proprietário, sem equação pública completa — por isso usamos a calculadora oficial. <b>STS &lt; 4%</b> = baixo risco; <b>4–8%</b> = intermediário; <b>&gt; 8%</b> = alto risco (referência usada na avaliação para TAVI).'
+    },
+    {
+      id:'maggic', grupo:'Insuficiência cardíaca', nome:'MAGGIC',
+      desc:'Mortalidade em 1 e 3 anos na insuficiência cardíaca.',
+      link:{ u:'https://www.mdcalc.com/calc/3803/maggic-risk-calculator-heart-failure', t:'Abrir calculadora MAGGIC' },
+      extra:'Estima a mortalidade em 1 e 3 anos na IC (FE reduzida ou preservada) a partir de idade, FEVE, classe NYHA, PAS, creatinina, IMC, comorbidades e terapia. Útil para prognóstico e decisões (ex.: encaminhamento a transplante/dispositivos).'
     }
   ];
 
@@ -2104,6 +2306,14 @@ window.GUIAS = [
   function select(id, el){
     const s=SCORES.find(x=>x.id===id); if(!s) return; atual=s;
     menu.querySelectorAll('.evol-item').forEach(x=>x.classList.toggle('active', x===el));
+    // scores de "link oficial" (equações complexas / proprietárias)
+    if(s.link){
+      let h='<h3 class="sc-title">'+esc(s.nome)+'</h3><p class="muted small">'+esc(s.desc)+'</p>';
+      h+='<div class="sc-result sc-info"><div class="sc-conduta">'+(s.extra||'')+'</div></div>';
+      h+='<a class="btn-primary" style="display:inline-block;margin-top:14px;text-decoration:none" href="'+esc(s.link.u)+'" target="_blank" rel="noopener">'+esc(s.link.t)+' ↗</a>';
+      h+='<p class="muted small" style="margin-top:10px">Esta calculadora usa equações complexas/proprietárias; para garantir o resultado correto, ela abre a ferramenta oficial validada.</p>';
+      panel.innerHTML=h; return;
+    }
     let html='<h3 class="sc-title">'+esc(s.nome)+'</h3><p class="muted small">'+esc(s.desc)+'</p><div class="sc-campos">';
     s.campos.forEach(c=>{
       if(c.tipo==='num'){
