@@ -581,9 +581,9 @@ window.DIRETRIZES = [
   // ---------------- FIBRILAÇÃO ATRIAL ----------------
   {
     cat: "Fibrilação atrial",
-    title: "Anticoagulação na FA (CHA₂DS₂-VASc)",
+    title: "Anticoagulação na FA (CHA₂DS₂-VA)",
     keywords: ["fibrilação atrial", "fa", "anticoagulação", "chads", "cha2ds2-vasc", "doac", "varfarina", "avc"],
-    bottom: "Anticoagulação oral indicada em CHA₂DS₂-VASc ≥2 (homens) ou ≥3 (mulheres); considerar se ≥1/≥2. Preferir DOAC à varfarina (exceto valvopatia mitral reumática moderada/grave ou prótese mecânica).",
+    bottom: "Anticoagulação oral indicada com CHA₂DS₂-VA ≥2 (considerar se =1), sem distinção de sexo (ESC 2024). Preferir DOAC à varfarina (exceto valvopatia mitral reumática moderada/grave ou prótese mecânica).",
     classe: "I", nivel: "A",
     trials: "RE-LY, ROCKET-AF, ARISTOTLE, ENGAGE AF-TIMI 48",
     src: "Diretriz ESC FA 2024 · SBC",
@@ -759,8 +759,8 @@ S) [Assintomático]/refere palpitações/[dispneia]. [estável].
 O) PA [x/x] · FC [x] bpm. ECG: FA com RV [controlada/elevada], FC média [x].
    ACV: ritmo irregular, sem sopros novos, sem congestão.
    [TSH, eletrólitos, função renal: x].
-A) FA [tipo]. CHA₂DS₂-VASc = [x] · HAS-BLED = [x].
-P) - Anticoagulação: [DOAC — apixabana/rivaroxabana/dabigatrana/edoxabana, dose] (indicada por CHA₂DS₂-VASc).
+A) FA [tipo]. CHA₂DS₂-VA = [x] · HAS-BLED = [x].
+P) - Anticoagulação: [DOAC — apixabana/rivaroxabana/dabigatrana/edoxabana, dose] (indicada por CHA₂DS₂-VA).
    - Controle de [frequência: BB/BCC não di-hidropiridínico / ritmo: cardioversão/antiarrítmico/ablação].
    - Investigar e tratar causas (tireoide, distúrbio HE, ICC, valvopatia).
    - [Eco TT].`
@@ -1859,11 +1859,10 @@ window.GUIAS = [
   // ---------- registro de scores ----------
   const SCORES = [
     {
-      id:'chadsvasc', grupo:'Fibrilação atrial', nome:'CHA₂DS₂-VASc',
-      desc:'Risco tromboembólico na FA não valvar e indicação de anticoagulação.',
+      id:'chadsvasc', grupo:'Fibrilação atrial', nome:'CHA₂DS₂-VA',
+      desc:'Risco tromboembólico na FA e indicação de anticoagulação (ESC 2024 — sem o componente de sexo do antigo CHA₂DS₂-VASc).',
       campos:[
         {id:'idade', tipo:'num', label:'Idade', un:'anos'},
-        {id:'sexo', tipo:'sel', label:'Sexo', opts:[{v:'M',t:'Masculino'},{v:'F',t:'Feminino'}]},
         {id:'icc', tipo:'chk', label:'IC / disfunção de VE', p:1},
         {id:'has', tipo:'chk', label:'Hipertensão', p:1},
         {id:'dm', tipo:'chk', label:'Diabetes', p:1},
@@ -1874,13 +1873,10 @@ window.GUIAS = [
         const id=n(v.idade)||0; let pts=0;
         pts += somaChk(v, this.campos);
         if(id>=75) pts+=2; else if(id>=65) pts+=1;
-        if(v.sexo==='F') pts+=1;
-        const homem = v.sexo!=='F';
-        let nivel='ok', cond;
-        const limiar = homem ? 2 : 3, consid = homem ? 1 : 2;
-        if(pts>=limiar){ nivel='bad'; cond='<b>Anticoagulação oral recomendada</b> (preferir DOAC à varfarina, salvo prótese mecânica ou estenose mitral reumática moderada/grave). Avalie o risco de sangramento (HAS-BLED).'; }
-        else if(pts===consid){ nivel='warn'; cond='<b>Considerar anticoagulação</b> individualizando risco/benefício (1 fator de risco não relacionado ao sexo).'; }
-        else { nivel='ok'; cond='Sem indicação de anticoagulação apenas pelo escore (sem fatores de risco relevantes além do sexo).'; }
+        let nivel, cond;
+        if(pts>=2){ nivel='bad'; cond='<b>Anticoagulação oral recomendada</b> (preferir DOAC à varfarina, salvo prótese mecânica ou estenose mitral reumática moderada/grave). Avalie o risco de sangramento (HAS-BLED).'; }
+        else if(pts===1){ nivel='warn'; cond='<b>Considerar anticoagulação</b> (1 fator de risco), individualizando risco/benefício.'; }
+        else { nivel='ok'; cond='Sem indicação de anticoagulação pelo escore (0 fatores de risco).'; }
         return { valor: pts+' ponto'+(pts===1?'':'s'), nivel, conduta: cond };
       }
     },
