@@ -2212,11 +2212,23 @@ window.GUIAS = [
     },
     {
       id:'hfapeff', grupo:'Insuficiência cardíaca', nome:'HFA-PEFF',
-      desc:'Probabilidade diagnóstica de ICFEp (passo 2 — domínios funcional, morfológico e biomarcador).',
+      desc:'Probabilidade diagnóstica de ICFEp (passo 2). Maior = 2 pts, menor = 1 pt; cada domínio conta o maior critério atingido (máx. 2). RS = ritmo sinusal; FA = fibrilação atrial.',
       campos:[
-        {id:'func', tipo:'sel', label:'Funcional (E/eʹ, eʹ, velocidade de IT)', opts:[{v:'0',t:'Nenhum critério (0)'},{v:'1',t:'Critério menor (1)'},{v:'2',t:'Critério maior (2)'}]},
-        {id:'morf', tipo:'sel', label:'Morfológico (AEi, massa/ERP do VE)', opts:[{v:'0',t:'Nenhum critério (0)'},{v:'1',t:'Critério menor (1)'},{v:'2',t:'Critério maior (2)'}]},
-        {id:'bio', tipo:'sel', label:'Biomarcador (NT-proBNP / BNP)', opts:[{v:'0',t:'Nenhum critério (0)'},{v:'1',t:'Critério menor (1)'},{v:'2',t:'Critério maior (2)'}]}
+        {id:'func', tipo:'sel', label:'Funcional', opts:[
+          {v:'2',t:'MAIOR (2): E/eʹ médio ≥ 15, ou eʹ septal < 7 / lateral < 10 cm/s, ou IT > 2,8 m/s (PSAP > 35)'},
+          {v:'1',t:'menor (1): E/eʹ médio 9–14, ou GLS < 16%'},
+          {v:'0',t:'Nenhum critério (0)'}
+        ]},
+        {id:'morf', tipo:'sel', label:'Morfológico', opts:[
+          {v:'2',t:'MAIOR (2): VAEi > 34 mL/m² (RS) / > 40 (FA), ou MVEi ≥ 149♂/122♀ g/m² com ERP > 0,42'},
+          {v:'1',t:'menor (1): VAEi 29–34 (RS)/34–40 (FA), ou MVEi ≥ 115♂/95♀, ou ERP > 0,42, ou parede ≥ 12 mm'},
+          {v:'0',t:'Nenhum critério (0)'}
+        ]},
+        {id:'bio', tipo:'sel', label:'Biomarcador', opts:[
+          {v:'2',t:'MAIOR (2): NT-proBNP > 220 ou BNP > 80 pg/mL (RS) | > 660 / > 240 (FA)'},
+          {v:'1',t:'menor (1): NT-proBNP 125–220 ou BNP 35–80 (RS) | 365–660 / 105–240 (FA)'},
+          {v:'0',t:'Nenhum critério (0)'}
+        ]}
       ],
       calc(v){
         const pts=(n(v.func)||0)+(n(v.morf)||0)+(n(v.bio)||0);
