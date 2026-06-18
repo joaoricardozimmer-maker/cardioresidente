@@ -2267,6 +2267,30 @@ window.GUIAS = [
       desc:'Mortalidade em 1 e 3 anos na insuficiência cardíaca.',
       link:{ u:'https://www.mdcalc.com/calc/3803/maggic-risk-calculator-heart-failure', t:'Abrir calculadora MAGGIC' },
       extra:'Estima a mortalidade em 1 e 3 anos na IC (FE reduzida ou preservada) a partir de idade, FEVE, classe NYHA, PAS, creatinina, IMC, comorbidades e terapia. Útil para prognóstico e decisões (ex.: encaminhamento a transplante/dispositivos).'
+    },
+    {
+      id:'gupta_mica', grupo:'Avaliação perioperatória', nome:'Gupta MICA (cirurgia vascular/não cardíaca)',
+      desc:'Risco de IAM ou parada cardíaca em 30 dias após cirurgia não cardíaca (modelo NSQIP). Complementa o Índice de Lee, sobretudo em cirurgia vascular.',
+      link:{ u:'https://www.mdcalc.com/calc/4038/gupta-perioperative-risk-myocardial-infarction-cardiac-arrest-mica', t:'Abrir calculadora Gupta MICA (NSQIP)' },
+      extra:'Usa idade, status funcional, classe ASA, creatinina > 1,5 mg/dL e <b>tipo de cirurgia</b> (modelo de regressão com muitas categorias cirúrgicas — por isso usa a ferramenta oficial). Não existe um score padrão chamado "Lee vascular"; para risco cardíaco em cirurgia vascular, o Gupta MICA (NSQIP) e o VSG-CRI são os mais usados.'
+    },
+    {
+      id:'score2', grupo:'Prevenção / risco cardiovascular', nome:'SCORE2 / SCORE2-OP (ESC)',
+      desc:'Risco de evento cardiovascular fatal e não fatal em 10 anos (prevenção primária) — algoritmo europeu.',
+      link:{ u:'https://u-prevent.com/', t:'Abrir calculadora SCORE2 (U-Prevent / ESC)' },
+      extra:'SCORE2 (40–69 anos), SCORE2-OP (≥70) e SCORE2-Diabetes. Categorias de risco e metas de LDL conforme a diretriz ESC 2021 de prevenção. Alternativa europeia ao PREVENT (AHA).'
+    },
+    {
+      id:'syntax', grupo:'Síndrome coronariana / dor torácica', nome:'SYNTAX score',
+      desc:'Complexidade anatômica da DAC (multiarterial/TCE) para decidir entre ICP e cirurgia (CRM).',
+      link:{ u:'https://syntaxscore.org/', t:'Abrir calculadora SYNTAX' },
+      extra:'Pontua a complexidade das lesões coronárias. <b>SYNTAX baixo (≤22)</b> favorece ICP; <b>alto (≥33)</b> favorece CRM; intermediário decide-se no Heart Team. (O SYNTAX Score II/2020 integra variáveis clínicas para individualizar ICP × CRM.)'
+    },
+    {
+      id:'crusade', grupo:'Síndrome coronariana / dor torácica', nome:'CRUSADE (sangramento na SCA)',
+      desc:'Risco de sangramento maior intra-hospitalar na SCA sem supra (NSTEMI).',
+      link:{ u:'https://www.mdcalc.com/calc/1784/crusade-score-post-mi-bleeding-risk', t:'Abrir calculadora CRUSADE' },
+      extra:'Usa hematócrito, ClCr, FC, PAS, sexo, sinais de IC, diabetes e doença vascular prévia (nomograma). Ajuda a escolher a estratégia antitrombótica e o acesso (radial) conforme o risco hemorrágico.'
     }
   ];
 
