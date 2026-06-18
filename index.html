@@ -222,6 +222,28 @@ select:focus, textarea:focus { outline: none; border-color: var(--blue); }
 .ens-doi:hover:not(:disabled) { background: #2a4058; border-color: var(--blue); }
 .ens-doi:disabled { opacity: .6; cursor: default; }
 
+/* ---------- Scores ---------- */
+.sc-panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+.sc-title { margin: 0 0 4px; font-size: 18px; }
+.sc-campos { display: flex; flex-direction: column; gap: 10px; margin: 16px 0; }
+.sc-campo { display: flex; flex-direction: column; gap: 5px; font-size: 13.5px; color: var(--muted); }
+.sc-campo span em { color: var(--muted); font-style: normal; }
+.sc-campo input, .sc-campo select { background: var(--card-2); border: 1px solid var(--line); border-radius: 8px; color: var(--text); padding: 9px 11px; font-size: 14px; }
+.sc-campo input:focus, .sc-campo select:focus { outline: none; border-color: var(--blue); }
+.sc-check { display: flex; align-items: flex-start; gap: 9px; font-size: 13.5px; color: var(--text); cursor: pointer; line-height: 1.4; }
+.sc-check input { margin-top: 2px; width: 17px; height: 17px; flex-shrink: 0; accent-color: var(--accent); }
+.sc-result { margin-top: 16px; border-radius: 10px; padding: 14px 16px; border: 1px solid var(--line); }
+.sc-valor { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+.sc-conduta { font-size: 14px; line-height: 1.55; }
+.sc-extra { color: var(--muted); font-size: 12.5px; }
+.sc-info { background: var(--card-2); }
+.sc-ok { background: rgba(43,212,125,.10); border-color: rgba(43,212,125,.4); }
+.sc-ok .sc-valor { color: var(--green); }
+.sc-warn { background: rgba(245,185,66,.10); border-color: rgba(245,185,66,.4); }
+.sc-warn .sc-valor { color: var(--amber); }
+.sc-bad { background: rgba(226,56,77,.12); border-color: rgba(226,56,77,.45); }
+.sc-bad .sc-valor { color: var(--accent-soft); }
+
 /* ---------- Diretrizes ---------- */
 #guias-root { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; }
 .gv-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
@@ -279,6 +301,7 @@ select:focus, textarea:focus { outline: none; border-color: var(--blue); }
       <button class="tab active" data-view="evidencia">🔎 Evidências</button>
       <button class="tab" data-view="transcricao">📝 Transcrever laudo</button>
       <button class="tab" data-view="evolucoes">🗂️ Evoluções</button>
+      <button class="tab" data-view="scores">🧮 Scores</button>
       <button class="tab" data-view="ensaios">🧪 Ensaios pivotais</button>
       <button class="tab" data-view="guias">📚 Diretrizes</button>
       <button class="tab" data-view="sobre">ℹ️ Sobre</button>
@@ -376,6 +399,18 @@ select:focus, textarea:focus { outline: none; border-color: var(--blue); }
           </div>
           <textarea id="evol-text" rows="22" placeholder="O modelo aparecerá aqui para edição."></textarea>
         </div>
+      </div>
+    </section>
+
+    <!-- ============ SCORES ============ -->
+    <section class="view" id="view-scores">
+      <div class="hero">
+        <h2>Scores e calculadoras</h2>
+        <p>Calcule o escore e veja a interpretação e os próximos passos. Apoio à decisão — confira sempre as diretrizes vigentes.</p>
+      </div>
+      <div class="evol-grid">
+        <aside class="evol-menu" id="scores-menu"></aside>
+        <div class="sc-panel" id="scores-panel"></div>
       </div>
     </section>
 
@@ -1805,6 +1840,289 @@ window.GUIAS = [
 
   input.addEventListener('input', render);
   render();
+})();
+
+
+/* ===== scores.js ===== */
+// Aba "Scores" — calculadoras cardiológicas com interpretação e conduta.
+// Cada score: { id, grupo, nome, desc, campos[], calc(v) -> {valor, nivel, conduta(HTML)} }
+// nivel: 'ok' (verde) | 'warn' (amarelo) | 'bad' (vermelho) | 'info' (azul)
+(function () {
+  const menu = document.getElementById('scores-menu');
+  const panel = document.getElementById('scores-panel');
+  if (!menu || !panel) return;
+
+  // ---------- helpers ----------
+  const n = v => { const x = parseFloat(String(v).replace(',', '.')); return isFinite(x) ? x : null; };
+  function somaChk(v, campos){ let s=0; campos.forEach(c=>{ if(c.tipo==='chk' && v[c.id]) s += (c.p||1); }); return s; }
+
+  // ---------- registro de scores ----------
+  const SCORES = [
+    {
+      id:'chadsvasc', grupo:'Fibrilação atrial', nome:'CHA₂DS₂-VASc',
+      desc:'Risco tromboembólico na FA não valvar e indicação de anticoagulação.',
+      campos:[
+        {id:'idade', tipo:'num', label:'Idade', un:'anos'},
+        {id:'sexo', tipo:'sel', label:'Sexo', opts:[{v:'M',t:'Masculino'},{v:'F',t:'Feminino'}]},
+        {id:'icc', tipo:'chk', label:'IC / disfunção de VE', p:1},
+        {id:'has', tipo:'chk', label:'Hipertensão', p:1},
+        {id:'dm', tipo:'chk', label:'Diabetes', p:1},
+        {id:'avc', tipo:'chk', label:'AVC / AIT / tromboembolismo prévio', p:2},
+        {id:'vasc', tipo:'chk', label:'Doença vascular (IAM, DAP, placa aórtica)', p:1}
+      ],
+      calc(v){
+        const id=n(v.idade)||0; let pts=0;
+        pts += somaChk(v, this.campos);
+        if(id>=75) pts+=2; else if(id>=65) pts+=1;
+        if(v.sexo==='F') pts+=1;
+        const homem = v.sexo!=='F';
+        let nivel='ok', cond;
+        const limiar = homem ? 2 : 3, consid = homem ? 1 : 2;
+        if(pts>=limiar){ nivel='bad'; cond='<b>Anticoagulação oral recomendada</b> (preferir DOAC à varfarina, salvo prótese mecânica ou estenose mitral reumática moderada/grave). Avalie o risco de sangramento (HAS-BLED).'; }
+        else if(pts===consid){ nivel='warn'; cond='<b>Considerar anticoagulação</b> individualizando risco/benefício (1 fator de risco não relacionado ao sexo).'; }
+        else { nivel='ok'; cond='Sem indicação de anticoagulação apenas pelo escore (sem fatores de risco relevantes além do sexo).'; }
+        return { valor: pts+' ponto'+(pts===1?'':'s'), nivel, conduta: cond };
+      }
+    },
+    {
+      id:'hasbled', grupo:'Fibrilação atrial', nome:'HAS-BLED',
+      desc:'Risco de sangramento maior em pacientes anticoagulados.',
+      campos:[
+        {id:'has', tipo:'chk', label:'Hipertensão (PAS > 160 mmHg)', p:1},
+        {id:'renal', tipo:'chk', label:'Função renal alterada (diálise, transplante ou Cr > 2,26 mg/dL)', p:1},
+        {id:'hep', tipo:'chk', label:'Função hepática alterada (cirrose, bilirrubina/TGO elevadas)', p:1},
+        {id:'avc', tipo:'chk', label:'AVC prévio', p:1},
+        {id:'sang', tipo:'chk', label:'Sangramento prévio ou predisposição', p:1},
+        {id:'inr', tipo:'chk', label:'INR lábil (se em varfarina)', p:1},
+        {id:'idoso', tipo:'chk', label:'Idade > 65 anos', p:1},
+        {id:'drogas', tipo:'chk', label:'Fármacos (AINE/antiplaquetário)', p:1},
+        {id:'alcool', tipo:'chk', label:'Álcool (≥ 8 doses/semana)', p:1}
+      ],
+      calc(v){
+        const pts=somaChk(v,this.campos);
+        let nivel, cond;
+        if(pts>=3){ nivel='bad'; cond='<b>Alto risco de sangramento.</b> Não contraindica a anticoagulação, mas exige cautela, corrigir fatores modificáveis (PA, INR lábil, AINE, álcool) e reavaliação frequente.'; }
+        else { nivel='ok'; cond='Risco de sangramento baixo/moderado. Mantenha vigilância e corrija fatores modificáveis.'; }
+        return { valor: pts+' ponto'+(pts===1?'':'s'), nivel, conduta: cond };
+      }
+    },
+    {
+      id:'heart', grupo:'Síndrome coronariana / dor torácica', nome:'HEART score',
+      desc:'Risco de evento cardíaco maior (MACE) em 6 semanas na dor torácica na emergência.',
+      campos:[
+        {id:'hist', tipo:'sel', label:'História', opts:[{v:'0',t:'Pouco suspeita (0)'},{v:'1',t:'Moderadamente suspeita (1)'},{v:'2',t:'Muito suspeita (2)'}]},
+        {id:'ecg', tipo:'sel', label:'ECG', opts:[{v:'0',t:'Normal (0)'},{v:'1',t:'Alteração inespecífica da repolarização (1)'},{v:'2',t:'Infradesnível de ST significativo (2)'}]},
+        {id:'idade', tipo:'sel', label:'Idade', opts:[{v:'0',t:'< 45 anos (0)'},{v:'1',t:'45–64 anos (1)'},{v:'2',t:'≥ 65 anos (2)'}]},
+        {id:'fr', tipo:'sel', label:'Fatores de risco', opts:[{v:'0',t:'Nenhum (0)'},{v:'1',t:'1–2 fatores (1)'},{v:'2',t:'≥3 fatores ou DAC conhecida (2)'}]},
+        {id:'tropo', tipo:'sel', label:'Troponina', opts:[{v:'0',t:'≤ limite normal (0)'},{v:'1',t:'1–3× o limite (1)'},{v:'2',t:'> 3× o limite (2)'}]}
+      ],
+      calc(v){
+        const pts=(n(v.hist)||0)+(n(v.ecg)||0)+(n(v.idade)||0)+(n(v.fr)||0)+(n(v.tropo)||0);
+        let nivel,cond;
+        if(pts<=3){ nivel='ok'; cond='<b>Baixo risco</b> (MACE ~0,9–1,7%). Geralmente permite alta precoce com seguimento, conforme protocolo institucional.'; }
+        else if(pts<=6){ nivel='warn'; cond='<b>Risco moderado</b> (MACE ~12–17%). Internar/observar, seriar troponina e considerar investigação isquêmica.'; }
+        else { nivel='bad'; cond='<b>Alto risco</b> (MACE ~50–65%). Conduta agressiva: internação e estratégia invasiva precoce.'; }
+        return { valor: pts+'/10', nivel, conduta: cond };
+      }
+    },
+    {
+      id:'rcri', grupo:'Avaliação perioperatória', nome:'Índice de Lee (RCRI)',
+      desc:'Risco de evento cardíaco maior em cirurgia não cardíaca.',
+      campos:[
+        {id:'cir', tipo:'chk', label:'Cirurgia de alto risco (intraperitoneal, intratorácica ou vascular suprainguinal)', p:1},
+        {id:'dac', tipo:'chk', label:'Doença arterial coronariana', p:1},
+        {id:'icc', tipo:'chk', label:'Insuficiência cardíaca', p:1},
+        {id:'avc', tipo:'chk', label:'Doença cerebrovascular (AVC/AIT)', p:1},
+        {id:'dm', tipo:'chk', label:'Diabetes em insulinoterapia', p:1},
+        {id:'cr', tipo:'chk', label:'Creatinina > 2,0 mg/dL', p:1}
+      ],
+      calc(v){
+        const pts=somaChk(v,this.campos);
+        const tab={0:'0,4%',1:'0,9%',2:'6,6%'};
+        const risco = pts>=3 ? '≥ 11%' : tab[pts];
+        let nivel = pts>=2?'bad':(pts===1?'warn':'ok');
+        const cond = pts>=2
+          ? '<b>Risco elevado.</b> Otimizar condições clínicas; considerar avaliação funcional/biomarcadores e estratégia perioperatória conforme diretriz.'
+          : 'Risco baixo. Em geral segue para cirurgia sem investigação cardíaca adicional, conforme capacidade funcional.';
+        return { valor: pts+' ponto'+(pts===1?'':'s')+' · risco ~'+risco, nivel, conduta: cond };
+      }
+    },
+    {
+      id:'dapt', grupo:'Antiagregação', nome:'DAPT score',
+      desc:'Avalia benefício de prolongar a dupla antiagregação além de 12 meses pós-stent.',
+      campos:[
+        {id:'idade', tipo:'sel', label:'Idade', opts:[{v:'0',t:'< 65 anos (0)'},{v:'-1',t:'65–74 anos (−1)'},{v:'-2',t:'≥ 75 anos (−2)'}]},
+        {id:'tabag', tipo:'chk', label:'Tabagismo atual', p:1},
+        {id:'dm', tipo:'chk', label:'Diabetes', p:1},
+        {id:'iam', tipo:'chk', label:'IAM na apresentação', p:1},
+        {id:'previo', tipo:'chk', label:'ICP ou IAM prévio', p:1},
+        {id:'stent', tipo:'chk', label:'Stent de diâmetro < 3 mm', p:1},
+        {id:'icc', tipo:'chk', label:'IC ou FEVE < 30%', p:2},
+        {id:'paclitaxel', tipo:'chk', label:'Stent eluidor de paclitaxel', p:1},
+        {id:'veia', tipo:'chk', label:'ICP de enxerto de veia safena', p:2}
+      ],
+      calc(v){
+        let pts=(n(v.idade)||0)+somaChk(v,this.campos);
+        let nivel, cond;
+        if(pts>=2){ nivel='ok'; cond='<b>DAPT score ≥ 2:</b> favorece <b>prolongar a DAPT</b> além de 12 meses (benefício isquêmico tende a superar o risco hemorrágico). Confirmar baixo risco de sangramento.'; }
+        else { nivel='warn'; cond='<b>DAPT score < 2:</b> não favorece prolongar a DAPT (risco de sangramento tende a superar o benefício).'; }
+        return { valor: (pts>0?'+':'')+pts, nivel, conduta: cond };
+      }
+    },
+    {
+      id:'h2fpef', grupo:'Insuficiência cardíaca', nome:'H₂FPEF',
+      desc:'Probabilidade de IC com fração de ejeção preservada (ICFEp).',
+      campos:[
+        {id:'obeso', tipo:'chk', label:'Heavy — IMC > 30 kg/m²', p:2},
+        {id:'hta', tipo:'chk', label:'Hypertensive — ≥ 2 anti-hipertensivos', p:1},
+        {id:'fa', tipo:'chk', label:'AF — fibrilação atrial', p:3},
+        {id:'php', tipo:'chk', label:'Pulmonary HTN — PSAP > 35 mmHg', p:1},
+        {id:'elder', tipo:'chk', label:'Elder — idade > 60 anos', p:1},
+        {id:'filling', tipo:'chk', label:'Filling — E/eʹ > 9', p:1}
+      ],
+      calc(v){
+        const pts=somaChk(v,this.campos);
+        let nivel,cond;
+        if(pts<=1){ nivel='ok'; cond='<b>Baixa probabilidade</b> de ICFEp — considerar outras causas de dispneia.'; }
+        else if(pts<=5){ nivel='warn'; cond='<b>Probabilidade intermediária</b> — considerar testes adicionais (eco diastólico, BNP/NT-proBNP, teste de esforço/cateterismo direito).'; }
+        else { nivel='bad'; cond='<b>Alta probabilidade</b> de ICFEp — diagnóstico provável; iniciar manejo (iSGLT2, controle de PA/volume/comorbidades).'; }
+        return { valor: pts+'/9', nivel, conduta: cond };
+      }
+    },
+    {
+      id:'ckdepi', grupo:'Função renal', nome:'CKD-EPI 2021 (TFG)',
+      desc:'Taxa de filtração glomerular estimada (equação de creatinina, sem raça).',
+      campos:[
+        {id:'cr', tipo:'num', label:'Creatinina sérica', un:'mg/dL'},
+        {id:'idade', tipo:'num', label:'Idade', un:'anos'},
+        {id:'sexo', tipo:'sel', label:'Sexo', opts:[{v:'M',t:'Masculino'},{v:'F',t:'Feminino'}]}
+      ],
+      calc(v){
+        const cr=n(v.cr), id=n(v.idade);
+        if(!cr||!id) return { valor:'—', nivel:'info', conduta:'Preencha creatinina e idade.' };
+        const fem = v.sexo==='F';
+        const k = fem?0.7:0.9, a = fem?-0.241:-0.302;
+        const minr = Math.min(cr/k,1), maxr = Math.max(cr/k,1);
+        let egfr = 142*Math.pow(minr,a)*Math.pow(maxr,-1.200)*Math.pow(0.9938,id);
+        if(fem) egfr*=1.012;
+        egfr = Math.round(egfr);
+        let estagio, nivel;
+        if(egfr>=90){estagio='G1 (normal)'; nivel='ok';}
+        else if(egfr>=60){estagio='G2 (levemente reduzida)'; nivel='ok';}
+        else if(egfr>=45){estagio='G3a'; nivel='warn';}
+        else if(egfr>=30){estagio='G3b'; nivel='warn';}
+        else if(egfr>=15){estagio='G4'; nivel='bad';}
+        else {estagio='G5 (falência)'; nivel='bad';}
+        const cond = 'Estágio <b>'+estagio+'</b>. Ajustar doses de fármacos pela TFG; em G3b–G5 evitar nefrotóxicos/contraste e considerar nefrologia. (Classifique também pela albuminúria.)';
+        return { valor: egfr+' mL/min/1,73m²', nivel, conduta: cond };
+      }
+    },
+    {
+      id:'qtc', grupo:'Eletrocardiograma', nome:'Correção do intervalo QT (QTc)',
+      desc:'Calcula o QTc por Bazett, Fridericia, Framingham e Hodges.',
+      campos:[
+        {id:'qt', tipo:'num', label:'Intervalo QT medido', un:'ms'},
+        {id:'fc', tipo:'num', label:'Frequência cardíaca', un:'bpm'},
+        {id:'sexo', tipo:'sel', label:'Sexo', opts:[{v:'M',t:'Masculino'},{v:'F',t:'Feminino'}]}
+      ],
+      calc(v){
+        const qt=n(v.qt), fc=n(v.fc);
+        if(!qt||!fc) return { valor:'—', nivel:'info', conduta:'Preencha o QT (ms) e a FC (bpm).' };
+        const rr=60/fc; // segundos
+        const bazett=Math.round(qt/Math.sqrt(rr));
+        const frid=Math.round(qt/Math.cbrt(rr));
+        const fram=Math.round(qt+154*(1-rr));
+        const hodges=Math.round(qt+1.75*(fc-60));
+        const limProl = v.sexo==='F'?460:450;
+        let nivel='ok';
+        if(bazett>500) nivel='bad'; else if(bazett>limProl) nivel='warn';
+        const cond = 'QTc (Bazett) = <b>'+bazett+' ms</b>. '
+          + (bazett>500 ? 'QTc > 500 ms: <b>risco elevado de Torsades</b> — revisar fármacos que prolongam QT, corrigir K⁺/Mg²⁺/Ca²⁺.'
+             : (bazett>limProl ? 'QTc prolongado para o sexo (>'+limProl+' ms) — investigar causas (fármacos, distúrbios eletrolíticos).'
+                : 'QTc dentro do normal.'))
+          + '<br><span class="sc-extra">Fridericia '+frid+' ms · Framingham '+fram+' ms · Hodges '+hodges+' ms. Em FC muito alta/baixa, prefira Fridericia/Framingham ao Bazett.</span>';
+        return { valor: bazett+' ms (Bazett)', nivel, conduta: cond };
+      }
+    },
+    {
+      id:'imc', grupo:'Antropometria', nome:'IMC',
+      desc:'Índice de massa corporal e classificação.',
+      campos:[
+        {id:'peso', tipo:'num', label:'Peso', un:'kg'},
+        {id:'altura', tipo:'num', label:'Altura', un:'cm'}
+      ],
+      calc(v){
+        const p=n(v.peso), a=n(v.altura);
+        if(!p||!a) return { valor:'—', nivel:'info', conduta:'Preencha peso e altura.' };
+        const imc = p/Math.pow(a/100,2);
+        const r = Math.round(imc*10)/10;
+        let cat, nivel;
+        if(imc<18.5){cat='Baixo peso'; nivel='warn';}
+        else if(imc<25){cat='Eutrófico'; nivel='ok';}
+        else if(imc<30){cat='Sobrepeso'; nivel='warn';}
+        else if(imc<35){cat='Obesidade grau I'; nivel='bad';}
+        else if(imc<40){cat='Obesidade grau II'; nivel='bad';}
+        else {cat='Obesidade grau III'; nivel='bad';}
+        return { valor: r+' kg/m² — '+cat, nivel, conduta:'Classificação OMS. Avalie também circunferência abdominal e risco cardiometabólico global.' };
+      }
+    }
+  ];
+
+  // ---------- UI ----------
+  function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  let atual = null;
+
+  // monta menu agrupado
+  const grupos={};
+  SCORES.forEach(s=>{(grupos[s.grupo]=grupos[s.grupo]||[]).push(s);});
+  Object.keys(grupos).forEach(g=>{
+    const gt=document.createElement('div'); gt.className='evol-group-title'; gt.textContent=g; menu.appendChild(gt);
+    grupos[g].forEach(s=>{
+      const b=document.createElement('button'); b.className='evol-item'; b.textContent=s.nome; b.dataset.id=s.id;
+      b.addEventListener('click',()=>select(s.id,b)); menu.appendChild(b);
+    });
+  });
+
+  function readVals(s){
+    const v={};
+    s.campos.forEach(c=>{
+      const el=document.getElementById('sc-'+c.id);
+      if(!el) return;
+      if(c.tipo==='chk') v[c.id]=el.checked;
+      else v[c.id]=el.value;
+    });
+    return v;
+  }
+
+  function compute(s){
+    const r=s.calc(readVals(s));
+    const out=document.getElementById('sc-out');
+    out.className='sc-result sc-'+(r.nivel||'info');
+    out.innerHTML='<div class="sc-valor">'+esc(r.valor)+'</div><div class="sc-conduta">'+r.conduta+'</div>';
+  }
+
+  function select(id, el){
+    const s=SCORES.find(x=>x.id===id); if(!s) return; atual=s;
+    menu.querySelectorAll('.evol-item').forEach(x=>x.classList.toggle('active', x===el));
+    let html='<h3 class="sc-title">'+esc(s.nome)+'</h3><p class="muted small">'+esc(s.desc)+'</p><div class="sc-campos">';
+    s.campos.forEach(c=>{
+      if(c.tipo==='num'){
+        html+='<label class="sc-campo"><span>'+esc(c.label)+(c.un?' <em>('+esc(c.un)+')</em>':'')+'</span><input type="number" step="any" id="sc-'+c.id+'"></label>';
+      } else if(c.tipo==='sel'){
+        html+='<label class="sc-campo"><span>'+esc(c.label)+'</span><select id="sc-'+c.id+'">'+c.opts.map(o=>'<option value="'+esc(o.v)+'">'+esc(o.t)+'</option>').join('')+'</select></label>';
+      } else if(c.tipo==='chk'){
+        html+='<label class="sc-check"><input type="checkbox" id="sc-'+c.id+'"><span>'+esc(c.label)+'</span></label>';
+      }
+    });
+    html+='</div><button id="sc-calc" class="btn-primary">Calcular</button><div id="sc-out" class="sc-result sc-info"><div class="sc-conduta">Preencha os campos e clique em Calcular.</div></div>';
+    panel.innerHTML=html;
+    document.getElementById('sc-calc').addEventListener('click',()=>compute(s));
+    panel.querySelectorAll('input,select').forEach(el=>el.addEventListener('change',()=>compute(s)));
+  }
+
+  // seleciona o primeiro
+  const first=menu.querySelector('.evol-item');
+  if(first) select(first.dataset.id, first);
 })();
 
 
