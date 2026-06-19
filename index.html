@@ -4,8 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CardioResidente — Ferramentas para o residente de cardiologia</title>
-  <meta name="description" content="Busca de evidências, transcrição de laudos por IA e modelos de evolução para o residente de cardiologia." />
+  <meta name="description" content="Ferramentas para o residente de cardiologia: evidências (PubMed), transcrição de laudos por IA, scores, ensaios pivotais, diretrizes e modelos de evolução." />
+  <meta name="theme-color" content="#c10e21" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23c10e21' d='M12 21s-7.5-4.35-10-9.06C.9 9.36 2.2 6 5.5 6 7.3 6 8.6 7 12 9c3.4-2 4.7-3 6.5-3 3.3 0 4.6 3.36 3.5 5.94C19.5 16.65 12 21 12 21z'/%3E%3C/svg%3E" />
+  <meta property="og:title" content="CardioResidente" />
+  <meta property="og:description" content="Ferramentas para o residente de cardiologia: evidências, transcrição de laudos por IA, scores, ensaios pivotais e diretrizes." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://cardioresidente.vercel.app" />
+  <meta name="twitter:card" content="summary" />
   <link rel="preconnect" href="https://eutils.ncbi.nlm.nih.gov" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap');
 
@@ -290,6 +299,46 @@ select:focus, textarea:focus { outline: none; border-color: var(--blue); }
   .brand h1 { font-size: 18px; }
 }
 
+/* ============================================================
+   Refinamentos de design (v2) — espaçamento, tipografia,
+   navegação responsiva, acessibilidade e rodapé
+   ============================================================ */
+body { line-height: 1.6; }
+main { padding-top: 30px; }
+.hero h2 { font-size: 26px; }
+.hero p { font-size: 15px; }
+
+/* mais respiro nos cartões principais */
+.evi-card, .ens-card, .gv-card, .sc-panel, .sobre { padding: 20px; }
+.evi-card .bottom { border-left: 3px solid var(--accent); padding-left: 11px; }
+
+/* navegação: rolagem horizontal em telas estreitas (sem quebra) */
+.tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { white-space: nowrap; flex: 0 0 auto; }
+
+/* foco visível por teclado (acessibilidade) */
+a:focus-visible, button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible, .tab:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+}
+
+/* rodapé mais institucional */
+.footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding: 26px 20px; display: flex; flex-direction: column; gap: 6px; }
+.footer-meta { font-size: 11.5px; color: var(--muted); }
+.footer-note { max-width: 760px; margin: 0 auto; }
+
+/* botões e inputs com transição consistente */
+.btn-primary, .btn-ghost, .gv-btn, .ens-doi, input, select, textarea { transition: all .15s ease; }
+
+@media (max-width: 600px) {
+  main { padding: 20px 14px 50px; }
+  .hero h2 { font-size: 22px; }
+  .topbar-band { padding: 12px 16px; }
+  .creator-badge { padding: 6px 10px; }
+  .cb-name { font-size: 12px; }
+}
+
 </style>
 </head>
 <body>
@@ -489,7 +538,8 @@ select:focus, textarea:focus { outline: none; border-color: var(--blue); }
       Criado por <strong>Dr. João Ricardo Cambruzzi Zimmer</strong> ·
       <a href="https://instagram.com/joaozimmer_" target="_blank" rel="noopener">📷 @joaozimmer_</a>
     </div>
-    <span class="footer-note">CardioResidente · ferramenta de apoio · não substitui julgamento clínico</span>
+    <span class="footer-note">Ferramenta de <strong>apoio à decisão</strong> — não substitui o julgamento clínico nem as diretrizes vigentes. Não insira dados que identifiquem o paciente.</span>
+    <span class="footer-meta">CardioResidente · atualizado em junho/2026</span>
   </footer>
 <script>
 /* ===== data-diretrizes.js ===== */
