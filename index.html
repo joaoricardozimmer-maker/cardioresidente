@@ -351,9 +351,25 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .mbe-table tr:last-child td { border-bottom: none; }
 .mbe-num { text-align: center; font-weight: 600; white-space: nowrap; }
 .mbe-ref { color: var(--muted); font-size: 11.5px; white-space: nowrap; }
+
+/* filtros, chips de força e botão de envio à calculadora */
+.mbe-filtros { display: flex; gap: 8px; flex-wrap: wrap; }
+.mbe-filtros .mbe-search { flex: 1 1 200px; }
+.mbe-legenda { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 11.5px; color: var(--muted); margin: 8px 0 2px; }
+.lr-chip { display: inline-block; min-width: 34px; padding: 2px 7px; border-radius: 20px; font-size: 12px; font-weight: 700; color: #fff; text-align: center; }
+.lr-strong { background: #1f9d57; }            /* mudança grande/conclusiva */
+.lr-mod { background: #14679e; }               /* moderada */
+.lr-small { background: #b07414; }             /* pequena */
+.lr-min { background: #9aa5b1; }               /* mínima */
+.lr-na { background: transparent; color: var(--muted); font-weight: 600; min-width: 0; padding: 0; }
+.mbe-usar { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 4px 9px; font-size: 11.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.mbe-usar:hover { background: var(--accent-soft); }
+
 @media (max-width: 600px) {
-  .mbe-table { font-size: 12.5px; }
+  .mbe-table { font-size: 12px; }
   .mbe-ref { white-space: normal; }
+  .mbe-table th:nth-child(4), .mbe-table td:nth-child(4),
+  .mbe-table th:nth-child(5), .mbe-table td:nth-child(5) { display: none; } /* oculta Sens/Espec no celular */
 }
 
 </style>
@@ -2492,7 +2508,7 @@ window.GUIAS = [
 
 // Aba "Medicina baseada em evidências" (MBE)
 // Ferramentas: probabilidade pós-teste (Bayes/Fagan), medidas de efeito (NNT/NNH/RRA/RRR/OR)
-// e biblioteca de razões de verossimilhança (LR) cardiológicas, com referências.
+// e biblioteca robusta de razões de verossimilhança (LR) cardiológicas, com referências.
 (function () {
   const menu = document.getElementById('mbe-menu');
   const panel = document.getElementById('mbe-panel');
@@ -2502,6 +2518,9 @@ window.GUIAS = [
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const r1 = x => Math.round(x * 10) / 10;
   const r2 = x => Math.round(x * 100) / 100;
+  const fmt = x => (x === null || x === undefined) ? '—' : String(r2(x)).replace('.', ',');
+
+  let pendingLR = null; // usado para enviar uma LR da tabela para a calculadora de Bayes
 
   // Interpretação da magnitude da LR (Jaeschke, JAMA 1994)
   function forcaLR(lr, positiva) {
@@ -2516,6 +2535,12 @@ window.GUIAS = [
       if (lr <= 0.5) return 'mudança <b>pequena</b> (às vezes importante)';
       return 'mudança <b>mínima/insignificante</b>';
     }
+  }
+  // Classe de cor do "chip" conforme a força da LR
+  function chipClass(lr, positiva) {
+    if (lr === null || lr === undefined) return 'lr-na';
+    if (positiva) return lr >= 10 ? 'lr-strong' : (lr >= 5 ? 'lr-mod' : (lr >= 2 ? 'lr-small' : 'lr-min'));
+    return lr < 0.1 ? 'lr-strong' : (lr <= 0.2 ? 'lr-mod' : (lr <= 0.5 ? 'lr-small' : 'lr-min'));
   }
 
   // ------------------------------------------------------------------
@@ -2537,7 +2562,7 @@ window.GUIAS = [
       '<label class="sc-campo"><span>LR− (razão de verossimilhança negativa)</span><input type="number" step="any" id="mb-lrn"></label>' +
       '</div>' +
       '<button id="mb-calc" class="btn-primary">Calcular</button>' +
-      '<div id="mb-out" class="sc-result sc-info"><div class="sc-conduta">Preencha os campos e clique em Calcular.</div></div>';
+      '<div id="mb-out" class="sc-result sc-info"><div class="sc-conduta">Preencha os campos e clique em Calcular. Dica: na <b>biblioteca de LRs</b> você pode enviar um valor direto para cá.</div></div>';
 
     const calc = () => {
       const pre = n(document.getElementById('mb-pre').value);
@@ -2552,7 +2577,6 @@ window.GUIAS = [
         out.innerHTML = '<div class="sc-conduta">Informe uma probabilidade pré-teste entre 0 e 100%.</div>';
         return;
       }
-      // Se sens/spec informados, derivam as LRs
       let origem = '';
       if (sens !== null && spec !== null && sens > 0 && sens < 100 && spec > 0 && spec < 100) {
         const se = sens / 100, sp = spec / 100;
@@ -2583,6 +2607,17 @@ window.GUIAS = [
     };
     document.getElementById('mb-calc').addEventListener('click', calc);
     panel.querySelectorAll('input').forEach(el => el.addEventListener('change', calc));
+
+    // se chegou uma LR vinda da biblioteca, preenche e calcula
+    if (pendingLR) {
+      if (pendingLR.lrp !== null && pendingLR.lrp !== undefined) document.getElementById('mb-lrp').value = pendingLR.lrp;
+      if (pendingLR.lrn !== null && pendingLR.lrn !== undefined) document.getElementById('mb-lrn').value = pendingLR.lrn;
+      document.getElementById('mb-pre').value = pendingLR.pre || 20;
+      pendingLR = null;
+      calc();
+      const out = document.getElementById('mb-out');
+      out.insertAdjacentHTML('afterbegin', '<div class="sc-conduta" style="margin-bottom:8px"><b>Ajuste a probabilidade pré-teste</b> ao seu paciente — preenchi 20% como ponto de partida.</div>');
+    }
   }
 
   // ------------------------------------------------------------------
@@ -2610,7 +2645,7 @@ window.GUIAS = [
         return;
       }
       const cer = cerP / 100, eer = eerP / 100;
-      const ard = cer - eer;            // diferença absoluta (positivo = tratamento reduz)
+      const ard = cer - eer;
       const rrr = cer > 0 ? ard / cer : null;
       const rr = cer > 0 ? eer / cer : null;
       const or = (cer > 0 && cer < 1 && eer < 1) ? (eer / (1 - eer)) / (cer / (1 - cer)) : null;
@@ -2641,54 +2676,114 @@ window.GUIAS = [
   }
 
   // ------------------------------------------------------------------
-  // 3) BIBLIOTECA DE LRs CARDIOLÓGICAS
+  // 3) BIBLIOTECA DE LRs CARDIOLÓGICAS (robusta)
+  // lrp/lrn/sens/spec: número ou null. obs: texto opcional (faixa, ressalva).
   // ------------------------------------------------------------------
   const LRS = [
-    { grupo: 'Insuficiência cardíaca (dispneia na emergência)', achado: 'Terceira bulha (B3 / galope)', lrp: '11', lrn: '0,88', ref: 'Wang, JAMA 2005' },
-    { grupo: 'Insuficiência cardíaca (dispneia na emergência)', achado: 'Turgência jugular', lrp: '5,1', lrn: '0,66', ref: 'Wang, JAMA 2005' },
-    { grupo: 'Insuficiência cardíaca (dispneia na emergência)', achado: 'Refluxo hepatojugular', lrp: '6,4', lrn: '0,79', ref: 'Wang, JAMA 2005' },
-    { grupo: 'Insuficiência cardíaca (dispneia na emergência)', achado: 'História prévia de IC', lrp: '5,8', lrn: '0,45', ref: 'Wang, JAMA 2005' },
-    { grupo: 'Insuficiência cardíaca (dispneia na emergência)', achado: 'Estertores pulmonares', lrp: '2,8', lrn: '0,51', ref: 'Wang, JAMA 2005' },
-    { grupo: 'Insuficiência cardíaca (dispneia na emergência)', achado: 'Congestão venosa pulmonar no RX', lrp: '12', lrn: '0,48', ref: 'Wang, JAMA 2005' },
-    { grupo: 'Insuficiência cardíaca (dispneia na emergência)', achado: 'Fibrilação atrial no ECG', lrp: '3,8', lrn: '0,79', ref: 'Wang, JAMA 2005' },
-    { grupo: 'Insuficiência cardíaca (dispneia na emergência)', achado: 'BNP ≥ 100 pg/mL (positivo)', lrp: '3,1', lrn: '—', ref: 'Wang, JAMA 2005' },
-    { grupo: 'Insuficiência cardíaca (dispneia na emergência)', achado: 'BNP < 100 pg/mL (afasta IC)', lrp: '—', lrn: '0,13', ref: 'Wang, JAMA 2005' },
-    { grupo: 'Estenose aórtica (sopro sistólico)', achado: '3–4 achados (S2 reduzida, volume/ascensão carotídea reduzidos, sopro em foco aórtico)', lrp: '40', lrn: '—', ref: 'Etchells, JGIM 1998' },
-    { grupo: 'Estenose aórtica (sopro sistólico)', achado: 'Ausência de sopro irradiando p/ carótida direita (afasta EAo ≥ moderada)', lrp: '—', lrn: '0,10', ref: 'Etchells, JGIM 1998' },
-    { grupo: 'Estenose aórtica (sopro sistólico)', achado: 'Ascensão carotídea lenta/tardia', lrp: '3,7', lrn: '0,42', ref: 'Etchells, JAMA 1997' },
-    { grupo: 'Doença coronariana', achado: 'Teste ergométrico positivo (infra de ST)', lrp: '2,9', lrn: '0,42', ref: 'Gibbons, ACC/AHA' },
-    { grupo: 'Doença coronariana', achado: 'Cintilografia de perfusão (SPECT) alterada', lrp: '4,3', lrn: '0,18', ref: 'Diamond/meta-análises' },
-    { grupo: 'Tromboembolismo', achado: 'D-dímero de alta sensibilidade NEGATIVO (afasta TEP/TVP)', lrp: '—', lrn: '0,09', ref: 'Stein, Ann Intern Med 2004' }
+    // ---- IC: exame e história (Wang, JAMA 2005) ----
+    { g: 'Insuficiência cardíaca — exame e história', a: 'Terceira bulha (B3 / galope)', lrp: 11, lrn: 0.88, ref: 'Wang, JAMA 2005' },
+    { g: 'Insuficiência cardíaca — exame e história', a: 'Refluxo hepatojugular', lrp: 6.4, lrn: 0.79, ref: 'Wang, JAMA 2005' },
+    { g: 'Insuficiência cardíaca — exame e história', a: 'História prévia de insuficiência cardíaca', lrp: 5.8, lrn: 0.45, ref: 'Wang, JAMA 2005' },
+    { g: 'Insuficiência cardíaca — exame e história', a: 'Turgência jugular', lrp: 5.1, lrn: 0.66, ref: 'Wang, JAMA 2005' },
+    { g: 'Insuficiência cardíaca — exame e história', a: 'Dispneia paroxística noturna', lrp: 2.6, lrn: 0.70, ref: 'Wang, JAMA 2005' },
+    { g: 'Insuficiência cardíaca — exame e história', a: 'Estertores pulmonares', lrp: 2.8, lrn: 0.51, ref: 'Wang, JAMA 2005' },
+    { g: 'Insuficiência cardíaca — exame e história', a: 'Ortopneia', lrp: 2.2, lrn: 0.65, ref: 'Wang, JAMA 2005' },
+    { g: 'Insuficiência cardíaca — exame e história', a: 'Edema de membros (ao exame)', lrp: 2.3, lrn: 0.64, ref: 'Wang, JAMA 2005' },
+    // ---- IC: biomarcadores e imagem ----
+    { g: 'Insuficiência cardíaca — biomarcadores e imagem', a: 'NT-proBNP < 300 pg/mL (afasta IC aguda)', lrp: null, lrn: 0.02, ref: 'Januzzi, PRIDE 2005' },
+    { g: 'Insuficiência cardíaca — biomarcadores e imagem', a: 'BNP < 100 pg/mL (afasta IC)', lrp: null, lrn: 0.13, ref: 'Wang, JAMA 2005' },
+    { g: 'Insuficiência cardíaca — biomarcadores e imagem', a: 'BNP 300–400 pg/mL (ponto de corte para confirmar)', lrp: 7.6, lrn: null, sens: 81, spec: 90, ref: 'Worster, meta-análise 2008' },
+    { g: 'Insuficiência cardíaca — biomarcadores e imagem', a: 'Congestão venosa pulmonar no RX de tórax', lrp: 12, lrn: 0.48, ref: 'Wang, JAMA 2005' },
+    { g: 'Insuficiência cardíaca — biomarcadores e imagem', a: 'Cardiomegalia no RX de tórax', lrp: 3.3, lrn: 0.33, ref: 'Wang, JAMA 2005' },
+    { g: 'Insuficiência cardíaca — biomarcadores e imagem', a: 'Fibrilação atrial no ECG', lrp: 3.8, lrn: 0.79, ref: 'Wang, JAMA 2005' },
+    // ---- SCA: características da dor (Swap & Nagurney, JAMA 2005) ----
+    { g: 'Dor torácica / SCA — características da dor', a: 'Irradiação para o braço/ombro DIREITO', lrp: 4.7, lrn: null, ref: 'Swap, JAMA 2005' },
+    { g: 'Dor torácica / SCA — características da dor', a: 'Irradiação para AMBOS os braços', lrp: 2.6, lrn: null, ref: 'Swap, JAMA 2005' },
+    { g: 'Dor torácica / SCA — características da dor', a: 'Dor desencadeada pelo esforço', lrp: 2.4, lrn: null, ref: 'Swap, JAMA 2005' },
+    { g: 'Dor torácica / SCA — características da dor', a: 'Irradiação para o braço ESQUERDO', lrp: 2.3, lrn: null, ref: 'Swap, JAMA 2005' },
+    { g: 'Dor torácica / SCA — características da dor', a: 'Sudorese (diaforese) associada', lrp: 2.0, lrn: null, ref: 'Swap, JAMA 2005' },
+    { g: 'Dor torácica / SCA — características da dor', a: 'Náusea ou vômito associados', lrp: 1.9, lrn: null, ref: 'Swap, JAMA 2005' },
+    { g: 'Dor torácica / SCA — características da dor', a: 'Dor reprodutível à palpação (torna SCA improvável)', lrp: 0.3, lrn: null, ref: 'Swap, JAMA 2005' },
+    { g: 'Dor torácica / SCA — características da dor', a: 'Dor posicional (torna SCA improvável)', lrp: 0.3, lrn: null, ref: 'Swap, JAMA 2005' },
+    { g: 'Dor torácica / SCA — características da dor', a: 'Dor pleurítica (torna SCA improvável)', lrp: 0.2, lrn: null, ref: 'Swap, JAMA 2005' },
+    // ---- DAC: testes não invasivos (meta-análises) ----
+    { g: 'Doença coronariana — testes não invasivos', a: 'Angio-TC de coronárias', lrp: 4.0, lrn: 0.07, sens: 95, spec: 76, ref: 'Meta-análise 2025 (104 estudos)' },
+    { g: 'Doença coronariana — testes não invasivos', a: 'Eco sob estresse', lrp: 5.4, lrn: 0.22, sens: 81, spec: 85, ref: 'Meta-análise 2025 (104 estudos)' },
+    { g: 'Doença coronariana — testes não invasivos', a: 'Cintilografia de perfusão (SPECT)', lrp: 3.2, lrn: 0.24, sens: 82, spec: 74, ref: 'Meta-análise 2025 (104 estudos)' },
+    { g: 'Doença coronariana — testes não invasivos', a: 'Teste ergométrico (ECG de esforço)', lrp: 1.7, lrn: 0.56, sens: 66, spec: 61, ref: 'Meta-análise 2025 (104 estudos)' },
+    // ---- Estenose aórtica (Etchells) ----
+    { g: 'Estenose aórtica (sopro sistólico)', a: '3–4 achados (S2 reduzida, volume/ascensão carotídea reduzidos, sopro em foco aórtico)', lrp: 40, lrn: null, ref: 'Etchells, JGIM 1998' },
+    { g: 'Estenose aórtica (sopro sistólico)', a: 'Ascensão carotídea lenta/tardia', lrp: 3.7, lrn: 0.42, ref: 'Etchells, JAMA 1997' },
+    { g: 'Estenose aórtica (sopro sistólico)', a: 'Ausência de sopro irradiando p/ carótida direita (afasta EAo ≥ moderada)', lrp: null, lrn: 0.10, ref: 'Etchells, JGIM 1998' },
+    // ---- Insuficiência aórtica (Choudhry, JAMA 1999) ----
+    { g: 'Insuficiência aórtica', a: 'Sopro diastólico precoce presente (faixa LR+ 9–32)', lrp: 10, lrn: 0.1, ref: 'Choudhry, JAMA 1999' },
+    { g: 'Insuficiência aórtica', a: 'Aumento do sopro à oclusão arterial transitória', lrp: 8.4, lrn: 0.3, ref: 'Choudhry, JAMA 1999' },
+    // ---- Sopros sistólicos: manobras (Lembo, NEJM 1988) ----
+    { g: 'Sopros sistólicos — manobras dinâmicas', a: 'Sopro AUMENTA com Valsalva → cardiomiopatia hipertrófica', lrp: 16, lrn: 0.36, sens: 65, spec: 96, ref: 'Lembo, NEJM 1988' },
+    { g: 'Sopros sistólicos — manobras dinâmicas', a: 'Sopro AUMENTA com handgrip → insuf. mitral / CIV', lrp: 8.5, lrn: 0.35, sens: 68, spec: 92, ref: 'Lembo, NEJM 1988' },
+    // ---- Tamponamento (Roy, JAMA 2007) ----
+    { g: 'Tamponamento cardíaco (com derrame pericárdico)', a: 'Pulso paradoxal > 20 mmHg', lrp: 8.8, lrn: null, ref: 'Roy, JAMA 2007' },
+    { g: 'Tamponamento cardíaco (com derrame pericárdico)', a: 'Pulso paradoxal > 12 mmHg', lrp: 5.9, lrn: null, ref: 'Roy, JAMA 2007' },
+    { g: 'Tamponamento cardíaco (com derrame pericárdico)', a: 'Pulso paradoxal > 10 mmHg', lrp: 3.3, lrn: null, ref: 'Roy, JAMA 2007' },
+    { g: 'Tamponamento cardíaco (com derrame pericárdico)', a: 'Pulso paradoxal ≤ 10 mmHg (torna tamponamento improvável)', lrp: null, lrn: 0.03, ref: 'Roy, JAMA 2007' },
+    // ---- PVC / volemia ----
+    { g: 'Pressão venosa central / volemia', a: 'PVJ > 8 cmH₂O à beira-leito → PVC elevada', lrp: 9.7, lrn: null, ref: 'Rational Clinical Exam (McGee)' },
+    // ---- Doença carotídea ----
+    { g: 'Doença carotídea', a: 'Sopro carotídeo → estenose 50–99%', lrp: 3.7, lrn: 0.36, sens: 71, spec: 81, ref: 'Northern Manhattan Study' },
+    // ---- TEP / TVP ----
+    { g: 'Tromboembolismo venoso', a: 'D-dímero de alta sensibilidade NEGATIVO (afasta TEP/TVP)', lrp: null, lrn: 0.09, ref: 'Stein, Ann Intern Med 2004' }
   ];
 
   function viewLRs() {
+    const grupos = [...new Set(LRS.map(x => x.g))];
     let html =
       '<h3 class="sc-title">Biblioteca de razões de verossimilhança (LR)</h3>' +
-      '<p class="muted small">Razões de verossimilhança de achados clínicos e exames em cardiologia, com a referência. ' +
-      'Combine com a calculadora de probabilidade pós-teste. As LRs variam conforme a população estudada — use como orientação, não como valor absoluto.</p>' +
-      '<input type="text" id="mb-lr-busca" placeholder="Buscar achado ou tema... (ex: B3, carótida, D-dímero)" class="mbe-search">' +
+      '<p class="muted small">' + LRS.length + ' achados clínicos e exames em cardiologia, com sensibilidade/especificidade (quando disponível) e a referência. ' +
+      'Use o botão <b>→ Bayes</b> para enviar a LR à calculadora de probabilidade pós-teste. As LRs variam conforme a população — orientação, não valor absoluto.</p>' +
+      '<div class="mbe-filtros">' +
+      '<input type="text" id="mb-lr-busca" placeholder="Buscar achado ou tema... (ex: B3, carótida, Valsalva)" class="mbe-search">' +
+      '<select id="mb-lr-grupo" class="mbe-search"><option value="">Todos os grupos</option>' +
+      grupos.map(g => '<option value="' + esc(g) + '">' + esc(g) + '</option>').join('') + '</select>' +
+      '</div>' +
+      '<div class="mbe-legenda"><span class="lr-chip lr-strong">grande</span><span class="lr-chip lr-mod">moderada</span><span class="lr-chip lr-small">pequena</span><span class="lr-chip lr-min">mínima</span> — força da mudança na probabilidade</div>' +
       '<div id="mb-lr-table"></div>';
     panel.innerHTML = html;
 
-    const render = (filtro) => {
+    const render = (filtro, grupoSel) => {
       const f = (filtro || '').toLowerCase();
-      const grupos = {};
-      LRS.filter(x => !f || (x.achado + ' ' + x.grupo).toLowerCase().includes(f))
-        .forEach(x => { (grupos[x.grupo] = grupos[x.grupo] || []).push(x); });
+      const grp = {};
+      LRS.filter(x => (!grupoSel || x.g === grupoSel) && (!f || (x.a + ' ' + x.g + ' ' + x.ref).toLowerCase().includes(f)))
+        .forEach(x => { (grp[x.g] = grp[x.g] || []).push(x); });
       let h = '';
-      Object.keys(grupos).forEach(g => {
+      Object.keys(grp).forEach(g => {
         h += '<div class="evol-group-title" style="margin-top:14px">' + esc(g) + '</div>';
-        h += '<table class="mbe-table"><thead><tr><th>Achado / exame</th><th>LR+</th><th>LR−</th><th>Ref.</th></tr></thead><tbody>';
-        grupos[g].forEach(x => {
-          h += '<tr><td>' + esc(x.achado) + '</td><td class="mbe-num">' + esc(x.lrp) + '</td><td class="mbe-num">' + esc(x.lrn) + '</td><td class="mbe-ref">' + esc(x.ref) + '</td></tr>';
+        h += '<table class="mbe-table"><thead><tr><th>Achado / exame</th><th>LR+</th><th>LR−</th><th>Sens</th><th>Espec</th><th>Ref.</th><th></th></tr></thead><tbody>';
+        grp[g].forEach((x, i) => {
+          const idx = LRS.indexOf(x);
+          h += '<tr>' +
+            '<td>' + esc(x.a) + '</td>' +
+            '<td class="mbe-num"><span class="lr-chip ' + chipClass(x.lrp, true) + '">' + fmt(x.lrp) + '</span></td>' +
+            '<td class="mbe-num"><span class="lr-chip ' + chipClass(x.lrn, false) + '">' + fmt(x.lrn) + '</span></td>' +
+            '<td class="mbe-num">' + (x.sens != null ? x.sens + '%' : '—') + '</td>' +
+            '<td class="mbe-num">' + (x.spec != null ? x.spec + '%' : '—') + '</td>' +
+            '<td class="mbe-ref">' + esc(x.ref) + '</td>' +
+            '<td class="mbe-num"><button class="mbe-usar" data-i="' + idx + '">→ Bayes</button></td>' +
+            '</tr>';
         });
         h += '</tbody></table>';
       });
       if (!h) h = '<p class="muted small">Nenhum achado encontrado.</p>';
-      document.getElementById('mb-lr-table').innerHTML = h;
+      const t = document.getElementById('mb-lr-table');
+      t.innerHTML = h;
+      t.querySelectorAll('.mbe-usar').forEach(b => b.addEventListener('click', () => {
+        const x = LRS[+b.dataset.i];
+        pendingLR = { lrp: x.lrp, lrn: x.lrn, pre: 20 };
+        irPara('post');
+      }));
     };
-    render('');
-    document.getElementById('mb-lr-busca').addEventListener('input', e => render(e.target.value));
+    render('', '');
+    document.getElementById('mb-lr-busca').addEventListener('input', e => render(e.target.value, document.getElementById('mb-lr-grupo').value));
+    document.getElementById('mb-lr-grupo').addEventListener('change', e => render(document.getElementById('mb-lr-busca').value, e.target.value));
   }
 
   // ---------- menu ----------
@@ -2697,17 +2792,20 @@ window.GUIAS = [
     { id: 'efeito', nome: 'Medidas de efeito (NNT / NNH)', fn: viewEfeito },
     { id: 'lrs', nome: 'Biblioteca de LRs cardiológicas', fn: viewLRs }
   ];
+  const botoes = {};
   const gt = document.createElement('div'); gt.className = 'evol-group-title'; gt.textContent = 'Ferramentas'; menu.appendChild(gt);
   TOOLS.forEach(t => {
     const b = document.createElement('button'); b.className = 'evol-item'; b.textContent = t.nome; b.dataset.id = t.id;
-    b.addEventListener('click', () => {
-      menu.querySelectorAll('.evol-item').forEach(x => x.classList.toggle('active', x === b));
-      t.fn();
-    });
+    botoes[t.id] = b;
+    b.addEventListener('click', () => irPara(t.id));
     menu.appendChild(b);
   });
-  const first = menu.querySelector('.evol-item');
-  if (first) { first.classList.add('active'); TOOLS[0].fn(); }
+  function irPara(id) {
+    const t = TOOLS.find(x => x.id === id); if (!t) return;
+    menu.querySelectorAll('.evol-item').forEach(x => x.classList.toggle('active', x === botoes[id]));
+    t.fn();
+  }
+  irPara('post');
 })();
 
 // Navegação entre abas + utilidades compartilhadas
