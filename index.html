@@ -6,7 +6,7 @@
   <title>CardioResidente — Ferramentas para o residente de cardiologia</title>
   <meta name="description" content="Ferramentas para o residente de cardiologia: evidências (PubMed), transcrição de laudos por IA, scores, ensaios pivotais, diretrizes e modelos de evolução." />
   <meta name="theme-color" content="#c10e21" />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23c10e21' d='M12 21s-7.5-4.35-10-9.06C.9 9.36 2.2 6 5.5 6 7.3 6 8.6 7 12 9c3.4-2 4.7-3 6.5-3 3.3 0 4.6 3.36 3.5 5.94C19.5 16.65 12 21 12 21z'/%3E%3C/svg%3E" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='20' fill='%23a31f2f'/%3E%3Cg transform='translate(6,32) scale(0.36)' fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 54 H100 L112 54 L117 45 L123 54 L130 27 L137 67 L143 52 L149 54 H222' stroke-width='6'/%3E%3Cpath d='M84 15 V58 Q84 70 73 70 Q63 70 62 59' stroke-width='9'/%3E%3Cpath d='M150 15 H187 L151 64 H189' stroke-width='9'/%3E%3C/g%3E%3C/svg%3E" />
   <meta property="og:title" content="CardioResidente" />
   <meta property="og:description" content="Ferramentas para o residente de cardiologia: evidências, transcrição de laudos por IA, scores, ensaios pivotais e diretrizes." />
   <meta property="og:type" content="website" />
@@ -69,10 +69,10 @@ h1, h2, h3, .sc-title, .ens-sec-title, .col-title, .gv-tema {
 .cb-name { font-size: 13.5px; color: #fff; font-weight: 700; }
 .cb-ig { font-size: 12.5px; color: #fff; font-weight: 600; }
 .logo {
-  font-size: 30px; color: #fff;
-  background: rgba(255,255,255,.15); width: 46px; height: 46px; border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
+  display: flex; align-items: center; justify-content: center; background: transparent;
 }
+.logo svg { height: 42px; width: auto; display: block; }
+@media (max-width: 600px) { .logo svg { height: 34px; } }
 .brand h1 { font-size: 20px; margin: 0; letter-spacing: .2px; font-weight: 800; color: #fff; }
 .tagline { margin: 0; color: rgba(255,255,255,.85); font-size: 12.5px; }
 
@@ -405,7 +405,9 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
   <header class="topbar">
     <div class="topbar-band">
       <div class="brand">
-        <span class="logo">♥</span>
+        <span class="logo" aria-label="Logo JZ">
+          <svg viewBox="0 0 234 86" role="img" aria-label="JZ"><g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round"><path d="M12 54 H100 L112 54 L117 45 L123 54 L130 27 L137 67 L143 52 L149 54 H222" stroke-width="4.5"/><path d="M84 15 V58 Q84 70 73 70 Q63 70 62 59" stroke-width="7"/><path d="M150 15 H187 L151 64 H189" stroke-width="7"/></g></svg>
+        </span>
         <div>
           <h1>CardioResidente</h1>
           <p class="tagline">Evidências · Laudos · Evoluções</p>
