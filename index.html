@@ -372,6 +372,31 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
   .mbe-table th:nth-child(5), .mbe-table td:nth-child(5) { display: none; } /* oculta Sens/Espec no celular */
 }
 
+/* ===== Evidências: recomendações por diretriz ===== */
+.rec-count { color: var(--muted); font-size: 13px; margin: 4px 0 14px; }
+.rec-legenda { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+.rec-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin-bottom: 14px; border-left: 4px solid var(--accent); }
+.rec-area { display: inline-block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--accent); margin-bottom: 4px; }
+.rec-titulo { margin: 2px 0 6px; font-size: 17px; }
+.rec-resumo { color: var(--text); font-size: 14px; margin: 0 0 12px; line-height: 1.5; }
+.rec-tabela { display: flex; flex-direction: column; gap: 6px; }
+.rec-row { display: grid; grid-template-columns: 84px auto auto 1fr; align-items: center; gap: 10px; padding: 7px 10px; background: var(--bg-soft); border-radius: 8px; }
+.rec-soc { font-weight: 700; font-size: 13px; }
+.rec-classe { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 12px; font-weight: 700; color: #fff; white-space: nowrap; }
+.cls-i { background: #1f9d57; }    /* Classe I — recomendado */
+.cls-iia { background: #14679e; }  /* Classe IIa — considerar */
+.cls-iib { background: #b07414; }  /* Classe IIb — pode-se considerar */
+.cls-iii { background: #c10e21; }  /* Classe III — não recomendado */
+.cls-na { background: #9aa5b1; }
+.rec-niv { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; background: #fff; border: 1px solid var(--line); color: var(--text); white-space: nowrap; cursor: help; }
+.rec-niv-na { color: var(--muted); }
+.rec-fonte { font-size: 12px; color: var(--muted); text-align: right; }
+.rec-vazio { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 10px; padding: 18px; font-size: 14px; color: var(--text); }
+@media (max-width: 600px) {
+  .rec-row { grid-template-columns: 64px auto auto; grid-row-gap: 4px; }
+  .rec-fonte { grid-column: 1 / -1; text-align: left; }
+}
+
 </style>
 </head>
 <body>
@@ -408,29 +433,19 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
     <!-- ============ EVIDÊNCIAS ============ -->
     <section class="view active" id="view-evidencia">
       <div class="hero">
-        <h2>Busca de evidências</h2>
-        <p>Pesquise a evidência por trás de uma conduta. Resultados da literatura ao vivo (PubMed) com link direto para o DOI, e uma base curada das principais condutas cardiológicas.</p>
+        <h2>Recomendações por diretriz</h2>
+        <p>Pergunte uma conduta e receba a <strong>Classe de recomendação</strong> e o <strong>Nível de evidência</strong> segundo a diretriz mais atual de cada sociedade (ESC, AHA/ACC e SBC). Apoio à decisão — confira sempre o documento original na aba Diretrizes.</p>
       </div>
 
       <form id="busca-form" class="search-box">
         <input type="text" id="busca-input" autocomplete="off"
-               placeholder="Ex: AAS na síndrome coronariana aguda, iSGLT2 na insuficiência cardíaca..." />
+               placeholder="Ex: sacubitril na ICFEr, anticoagulação na FA, meta de LDL..." />
         <button type="submit" class="btn-primary">Pesquisar</button>
       </form>
 
       <div class="chips" id="busca-chips"></div>
 
-      <div class="evi-grid">
-        <div class="evi-col">
-          <h3 class="col-title">📌 Base curada (condutas-chave)</h3>
-          <div id="curada-results" class="curada-list"></div>
-        </div>
-        <div class="evi-col">
-          <h3 class="col-title">🌐 PubMed — artigos ao vivo</h3>
-          <div id="pubmed-status" class="muted">Digite uma pergunta e clique em Pesquisar para buscar artigos no PubMed.</div>
-          <div id="pubmed-results" class="pubmed-list"></div>
-        </div>
-      </div>
+      <div id="rec-results"></div>
     </section>
 
     <!-- ============ TRANSCRIÇÃO ============ -->
@@ -568,8 +583,7 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
         <ul>
           <li><strong>Apoio à decisão, não substitui o julgamento clínico.</strong> Sempre confira condutas nas diretrizes vigentes e individualize para o paciente.</li>
           <li><strong>Privacidade:</strong> evite colar dados que identifiquem o paciente (nome, registro, CPF) nas ferramentas de IA. Use apenas o conteúdo técnico do laudo.</li>
-          <li>A base curada reflete recomendações consolidadas das diretrizes (ESC, AHA/ACC, SBC). Verifique a versão mais recente de cada diretriz.</li>
-          <li>Os artigos do PubMed vêm da API pública do NCBI e abrem no DOI/PubMed original.</li>
+          <li>A aba <strong>Evidências</strong> traz a Classe de recomendação e o Nível de evidência de cada conduta segundo a diretriz mais atual de cada sociedade (ESC, AHA/ACC, SBC). Os valores foram conferidos nas fontes citadas, mas <strong>confirme sempre no documento original</strong> (aba Diretrizes), pois as diretrizes são atualizadas periodicamente.</li>
         </ul>
         <p class="muted small">Esta ferramenta não armazena os textos digitados em servidores além da chamada necessária à IA para a transcrição.</p>
         <h3>Criador</h3>
@@ -588,6 +602,341 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
     <span class="footer-meta">CardioResidente · atualizado em junho/2026</span>
   </footer>
 <script>
+// Base de recomendações por sociedade (ESC, AHA/ACC, SBC).
+// Cada conduta traz a Classe de recomendação e o Nível de evidência da diretriz
+// mais recente de cada sociedade. cls: I | IIa | IIb | III ; niv: A | B | C | '' (—)
+// Valores conferidos nas diretrizes citadas (jun/2026). Apoio à decisão — confira sempre a fonte.
+window.RECOMENDACOES = [
+  // ===================== INSUFICIÊNCIA CARDÍACA =====================
+  {
+    area: 'Insuficiência cardíaca', titulo: 'Sacubitril/valsartana (ARNI) na ICFEr',
+    kw: ['arni', 'sacubitril', 'valsartana', 'entresto', 'neprilisina', 'icfer', 'ic fe reduzida', 'fevе reduzida', 'fe reduzida', 'insuficiencia cardiaca fe reduzida'],
+    resumo: 'ICFEr sintomática (FEVE ≤40%) para reduzir morbimortalidade; preferível ao IECA/BRA, ou de início em pacientes selecionados.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC IC 2021' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC/HFSA 2022' },
+      { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC IC 2021' }
+    ]
+  },
+  {
+    area: 'Insuficiência cardíaca', titulo: 'Betabloqueador na ICFEr',
+    kw: ['betabloqueador', 'carvedilol', 'bisoprolol', 'metoprolol', 'nebivolol', 'icfer', 'fe reduzida'],
+    resumo: 'ICFEr estável (FEVE ≤40%): reduz mortalidade e hospitalização. Um dos quatro pilares.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC IC 2021' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC/HFSA 2022' },
+      { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC IC 2021' }
+    ]
+  },
+  {
+    area: 'Insuficiência cardíaca', titulo: 'Antagonista mineralocorticoide (espironolactona/eplerenona) na ICFEr',
+    kw: ['espironolactona', 'eplerenona', 'antagonista mineralocorticoide', 'mra', 'arm', 'icfer', 'fe reduzida'],
+    resumo: 'ICFEr (FEVE ≤40%) sintomática apesar de IECA/ARNI + BB. Vigiar potássio e função renal.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC IC 2021' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC/HFSA 2022' },
+      { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC IC 2021' }
+    ]
+  },
+  {
+    area: 'Insuficiência cardíaca', titulo: 'iSGLT2 (dapagliflozina/empagliflozina) na ICFEr',
+    kw: ['isglt2', 'sglt2', 'dapagliflozina', 'empagliflozina', 'gliflozina', 'icfer', 'fe reduzida'],
+    resumo: 'ICFEr (FEVE ≤40%): reduz hospitalização por IC e morte cardiovascular, independente de diabetes. Quarto pilar.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC IC 2021' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC/HFSA 2022' },
+      { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC (atualização 2021)' }
+    ]
+  },
+  {
+    area: 'Insuficiência cardíaca', titulo: 'iSGLT2 na ICFEp e ICFE levemente reduzida',
+    kw: ['isglt2', 'sglt2', 'dapagliflozina', 'empagliflozina', 'icfep', 'fe preservada', 'fe levemente reduzida', 'icfelr', 'hfpef'],
+    resumo: 'IC com FEVE >40% (levemente reduzida ou preservada): reduz hospitalização por IC/morte CV (DELIVER, EMPEROR-Preserved).',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC IC — atualização 2023' },
+      { soc: 'AHA/ACC', cls: 'IIa', niv: 'B', fonte: 'AHA/ACC/HFSA 2022' }
+    ]
+  },
+  {
+    area: 'Insuficiência cardíaca', titulo: 'CDI para prevenção primária na ICFEr',
+    kw: ['cdi', 'desfibrilador', 'prevencao primaria', 'morte subita', 'icfer', 'fevе 35', 'fe 35'],
+    resumo: 'FEVE ≤35%, NYHA II–III, sob terapia otimizada e expectativa de vida >1 ano (em isquêmicos, ≥40 dias pós-IAM).',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC IC 2021 (isquêmica)' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC/HFSA 2022' },
+      { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC Dispositivos' }
+    ]
+  },
+  {
+    area: 'Insuficiência cardíaca', titulo: 'Terapia de ressincronização cardíaca (TRC)',
+    kw: ['trc', 'ressincronizacao', 'crt', 'bre', 'bloqueio de ramo esquerdo', 'qrs largo', 'icfer'],
+    resumo: 'Ritmo sinusal, BRE com QRS ≥150 ms, FEVE ≤35% e sintomático apesar de terapia otimizada.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC IC 2021' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC/HFSA 2022' },
+      { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC Dispositivos' }
+    ]
+  },
+  {
+    area: 'Insuficiência cardíaca', titulo: 'Ivabradina na ICFEr',
+    kw: ['ivabradina', 'ivabradine', 'frequencia cardiaca', 'icfer', 'ritmo sinusal'],
+    resumo: 'ICFEr, ritmo sinusal, FC ≥70 bpm apesar de dose máxima tolerada de betabloqueador (ou intolerância).',
+    recs: [
+      { soc: 'ESC', cls: 'IIa', niv: 'B', fonte: 'ESC IC 2021' },
+      { soc: 'AHA/ACC', cls: 'IIa', niv: 'B', fonte: 'AHA/ACC/HFSA 2022' }
+    ]
+  },
+  {
+    area: 'Insuficiência cardíaca', titulo: 'Diurético de alça na congestão',
+    kw: ['diuretico', 'furosemida', 'congestao', 'edema', 'ic descompensada', 'volemia'],
+    resumo: 'Alívio de sintomas e sinais de congestão na IC; não modifica mortalidade, usar a menor dose eficaz.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'C', fonte: 'ESC IC 2021' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'C', fonte: 'AHA/ACC/HFSA 2022' }
+    ]
+  },
+  // ===================== SÍNDROME CORONARIANA =====================
+  {
+    area: 'Síndrome coronariana', titulo: 'AAS na síndrome coronariana aguda',
+    kw: ['aas', 'aspirina', 'acido acetilsalicilico', 'sca', 'iam', 'infarto', 'antiagregante'],
+    resumo: 'Ataque 150–300 mg VO (mastigado) seguido de manutenção 75–100 mg/dia indefinidamente, salvo contraindicação.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC SCA 2023' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC SCA 2025' },
+      { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC IAMCSST/SCA' }
+    ]
+  },
+  {
+    area: 'Síndrome coronariana', titulo: 'Dupla antiagregação (DAPT) por 12 meses pós-SCA',
+    kw: ['dapt', 'dupla antiagregacao', 'ticagrelor', 'prasugrel', 'clopidogrel', 'sca', 'pos stent', 'p2y12'],
+    resumo: 'AAS + inibidor de P2Y12 (preferir ticagrelor ou prasugrel) por 12 meses como estratégia padrão; ajustar pelo risco isquêmico/hemorrágico.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC SCA 2023' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC SCA 2025' },
+      { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC SCA' }
+    ]
+  },
+  {
+    area: 'Síndrome coronariana', titulo: 'Estatina de alta intensidade na SCA (início precoce)',
+    kw: ['estatina', 'atorvastatina', 'rosuvastatina', 'alta intensidade', 'sca', 'iam', 'ldl'],
+    resumo: 'Iniciar estatina de alta intensidade o mais cedo possível em todos os pacientes com SCA, independentemente do LDL.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC SCA 2023' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC SCA 2025' },
+      { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC SCA' }
+    ]
+  },
+  {
+    area: 'Síndrome coronariana', titulo: 'ICP primária no IAM com supra (STEMI)',
+    kw: ['icp primaria', 'angioplastia primaria', 'stemi', 'iamcsst', 'supra de st', 'reperfusao', 'porta balao'],
+    resumo: 'Reperfusão preferencial no STEMI quando exequível em ≤120 min do diagnóstico; se não, fibrinólise e transferência.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC SCA 2023' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC SCA 2025' },
+      { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC IAMCSST' }
+    ]
+  },
+  {
+    area: 'Síndrome coronariana', titulo: 'Revascularização completa no STEMI multiarterial',
+    kw: ['revascularizacao completa', 'multiarterial', 'stemi', 'lesao nao culpada', 'complete revascularization'],
+    resumo: 'No STEMI com doença multiarterial e choque ausente: tratar também as lesões não culpadas (no índice ou em até 45 dias).',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC SCA 2023' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC SCA 2025' }
+    ]
+  },
+  {
+    area: 'Síndrome coronariana', titulo: 'Estratégia invasiva precoce (<24h) no NSTE-ACS de alto risco',
+    kw: ['estrategia invasiva', 'nstemi', 'nste-acs', 'sca sem supra', 'grace', 'cateterismo precoce', 'invasiva precoce'],
+    resumo: 'NSTEMI de alto risco (GRACE >140, troponina dinâmica, alterações de ST). Imediata (<2h) se muito alto risco/instabilidade (I-C).',
+    recs: [
+      { soc: 'ESC', cls: 'IIa', niv: 'A', fonte: 'ESC SCA 2023' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC SCA 2025' },
+      { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC SCA' }
+    ]
+  },
+  {
+    area: 'Síndrome coronariana', titulo: 'Colchicina na pericardite aguda',
+    kw: ['colchicina', 'pericardite', 'pericardite aguda', 'recorrencia'],
+    resumo: 'Adjuvante ao AINE/AAS na pericardite aguda — reduz sintomas e recorrência. Manter por ~3 meses.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC Pericárdio 2015' }
+    ]
+  },
+  // ===================== FIBRILAÇÃO ATRIAL =====================
+  {
+    area: 'Fibrilação atrial', titulo: 'Anticoagulação na FA com CHA₂DS₂-VA ≥ 2',
+    kw: ['anticoagulacao', 'fibrilacao atrial', 'fa', 'chadsva', 'chadsvasc', 'avc', 'tromboembolismo', 'doac', 'varfarina'],
+    resumo: 'CHA₂DS₂-VA ≥2: anticoagulação oral recomendada. Com escore = 1, considerar (IIa); = 0, não recomendada (III).',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC FA 2024' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'ACC/AHA FA 2023' },
+      { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC FA' }
+    ]
+  },
+  {
+    area: 'Fibrilação atrial', titulo: 'DOAC preferível à varfarina (FA não valvar)',
+    kw: ['doac', 'noac', 'apixabana', 'rivaroxabana', 'dabigatrana', 'edoxabana', 'varfarina', 'fa nao valvar', 'fibrilacao'],
+    resumo: 'Em FA elegível, os DOACs são preferíveis à varfarina (salvo prótese mecânica ou estenose mitral reumática moderada/grave).',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC FA 2024' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'ACC/AHA FA 2023' },
+      { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC FA' }
+    ]
+  },
+  {
+    area: 'Fibrilação atrial', titulo: 'Ablação por cateter na FA sintomática',
+    kw: ['ablacao', 'cateter', 'isolamento de veias pulmonares', 'fa paroxistica', 'fibrilacao sintomatica', 'controle de ritmo'],
+    resumo: 'FA sintomática refratária/intolerante a antiarrítmico: ablação para controle de ritmo (I). Primeira linha em paroxística selecionada (IIa).',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC FA 2024' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'ACC/AHA FA 2023' }
+    ]
+  },
+  {
+    area: 'Fibrilação atrial', titulo: 'Oclusão do apêndice atrial esquerdo (contraindicação a anticoagulação)',
+    kw: ['oclusao do apendice', 'apendice atrial esquerdo', 'watchman', 'laao', 'contraindicacao anticoagulacao'],
+    resumo: 'Pode ser considerada em pacientes com FA e contraindicação de longo prazo à anticoagulação oral.',
+    recs: [
+      { soc: 'ESC', cls: 'IIb', niv: 'B', fonte: 'ESC FA 2024' },
+      { soc: 'AHA/ACC', cls: 'IIa', niv: 'B', fonte: 'ACC/AHA FA 2023' }
+    ]
+  },
+  // ===================== VALVOPATIA =====================
+  {
+    area: 'Valvopatia', titulo: 'Intervenção na estenose aórtica grave sintomática',
+    kw: ['estenose aortica', 'eao', 'troca valvar aortica', 'tavi', 'savr', 'valvopatia aortica', 'sintomatica'],
+    resumo: 'Estenose aórtica grave sintomática tem indicação de intervenção (TAVI ou cirurgia), definida pelo Heart Team.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EACTS Valva 2021' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC Valva 2020' }
+    ]
+  },
+  {
+    area: 'Valvopatia', titulo: 'TAVI na estenose aórtica grave (≥75 anos ou alto risco cirúrgico)',
+    kw: ['tavi', 'tavr', 'implante transcateter', 'estenose aortica', 'idoso', 'alto risco cirurgico'],
+    resumo: 'TAVI recomendada em ≥75 anos, ou em alto risco/inoperáveis; SAVR preferida em <75 anos e baixo risco. Decisão do Heart Team.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC/EACTS Valva 2021' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC Valva 2020' }
+    ]
+  },
+  {
+    area: 'Valvopatia', titulo: 'Cirurgia na insuficiência mitral primária grave sintomática',
+    kw: ['insuficiencia mitral', 'im primaria', 'regurgitacao mitral', 'plastia mitral', 'cirurgia mitral'],
+    resumo: 'IM primária (degenerativa) grave sintomática: cirurgia (preferir plastia) — também em assintomáticos com disfunção de VE.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EACTS Valva 2021' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC Valva 2020' }
+    ]
+  },
+  {
+    area: 'Valvopatia', titulo: 'TEER mitral (insuficiência mitral secundária)',
+    kw: ['teer', 'mitraclip', 'reparo borda a borda', 'insuficiencia mitral secundaria', 'im funcional'],
+    resumo: 'IM secundária grave sintomática apesar de terapia otimizada, anatomia favorável e não candidato à cirurgia.',
+    recs: [
+      { soc: 'ESC', cls: 'IIa', niv: 'B', fonte: 'ESC/EACTS Valva 2021' },
+      { soc: 'AHA/ACC', cls: 'IIa', niv: 'B', fonte: 'AHA/ACC Valva 2020' }
+    ]
+  },
+  // ===================== DISLIPIDEMIA =====================
+  {
+    area: 'Dislipidemia', titulo: 'Estatina de alta intensidade na prevenção secundária',
+    kw: ['estatina', 'alta intensidade', 'prevencao secundaria', 'dac', 'dcv estabelecida', 'aterosclerose'],
+    resumo: 'Doença cardiovascular aterosclerótica estabelecida: estatina de alta intensidade na maior dose tolerada.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC/EAS Dislipidemia 2019' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC Colesterol 2018' },
+      { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC Dislipidemia' }
+    ]
+  },
+  {
+    area: 'Dislipidemia', titulo: 'Meta de LDL-C <55 mg/dL (muito alto risco)',
+    kw: ['ldl', 'meta de ldl', 'colesterol', 'muito alto risco', 'alvo lipidico', 'ldl 55', 'ldl 50'],
+    resumo: 'Muito alto risco: LDL-C <55 mg/dL e redução ≥50% do basal (ESC). A SBC adota alvo <50 mg/dL. A AHA usa redução ≥50% e limiar de LDL ≥70 para intensificar.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC/EAS Dislipidemia 2019' },
+      { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC Dislipidemia (alvo <50)' }
+    ]
+  },
+  {
+    area: 'Dislipidemia', titulo: 'Ezetimiba se não atingir a meta com estatina',
+    kw: ['ezetimiba', 'ezetimibe', 'meta de ldl nao atingida', 'combinacao', 'colesterol'],
+    resumo: 'Adicionar ezetimiba quando a meta de LDL não é alcançada com a dose máxima tolerada de estatina.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EAS Dislipidemia 2019' },
+      { soc: 'AHA/ACC', cls: 'IIa', niv: 'B', fonte: 'AHA/ACC Colesterol 2018' },
+      { soc: 'SBC', cls: 'I', niv: 'B', fonte: 'SBC Dislipidemia' }
+    ]
+  },
+  {
+    area: 'Dislipidemia', titulo: 'Inibidor de PCSK9 se meta não atingida com estatina + ezetimiba',
+    kw: ['pcsk9', 'evolocumabe', 'alirocumabe', 'inclisirana', 'muito alto risco', 'ldl refratario'],
+    resumo: 'Muito alto risco que não atinge a meta de LDL com estatina máxima + ezetimiba: associar inibidor de PCSK9.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC/EAS Dislipidemia 2019' },
+      { soc: 'AHA/ACC', cls: 'IIa', niv: 'A', fonte: 'AHA/ACC Colesterol 2018' }
+    ]
+  },
+  // ===================== HIPERTENSÃO =====================
+  {
+    area: 'Hipertensão arterial', titulo: 'Meta de pressão arterial <130/80 mmHg',
+    kw: ['meta pressorica', 'pressao arterial', 'has', 'hipertensao', 'alvo de pa', '130/80', 'controle pressorico'],
+    resumo: 'Alvo <130/80 mmHg na maioria, se tolerado (ESC 2024 mira PAS 120–129 mmHg). Individualizar em idosos frágeis.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC HAS 2024' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC HAS 2017' },
+      { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC HAS 2020' }
+    ]
+  },
+  {
+    area: 'Hipertensão arterial', titulo: 'Início do tratamento com combinação dupla',
+    kw: ['combinacao dupla', 'terapia combinada', 'has', 'ieca bcc', 'bra diuretico', 'inicio tratamento'],
+    resumo: 'Iniciar com combinação (IECA ou BRA + BCC ou diurético tiazídico), preferencialmente em comprimido único.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC HAS 2024' },
+      { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC HAS 2020' }
+    ]
+  },
+  // ===================== PREVENÇÃO =====================
+  {
+    area: 'Prevenção', titulo: 'Cessação do tabagismo',
+    kw: ['tabagismo', 'parar de fumar', 'cessacao', 'cigarro', 'prevencao'],
+    resumo: 'Interromper o tabagismo é a medida isolada de maior impacto na redução do risco cardiovascular.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC Prevenção 2021' },
+      { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC Prevenção 2019' }
+    ]
+  },
+  {
+    area: 'Prevenção', titulo: 'AAS na prevenção primária de rotina',
+    kw: ['aas prevencao primaria', 'aspirina prevencao', 'prevencao primaria', 'antiagregante rotina'],
+    resumo: 'NÃO recomendado de rotina na prevenção primária (risco de sangramento). Pode ser considerado em casos selecionados de alto risco e baixo risco hemorrágico.',
+    recs: [
+      { soc: 'ESC', cls: 'III', niv: 'A', fonte: 'ESC Prevenção 2021' },
+      { soc: 'AHA/ACC', cls: 'IIb', niv: 'A', fonte: 'AHA/ACC Prevenção 2019' }
+    ]
+  },
+  // ===================== TROMBOEMBOLISMO =====================
+  {
+    area: 'Tromboembolismo', titulo: 'Anticoagulação com DOAC no TEP (sem instabilidade)',
+    kw: ['tep', 'tromboembolismo pulmonar', 'embolia pulmonar', 'doac', 'anticoagulacao tep', 'apixabana rivaroxabana'],
+    resumo: 'TEP sem instabilidade hemodinâmica: anticoagulação plena, preferindo DOAC à varfarina (salvo SAF, gestação, ClCr muito baixo).',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC TEP 2019' },
+      { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC/Diretriz TEV' }
+    ]
+  },
+  {
+    area: 'Tromboembolismo', titulo: 'Trombólise sistêmica no TEP de alto risco',
+    kw: ['trombolise', 'fibrinolise', 'tep de alto risco', 'tep macico', 'instabilidade', 'embolia pulmonar grave'],
+    resumo: 'TEP de alto risco (instabilidade hemodinâmica/choque): trombólise sistêmica, salvo contraindicação.',
+    recs: [
+      { soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC TEP 2019' }
+    ]
+  }
+];
+
 // Base curada de condutas cardiológicas consolidadas.
 // classe = classe de recomendação (I, IIa, IIb, III) | nivel = nível de evidência (A, B, C)
 // pubmedQuery = consulta usada para buscar os artigos reais ao vivo no PubMed.
@@ -1510,27 +1859,34 @@ window.GUIAS = [
   }
 ];
 
-// Módulo de busca de evidências: base curada + PubMed ao vivo (NCBI E-utilities)
+// Aba Evidências: motor de recomendações por sociedade (ESC, AHA/ACC, SBC).
+// Pergunte uma conduta → recebe a Classe e o Nível de evidência de cada diretriz.
 (function () {
   const form = document.getElementById('busca-form');
   const input = document.getElementById('busca-input');
   const chipsEl = document.getElementById('busca-chips');
-  const curadaEl = document.getElementById('curada-results');
-  const pubEl = document.getElementById('pubmed-results');
-  const pubStatus = document.getElementById('pubmed-status');
+  const resultsEl = document.getElementById('rec-results');
+  if (!form || !input || !resultsEl) return;
 
-  const EUTILS = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils';
+  const BASE = window.RECOMENDACOES || [];
 
   const exemplos = [
-    "AAS na síndrome coronariana aguda",
-    "iSGLT2 na insuficiência cardíaca",
-    "Anticoagulação na fibrilação atrial",
-    "TAVI estenose aórtica",
-    "Colchicina pericardite",
-    "Metas de LDL"
+    'Sacubitril/valsartana na ICFEr',
+    'iSGLT2 na insuficiência cardíaca',
+    'Anticoagulação na fibrilação atrial',
+    'TAVI na estenose aórtica',
+    'Meta de LDL',
+    'AAS na prevenção primária'
   ];
 
-  // ---------- Chips de exemplo ----------
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function normaliza(s) {
+    return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+
+  // chips de exemplo
   exemplos.forEach(ex => {
     const c = document.createElement('button');
     c.type = 'button'; c.className = 'chip'; c.textContent = ex;
@@ -1538,145 +1894,90 @@ window.GUIAS = [
     chipsEl.appendChild(c);
   });
 
-  // ---------- Base curada ----------
-  function normaliza(s) {
-    return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-  }
-
-  function scoreCurada(item, q) {
+  function score(item, q) {
     const nq = normaliza(q);
     const termos = nq.split(/\s+/).filter(t => t.length > 2);
-    let score = 0;
-    const hay = normaliza(item.title + ' ' + item.cat + ' ' + item.keywords.join(' ') + ' ' + item.bottom);
-    termos.forEach(t => { if (hay.includes(t)) score += 1; });
-    item.keywords.forEach(k => { if (nq.includes(normaliza(k))) score += 2; });
-    return score;
+    let s = 0;
+    const hay = normaliza(item.titulo + ' ' + item.area + ' ' + item.kw.join(' ') + ' ' + item.resumo);
+    termos.forEach(t => { if (hay.includes(t)) s += 1; });
+    item.kw.forEach(k => { if (nq.includes(normaliza(k))) s += 2; });
+    if (normaliza(item.titulo).includes(nq) && nq.length > 3) s += 3;
+    return s;
   }
 
-  function renderCurada(q) {
-    const ranked = window.DIRETRIZES
-      .map(it => ({ it, s: scoreCurada(it, q) }))
-      .filter(x => x.s > 0)
-      .sort((a, b) => b.s - a.s)
-      .slice(0, 6)
-      .map(x => x.it);
-
-    if (!ranked.length) {
-      curadaEl.innerHTML = '<p class="muted small">Nenhuma conduta na base curada para esse termo. Veja os resultados do PubMed ao lado.</p>';
-      return;
-    }
-    curadaEl.innerHTML = ranked.map(cardCurada).join('');
-    curadaEl.querySelectorAll('.pm-link').forEach(el => {
-      el.addEventListener('click', () => {
-        const q = el.dataset.q;
-        input.value = el.dataset.title;
-        searchPubMed(q);
-        document.getElementById('view-evidencia').scrollIntoView({ behavior: 'smooth' });
-      });
-    });
+  // classe -> classe css (cor)
+  function classeCss(cls) {
+    if (cls === 'I') return 'cls-i';
+    if (cls === 'IIa') return 'cls-iia';
+    if (cls === 'IIb') return 'cls-iib';
+    if (cls === 'III') return 'cls-iii';
+    return 'cls-na';
+  }
+  function classeTexto(cls) {
+    if (cls === 'I') return 'Classe I — é recomendado/indicado (benefício comprovado)';
+    if (cls === 'IIa') return 'Classe IIa — deve ser considerado (peso da evidência a favor)';
+    if (cls === 'IIb') return 'Classe IIb — pode ser considerado (utilidade menos estabelecida)';
+    if (cls === 'III') return 'Classe III — não recomendado / pode ser prejudicial';
+    return '';
+  }
+  function nivelTexto(niv) {
+    if (niv === 'A') return 'múltiplos ensaios clínicos randomizados ou metanálises';
+    if (niv === 'B') return 'um ECR ou grandes estudos não randomizados';
+    if (niv === 'C') return 'consenso de especialistas / estudos pequenos';
+    return '';
   }
 
-  function cardCurada(it) {
-    return `
-      <div class="evi-card">
-        <span class="cat">${esc(it.cat)}</span>
-        <h4>${esc(it.title)}</h4>
-        <p class="bottom">${esc(it.bottom)}</p>
-        <div class="badges">
-          <span class="badge classe-${it.classe.replace(/[^IVab]/g,'')}">Classe ${esc(it.classe)}</span>
-          <span class="badge nivel">Nível ${esc(it.nivel)}</span>
-        </div>
-        ${it.trials && it.trials !== '—' ? `<div class="trials"><strong>Ensaios:</strong> ${esc(it.trials)}</div>` : ''}
-        <div class="src">${esc(it.src)}</div>
-        <a class="pm-link" data-q="${esc(it.pubmedQuery)}" data-title="${esc(it.title)}">→ Ver artigos no PubMed</a>
-      </div>`;
-  }
-
-  // ---------- PubMed ao vivo ----------
-  async function searchPubMed(query) {
-    pubEl.innerHTML = '';
-    pubStatus.innerHTML = '<span class="spinner"></span> Buscando no PubMed...';
-    try {
-      // 1) esearch -> lista de PMIDs
-      const term = encodeURIComponent(query);
-      const sUrl = `${EUTILS}/esearch.fcgi?db=pubmed&retmode=json&retmax=12&sort=relevance&term=${term}`;
-      const sRes = await fetch(sUrl);
-      if (!sRes.ok) throw new Error('esearch ' + sRes.status);
-      const sData = await sRes.json();
-      const ids = (sData.esearchresult && sData.esearchresult.idlist) || [];
-      if (!ids.length) {
-        pubStatus.textContent = 'Nenhum artigo encontrado no PubMed para esse termo.';
-        return;
-      }
-      // 2) esummary -> metadados
-      const sumUrl = `${EUTILS}/esummary.fcgi?db=pubmed&retmode=json&id=${ids.join(',')}`;
-      const sumRes = await fetch(sumUrl);
-      if (!sumRes.ok) throw new Error('esummary ' + sumRes.status);
-      const sumData = await sumRes.json();
-      const result = sumData.result || {};
-      const items = (result.uids || ids).map(id => result[id]).filter(Boolean);
-      renderPubMed(items, query);
-    } catch (err) {
-      console.error(err);
-      pubStatus.innerHTML = 'Não foi possível consultar o PubMed agora. '
-        + `<a href="https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(query)}" target="_blank" rel="noopener">Abrir busca no PubMed →</a>`;
-    }
-  }
-
-  function renderPubMed(items, query) {
-    pubStatus.innerHTML = `${items.length} artigos mais relevantes · `
-      + `<a href="https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(query)}" target="_blank" rel="noopener">ver todos no PubMed →</a>`;
-    pubEl.innerHTML = items.map(it => {
-      const pmid = it.uid;
-      const journal = it.fulljournalname || it.source || '';
-      const year = (it.pubdate || '').split(' ')[0] || '';
-      const authors = (it.authors || []).slice(0, 3).map(a => a.name).join(', ')
-        + ((it.authors || []).length > 3 ? ', et al.' : '');
-      const doi = extractDOI(it);
-      const pmLink = `https://pubmed.ncbi.nlm.nih.gov/${pmid}/`;
-      const doiLink = doi ? `https://doi.org/${doi}` : null;
-      return `
-        <div class="pm-item">
-          <a class="title" href="${doiLink || pmLink}" target="_blank" rel="noopener">${esc(it.title || '(sem título)')}</a>
-          <div class="meta">${esc(authors)} · <em>${esc(journal)}</em> ${esc(year)}</div>
-          <div class="links">
-            ${doiLink ? `<a href="${doiLink}" target="_blank" rel="noopener">DOI →</a>` : ''}
-            <a href="${pmLink}" target="_blank" rel="noopener">PubMed (PMID ${esc(String(pmid))}) →</a>
-          </div>
-        </div>`;
+  function card(item) {
+    const linhas = item.recs.map(r => {
+      const niv = r.niv ? '<span class="rec-niv" title="Nível ' + esc(r.niv) + ': ' + esc(nivelTexto(r.niv)) + '">Nível ' + esc(r.niv) + '</span>' : '<span class="rec-niv rec-niv-na">—</span>';
+      return '<div class="rec-row">' +
+        '<span class="rec-soc">' + esc(r.soc) + '</span>' +
+        '<span class="rec-classe ' + classeCss(r.cls) + '" title="' + esc(classeTexto(r.cls)) + '">Classe ' + esc(r.cls) + '</span>' +
+        niv +
+        '<span class="rec-fonte">' + esc(r.fonte) + '</span>' +
+        '</div>';
     }).join('');
-  }
-
-  function extractDOI(it) {
-    if (it.elocationid && /10\.\d{4,}/.test(it.elocationid)) {
-      const m = it.elocationid.match(/(10\.\d{4,}\/[^\s]+)/);
-      if (m) return m[1];
-    }
-    if (Array.isArray(it.articleids)) {
-      const d = it.articleids.find(a => a.idtype === 'doi');
-      if (d) return d.value;
-    }
-    return null;
-  }
-
-  // ---------- util ----------
-  function esc(s) {
-    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    return '<div class="rec-card">' +
+      '<span class="rec-area">' + esc(item.area) + '</span>' +
+      '<h4 class="rec-titulo">' + esc(item.titulo) + '</h4>' +
+      '<p class="rec-resumo">' + esc(item.resumo) + '</p>' +
+      '<div class="rec-tabela">' + linhas + '</div>' +
+      '</div>';
   }
 
   function doSearch(q) {
-    if (!q || !q.trim()) return;
-    renderCurada(q);
-    searchPubMed(q);
+    if (!q || !q.trim()) { renderInicial(); return; }
+    const ranked = BASE.map(it => ({ it, s: score(it, q) }))
+      .filter(x => x.s > 0)
+      .sort((a, b) => b.s - a.s)
+      .slice(0, 8)
+      .map(x => x.it);
+    if (!ranked.length) {
+      resultsEl.innerHTML = '<div class="rec-vazio">Nenhuma conduta encontrada para <b>' + esc(q) + '</b> na base atual. ' +
+        'Tente outros termos (ex.: nome do fármaco, condição ou procedimento), ou consulte a aba <b>Diretrizes</b> para o documento completo.</div>';
+      return;
+    }
+    resultsEl.innerHTML = '<p class="rec-count">' + ranked.length + ' conduta(s) encontrada(s) — recomendação mais atual de cada sociedade:</p>' +
+      ranked.map(card).join('');
+  }
+
+  function renderInicial() {
+    const amostra = ['Sacubitril', 'Anticoagulação na FA', 'Estatina', 'TAVI'];
+    const itens = [];
+    amostra.forEach(t => { const m = BASE.map(it => ({ it, s: score(it, t) })).sort((a, b) => b.s - a.s)[0]; if (m && m.s > 0 && !itens.includes(m.it)) itens.push(m.it); });
+    resultsEl.innerHTML =
+      '<div class="rec-legenda">' +
+      '<span class="rec-classe cls-i">Classe I</span> recomendado · ' +
+      '<span class="rec-classe cls-iia">IIa</span> considerar · ' +
+      '<span class="rec-classe cls-iib">IIb</span> pode-se considerar · ' +
+      '<span class="rec-classe cls-iii">III</span> não recomendado' +
+      '</div>' +
+      '<p class="rec-count">' + BASE.length + ' condutas na base. Exemplos:</p>' +
+      itens.map(card).join('');
   }
 
   form.addEventListener('submit', e => { e.preventDefault(); doSearch(input.value); });
-
-  // Render inicial da base curada (amostra)
-  curadaEl.innerHTML = window.DIRETRIZES.slice(0, 4).map(cardCurada).join('');
-  curadaEl.querySelectorAll('.pm-link').forEach(el => {
-    el.addEventListener('click', () => { input.value = el.dataset.title; searchPubMed(el.dataset.q); });
-  });
+  renderInicial();
 })();
 
 // Módulo de transcrição de laudos por IA (chama a função serverless /api/transcrever)
