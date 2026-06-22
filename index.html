@@ -405,6 +405,8 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .pt-table th:first-child { text-align: left; }
 .pt-age { font-weight: 700; padding: 6px 8px; border: 1px solid var(--line); }
 .pt-cell { color: #fff; font-weight: 700; text-align: center; padding: 6px 8px; border: 1px solid rgba(255,255,255,.5); }
+.pt-rf-title { font-weight: 600; font-size: 13px; margin: 10px 0 6px; }
+.pt-rfs { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
 @media (max-width: 600px) { .pt-table { font-size: 11.5px; } .pt-cell, .pt-age, .pt-table th { padding: 5px 4px; } }
 .rec-vazio { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 10px; padding: 18px; font-size: 14px; color: var(--text); }
 @media (max-width: 600px) {
@@ -558,8 +560,8 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
     <!-- ============ PRÉ-TESTE ============ -->
     <section class="view" id="view-pretest">
       <div class="hero">
-        <h2>Probabilidade pré-teste</h2>
-        <p>A probabilidade de doença <em>antes</em> de pedir o exame, por cenário clínico. Comece pela dor torácica / DAC (idade, sexo e tipo de sintoma). Combine com a aba MBE para chegar à probabilidade pós-teste.</p>
+        <h2>Probabilidade pré-teste — DAC (ESC 2024)</h2>
+        <p>A probabilidade de doença <em>antes</em> do exame, no modelo mais atual (likelihood clínica ponderada por fatores de risco, RF-CL, da ESC 2024): idade, sexo, tipo de sintoma e fatores de risco. Combine com a aba MBE para a probabilidade pós-teste.</p>
       </div>
       <div id="pretest-root"></div>
     </section>
@@ -3295,13 +3297,13 @@ window.GUIAS = [
   irPara('post');
 })();
 
-// Aba "Pré-teste": probabilidade pré-teste de DAC obstrutiva (ESC 2019) por idade, sexo e sintoma,
-// com interpretação e envio direto ao cálculo de Bayes (aba MBE).
+// Aba "Pré-teste": likelihood clínica de DAC obstrutiva no modelo ESC 2024 (RF-CL),
+// partindo da probabilidade base por sintoma/idade/sexo e ponderando pelos fatores de risco.
 (function () {
   const root = document.getElementById('pretest-root');
   if (!root) return;
 
-  // ESC 2019 CCS — probabilidade pré-teste de DAC obstrutiva (%). [homem, mulher]
+  // Probabilidade base por sintoma/idade/sexo (ESC — base do modelo RF-CL). [homem, mulher] em %
   const PTP = {
     tipica:   { '30-39': [3, 5],  '40-49': [22, 10], '50-59': [32, 13], '60-69': [44, 16], '70+': [52, 27] },
     atipica:  { '30-39': [4, 3],  '40-49': [10, 6],  '50-59': [17, 6],  '60-69': [26, 11], '70+': [34, 19] },
@@ -3315,77 +3317,97 @@ window.GUIAS = [
     { id: 'nao', t: 'Dor não anginosa' },
     { id: 'dispneia', t: 'Dispneia (sintoma principal)' }
   ];
+  const RFS = [
+    { id: 'rf-fam', t: 'História familiar de DAC precoce (♂ < 55, ♀ < 65 anos)' },
+    { id: 'rf-tab', t: 'Tabagismo (atual ou prévio)' },
+    { id: 'rf-disl', t: 'Dislipidemia' },
+    { id: 'rf-has', t: 'Hipertensão arterial' },
+    { id: 'rf-dm', t: 'Diabetes melito' }
+  ];
 
-  function nivel(p) {
-    if (p > 15) return { cls: 'cls-iii', txt: '<b>Probabilidade alta (&gt;15%)</b> — teste não invasivo claramente indicado: angio-TC de coronárias ou teste funcional de isquemia (eco/cintilografia/RM de estresse).' };
-    if (p >= 5) return { cls: 'cls-iib', txt: '<b>Probabilidade intermediária (5–15%)</b> — considerar teste após avaliar a probabilidade clínica (modificadores). A angio-TC de coronárias é uma boa opção para excluir DAC.' };
-    return { cls: 'cls-i', txt: '<b>Probabilidade baixa (≤5%)</b> — DAC obstrutiva improvável; em geral adiar testes de rotina e investigar outras causas (reavaliar se houver modificadores que aumentem a probabilidade clínica).' };
+  // Categorias e condutas ESC 2024 (likelihood clínica de DAC obstrutiva)
+  function categoria(p) {
+    if (p <= 5) return { nome: 'Muito baixa (≤5%)', cls: 'sc-ok', cor: '#1f9d57', cond: 'DAC obstrutiva muito improvável — em geral <b>adiar testes diagnósticos</b> e investigar outras causas.' };
+    if (p <= 15) return { nome: 'Baixa (&gt;5–15%)', cls: 'sc-ok', cor: '#3a8f4f', cond: 'Considerar adiar o teste; se prosseguir, o <b>escore de cálcio coronário</b> ajuda a reclassificar. Angio-TC é boa opção para excluir DAC.' };
+    if (p <= 50) return { nome: 'Moderada (&gt;15–50%)', cls: 'sc-warn', cor: '#b07414', cond: '<b>Angio-TC de coronárias</b> ou <b>imagem funcional de isquemia</b> (PET/SPECT, RM de estresse, eco de estresse) como primeira linha.' };
+    if (p <= 85) return { nome: 'Alta (&gt;50–85%)', cls: 'sc-bad', cor: '#c10e21', cond: 'Preferir <b>imagem funcional de isquemia</b>; considerar invasivo conforme sintomas e risco de evento.' };
+    return { nome: 'Muito alta (&gt;85%)', cls: 'sc-bad', cor: '#8d0a18', cond: '<b>Angiografia coronária invasiva (CATE)</b> recomendada, sobretudo com sintomas refratários ou alto risco.' };
   }
   function cor(p) { return p > 15 ? '#c10e21' : (p >= 5 ? '#b07414' : '#1f9d57'); }
 
   const defs =
-    '<div class="pt-defs"><b>Como classificar a dor torácica (ESC):</b> considere 3 características — (1) desconforto retroesternal típico em qualidade e duração; (2) desencadeada por esforço/emoção; (3) aliviada por repouso ou nitrato. ' +
-    '<u>Angina típica</u> = as 3; <u>atípica</u> = 2 de 3; <u>não anginosa</u> = 0–1 de 3. <u>Dispneia</u> = falta de ar como sintoma dominante.</div>';
+    '<div class="pt-defs"><b>Como classificar o sintoma (ESC):</b> 3 características — (1) desconforto retroesternal típico em qualidade/duração; (2) desencadeado por esforço/emoção; (3) aliviado por repouso ou nitrato. ' +
+    '<u>Angina típica</u> = as 3; <u>atípica</u> = 2; <u>não anginosa</u> = 0–1. <u>Dispneia</u> = falta de ar como equivalente anginoso dominante.</div>';
 
-  // ---- seletor interativo ----
-  const seletor =
+  // ---- calculadora RF-CL (ESC 2024) ----
+  const calc =
     '<div class="pt-card">' +
-    '<h3 class="sc-title">Calcule a probabilidade pré-teste (DAC)</h3>' +
+    '<h3 class="sc-title">Likelihood clínica de DAC — modelo RF-CL (ESC 2024)</h3>' +
+    '<p class="muted small">O modelo <b>RF-CL</b> (Classe I-B) parte da probabilidade por sintoma, idade e sexo e a pondera pelo <b>número de fatores de risco</b>. Recomendado como passo inicial em suspeita de síndrome coronariana crônica.</p>' +
     '<div class="sc-campos">' +
     '<label class="sc-campo"><span>Sexo</span><select id="pt-sexo"><option value="0">Masculino</option><option value="1">Feminino</option></select></label>' +
     '<label class="sc-campo"><span>Faixa etária</span><select id="pt-idade">' + FAIXAS.map(f => '<option value="' + f + '">' + f + ' anos</option>').join('') + '</select></label>' +
     '<label class="sc-campo"><span>Tipo de sintoma</span><select id="pt-tipo">' + TIPOS.map(t => '<option value="' + t.id + '">' + t.t + '</option>').join('') + '</select></label>' +
     '</div>' +
+    '<div class="pt-rf-title">Fatores de risco presentes:</div>' +
+    '<div class="pt-rfs">' + RFS.map(r => '<label class="sc-check"><input type="checkbox" id="' + r.id + '"><span>' + r.t + '</span></label>').join('') + '</div>' +
     '<div id="pt-out" class="sc-result sc-info"></div>' +
     '</div>';
 
-  // ---- tabela de referência completa ----
+  // ---- categorias ESC 2024 (referência) ----
+  const cats =
+    '<div class="pt-card"><h3 class="sc-title">Categorias e conduta (ESC 2024)</h3>' +
+    '<table class="pt-table"><thead><tr><th>Likelihood clínica</th><th>Conduta recomendada</th></tr></thead><tbody>' +
+    '<tr><td class="pt-cell" style="background:#1f9d57">≤5% — muito baixa</td><td>Adiar testes; DAC obstrutiva muito improvável.</td></tr>' +
+    '<tr><td class="pt-cell" style="background:#3a8f4f">&gt;5–15% — baixa</td><td>Considerar adiar; escore de cálcio reclassifica; angio-TC opcional.</td></tr>' +
+    '<tr><td class="pt-cell" style="background:#b07414">&gt;15–50% — moderada</td><td>Angio-TC de coronárias ou imagem funcional de isquemia.</td></tr>' +
+    '<tr><td class="pt-cell" style="background:#c10e21">&gt;50–85% — alta</td><td>Imagem funcional de isquemia (preferível).</td></tr>' +
+    '<tr><td class="pt-cell" style="background:#8d0a18">&gt;85% — muito alta</td><td>Angiografia coronária invasiva (CATE).</td></tr>' +
+    '</tbody></table>' +
+    '<p class="muted small">Fonte: ESC 2024 — Síndromes Coronarianas Crônicas (Vrints et al.). Os percentuais exatos do RF-CL constam da Figura 4 da diretriz (heatmap por idade/sexo/sintoma/fatores de risco) — abra o PDF para o valor preciso.</p>' +
+    '<a class="rec-fonte-link" href="https://academic.oup.com/eurheartj/article-pdf/45/36/3415/59561235/ehae177.pdf" target="_blank" rel="noopener">Abrir diretriz ESC 2024 (PDF) 📄</a></div>';
+
+  // ---- tabela base por sintoma/idade/sexo ----
   function tabela(sexoIdx) {
     let h = '<table class="pt-table"><thead><tr><th>Idade</th>' + TIPOS.map(t => '<th>' + t.t.replace(' (sintoma principal)', '') + '</th>').join('') + '</tr></thead><tbody>';
     FAIXAS.forEach(f => {
       h += '<tr><td class="pt-age">' + f + '</td>';
-      TIPOS.forEach(t => {
-        const p = PTP[t.id][f][sexoIdx];
-        h += '<td class="pt-cell" style="background:' + cor(p) + '">' + p + '%</td>';
-      });
+      TIPOS.forEach(t => { const p = PTP[t.id][f][sexoIdx]; h += '<td class="pt-cell" style="background:' + cor(p) + '">' + p + '%</td>'; });
       h += '</tr>';
     });
-    h += '</tbody></table>';
-    return h;
+    return h + '</tbody></table>';
   }
 
-  const modifiers =
-    '<div class="pt-card"><h3 class="sc-title">Modificadores da probabilidade clínica</h3>' +
-    '<p class="muted small">Na faixa intermediária (5–15%), estes fatores ajudam a decidir. <b>Aumentam</b> a probabilidade: fatores de risco (dislipidemia, diabetes, hipertensão, tabagismo, história familiar), alterações no ECG de repouso (ondas Q, alterações de ST/T), disfunção de VE compatível com isquemia, ECG de esforço anormal e escore de cálcio coronário elevado. <b>Reduzem</b>: ECG de esforço normal e escore de cálcio zero.</p>' +
-    '<p class="muted small">A ESC 2024 (SCC) refinou isso no modelo de <b>likelihood clínica ponderada por fatores de risco (RF-CL)</b>, que ajusta a probabilidade acima conforme o número de fatores de risco. Use esta tabela como base e ajuste pela clínica.</p></div>';
-
   function render() {
-    root.innerHTML = defs + seletor +
-      '<div class="pt-card"><h3 class="sc-title">Tabela de referência (ESC 2019) — probabilidade de DAC obstrutiva</h3>' +
-      '<div class="pt-legenda"><span class="lr-chip" style="background:#1f9d57">≤5%</span> baixa · <span class="lr-chip" style="background:#b07414">5–15%</span> intermediária · <span class="lr-chip" style="background:#c10e21">&gt;15%</span> alta</div>' +
+    root.innerHTML = defs + calc + cats +
+      '<div class="pt-card"><h3 class="sc-title">Probabilidade base por sintoma, idade e sexo</h3>' +
+      '<div class="pt-legenda"><span class="lr-chip" style="background:#1f9d57">≤5%</span> · <span class="lr-chip" style="background:#b07414">5–15%</span> · <span class="lr-chip" style="background:#c10e21">&gt;15%</span></div>' +
       '<div class="pt-tabwrap"><div class="pt-sexlabel">Homens</div>' + tabela(0) + '</div>' +
       '<div class="pt-tabwrap"><div class="pt-sexlabel">Mulheres</div>' + tabela(1) + '</div>' +
-      '<p class="muted small">Fonte: ESC 2019 — Síndromes Coronarianas Crônicas (Knuuti et al.). Valores de DAC obstrutiva em pacientes sintomáticos.</p></div>' +
-      modifiers;
+      '<p class="muted small">Base do modelo (ESC). O RF-CL ajusta estes valores conforme os fatores de risco.</p></div>';
 
-    const calc = () => {
+    const compute = () => {
       const sexo = +document.getElementById('pt-sexo').value;
       const idade = document.getElementById('pt-idade').value;
       const tipo = document.getElementById('pt-tipo').value;
-      const p = PTP[tipo][idade][sexo];
-      const nv = nivel(p);
+      const base = PTP[tipo][idade][sexo];
+      const nrf = RFS.filter(r => document.getElementById(r.id).checked).length;
+      const cat = categoria(base);
+      let ajuste;
+      if (nrf >= 3) ajuste = '<b>' + nrf + ' fatores de risco</b> — pelo RF-CL a probabilidade <b>sobe</b>; o paciente pode subir de categoria. Confirme na Figura 4 da diretriz.';
+      else if (nrf <= 1) ajuste = '<b>' + nrf + ' fator(es) de risco</b> — pelo RF-CL a probabilidade <b>cai</b>; muitos são reclassificados como muito baixa (≤5%).';
+      else ajuste = '<b>2 fatores de risco</b> — risco intermediário; ajuste conforme o conjunto clínico.';
       const out = document.getElementById('pt-out');
-      out.className = 'sc-result ' + (p > 15 ? 'sc-bad' : (p >= 5 ? 'sc-warn' : 'sc-ok'));
-      out.innerHTML = '<div class="sc-valor">Probabilidade pré-teste ≈ ' + p + '%</div>' +
-        '<div class="sc-conduta">' + nv.txt +
+      out.className = 'sc-result ' + cat.cls;
+      out.innerHTML = '<div class="sc-valor">Base ≈ ' + base + '% · categoria ' + cat.nome + '</div>' +
+        '<div class="sc-conduta">' + cat.cond + '<br><span class="sc-extra">' + ajuste + '</span>' +
         '<br><button id="pt-bayes" class="mbe-usar" style="margin-top:10px">→ usar no cálculo de Bayes</button></div>';
       const b = document.getElementById('pt-bayes');
-      if (b) b.addEventListener('click', () => { if (window.MBE_setPreTeste) window.MBE_setPreTeste(p); });
+      if (b) b.addEventListener('click', () => { if (window.MBE_setPreTeste) window.MBE_setPreTeste(base); });
     };
-    document.getElementById('pt-sexo').addEventListener('change', calc);
-    document.getElementById('pt-idade').addEventListener('change', calc);
-    document.getElementById('pt-tipo').addEventListener('change', calc);
-    calc();
+    ['pt-sexo', 'pt-idade', 'pt-tipo'].forEach(id => document.getElementById(id).addEventListener('change', compute));
+    RFS.forEach(r => document.getElementById(r.id).addEventListener('change', compute));
+    compute();
   }
   render();
 })();
