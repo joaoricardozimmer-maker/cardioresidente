@@ -393,6 +393,19 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .rec-fonte { font-size: 12px; color: var(--muted); text-align: right; }
 .rec-fonte-link { color: var(--blue); text-decoration: none; font-weight: 600; }
 .rec-fonte-link:hover { text-decoration: underline; }
+
+/* ===== Pré-teste ===== */
+.pt-defs { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-size: 13.5px; line-height: 1.55; margin-bottom: 14px; }
+.pt-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin-bottom: 14px; }
+.pt-legenda { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 12px; color: var(--muted); margin: 6px 0 12px; }
+.pt-tabwrap { margin-bottom: 14px; }
+.pt-sexlabel { font-weight: 700; font-size: 13px; margin-bottom: 4px; color: var(--text); }
+.pt-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.pt-table th { background: var(--bg-soft); color: var(--muted); font-weight: 600; padding: 6px 8px; border: 1px solid var(--line); font-size: 11.5px; text-align: center; }
+.pt-table th:first-child { text-align: left; }
+.pt-age { font-weight: 700; padding: 6px 8px; border: 1px solid var(--line); }
+.pt-cell { color: #fff; font-weight: 700; text-align: center; padding: 6px 8px; border: 1px solid rgba(255,255,255,.5); }
+@media (max-width: 600px) { .pt-table { font-size: 11.5px; } .pt-cell, .pt-age, .pt-table th { padding: 5px 4px; } }
 .rec-vazio { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 10px; padding: 18px; font-size: 14px; color: var(--text); }
 @media (max-width: 600px) {
   .rec-row { grid-template-columns: 64px auto auto; grid-row-gap: 4px; }
@@ -425,6 +438,7 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
       <button class="tab" data-view="guias">📚 Diretrizes</button>
       <button class="tab" data-view="ensaios">🧪 Ensaios pivotais</button>
       <button class="tab" data-view="mbe">📐 MBE</button>
+      <button class="tab" data-view="pretest">🎯 Pré-teste</button>
       <button class="tab" data-view="scores">🧮 Scores</button>
       <button class="tab" data-view="transcricao">📝 Transcrever laudo</button>
       <button class="tab" data-view="evolucoes">🗂️ Evoluções</button>
@@ -541,6 +555,15 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
       </div>
     </section>
 
+    <!-- ============ PRÉ-TESTE ============ -->
+    <section class="view" id="view-pretest">
+      <div class="hero">
+        <h2>Probabilidade pré-teste</h2>
+        <p>A probabilidade de doença <em>antes</em> de pedir o exame, por cenário clínico. Comece pela dor torácica / DAC (idade, sexo e tipo de sintoma). Combine com a aba MBE para chegar à probabilidade pós-teste.</p>
+      </div>
+      <div id="pretest-root"></div>
+    </section>
+
     <!-- ============ ENSAIOS PIVOTAIS ============ -->
     <section class="view" id="view-ensaios">
       <div class="hero">
@@ -628,7 +651,16 @@ window.REC_LINKS = {
   grav:  { 'ESC': 'https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/cardiovascular-diseases-during-pregnancy-management-of/', 'SBC': 'https://www.portal.cardiol.br/diretrizes' },
   disp:  { 'ESC': 'https://www.escardio.org/topics/arrythmias-and-device-therapy/', 'AHA/ACC': 'https://www.acc.org/guidelines', 'SBC': 'https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-120-01-e20220892/0066-782X-abc-120-01-e20220892.x55156.pdf' },
   dm:    { 'ESC': 'https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/', 'AHA/ACC': 'https://www.acc.org/guidelines' },
-  prev:  { 'ESC': 'https://www.escardio.org/topics/risk-factors-and-prevention/', 'AHA/ACC': 'https://www.acc.org/guidelines', 'SBC': 'https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-122-09-e20250640/0066-782X-abc-122-09-e20250640.x74770.pdf' }
+  prev:  { 'ESC': 'https://www.escardio.org/topics/risk-factors-and-prevention/', 'AHA/ACC': 'https://www.acc.org/guidelines', 'SBC': 'https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-122-09-e20250640/0066-782X-abc-122-09-e20250640.x74770.pdf' },
+  arr:   { 'ESC': 'https://www.escardio.org/topics/arrythmias-and-device-therapy/', 'AHA/ACC': 'https://www.acc.org/guidelines', 'SBC': 'https://www.portal.cardiol.br/diretrizes' },
+  hp:    { 'ESC': 'https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/pulmonary-hypertension-guidelines-on-diagnosis-and-treatment-of/', 'SBC': 'https://www.portal.cardiol.br/diretrizes' },
+  congenita: { 'ESC': 'https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/grown-up-congenital-heart-disease-management-of/', 'AHA/ACC': 'https://www.acc.org/guidelines' },
+  sincope: { 'ESC': 'https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/syncope-guidelines-on-diagnosis-and-management-of/', 'AHA/ACC': 'https://www.acc.org/guidelines' },
+  dap:   { 'ESC': 'https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/peripheral-arterial-diseases-diagnosis-and-treatment-of/', 'AHA/ACC': 'https://www.acc.org/guidelines' },
+  avc:   { 'ESC': 'https://www.escardio.org/Guidelines', 'AHA/ACC': 'https://www.acc.org/guidelines', 'SBC': 'https://www.portal.cardiol.br/diretrizes' },
+  reab:  { 'ESC': 'https://www.escardio.org/topics/risk-factors-and-prevention/', 'AHA/ACC': 'https://www.acc.org/guidelines', 'SBC': 'https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-121-3-e20240110/0066-782X-abc-121-3-e20240110.x47225.pdf' },
+  onco:  { 'ESC': 'https://www.escardio.org/topics/cardio-oncology/', 'AHA/ACC': 'https://www.acc.org/guidelines' },
+  chagas: { 'SBC': 'https://www.portal.cardiol.br/diretrizes', 'ESC': 'https://www.escardio.org/Guidelines' }
 };
 
 window.RECOMENDACOES = [
@@ -899,7 +931,161 @@ window.RECOMENDACOES = [
   { area: 'Tromboembolismo', doc: 'tep', titulo: 'Trombólise sistêmica no TEP de alto risco',
     kw: ['trombolise', 'fibrinolise', 'tep de alto risco', 'tep macico', 'instabilidade', 'embolia pulmonar grave'],
     resumo: 'TEP de alto risco (instabilidade hemodinâmica/choque): trombólise sistêmica, salvo contraindicação.',
-    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC TEP 2019' }] }
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC TEP 2019' }] },
+
+  // ===================== ARRITMIAS =====================
+  { area: 'Arritmias', doc: 'arr', titulo: 'Adenosina na taquicardia supraventricular estável',
+    kw: ['adenosina', 'tsv', 'taquicardia supraventricular', 'trnav', 'trav', 'manobra vagal'],
+    resumo: 'TSV paroxística estável: manobras vagais e, se falharem, adenosina EV para reversão.',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC TSV 2019' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'ACC/AHA/HRS TSV 2015' }] },
+  { area: 'Arritmias', doc: 'arr', titulo: 'Ablação por cateter na TSV recorrente sintomática',
+    kw: ['ablacao', 'tsv', 'trnav', 'wpw', 'via acessoria', 'taquicardia supraventricular'],
+    resumo: 'TRNAV/taquicardia por via acessória recorrente e sintomática: ablação por cateter (alta eficácia e curativa).',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC TSV 2019' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'ACC/AHA/HRS TSV 2015' }] },
+  { area: 'Arritmias', doc: 'arr', titulo: 'Cardioversão elétrica imediata na taquiarritmia com instabilidade',
+    kw: ['cardioversao eletrica', 'instabilidade', 'taquiarritmia', 'choque', 'sincronizada'],
+    resumo: 'Taquiarritmia com instabilidade hemodinâmica (hipotensão, isquemia, IC, alteração de consciência): cardioversão elétrica sincronizada imediata.',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'C', fonte: 'ESC TSV/FA' }, { soc: 'AHA/ACC', cls: 'I', niv: 'C', fonte: 'ACC/AHA' }] },
+  { area: 'Arritmias', doc: 'disp', titulo: 'CDI para prevenção secundária de morte súbita',
+    kw: ['cdi', 'desfibrilador', 'prevencao secundaria', 'tv sustentada', 'fibrilacao ventricular', 'morte subita abortada'],
+    resumo: 'Sobreviventes de PCR por FV/TV ou TV sustentada sem causa reversível, com expectativa de vida >1 ano: CDI.',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC VA/MS 2022' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'ACC/AHA/HRS VA 2017' }] },
+  { area: 'Arritmias', doc: 'arr', titulo: 'Betabloqueador na síndrome do QT longo congênito',
+    kw: ['qt longo', 'sqtl', 'betabloqueador', 'morte subita', 'nadolol', 'canalopatia'],
+    resumo: 'SQTL congênita: betabloqueador (preferir nadolol/propranolol) reduz eventos arrítmicos — mesmo em assintomáticos.',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC VA/MS 2022' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'ACC/AHA/HRS VA 2017' }] },
+  { area: 'Arritmias', doc: 'disp', titulo: 'CDI na síndrome de Brugada com PCR/TV',
+    kw: ['brugada', 'cdi', 'morte subita', 'fibrilacao ventricular', 'canalopatia'],
+    resumo: 'Brugada com PCR abortada ou TV sustentada documentada: CDI (prevenção secundária).',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'C', fonte: 'ESC VA/MS 2022' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'ACC/AHA/HRS VA 2017' }] },
+  { area: 'Arritmias', doc: 'arr', titulo: 'FA recente sintomática: controle de ritmo precoce',
+    kw: ['controle de ritmo', 'fa recente', 'cardioversao', 'antiarritmico', 'east-afnet', 'fibrilacao atrial'],
+    resumo: 'FA diagnosticada há <1 ano e sintomática: estratégia de controle de ritmo precoce reduz desfechos CV (EAST-AFNET 4).',
+    recs: [{ soc: 'ESC', cls: 'IIa', niv: 'B', fonte: 'ESC FA 2024' }] },
+
+  // ===================== INSUFICIÊNCIA CARDÍACA AVANÇADA =====================
+  { area: 'Insuficiência cardíaca avançada', doc: 'ic', titulo: 'Carboximaltose férrica na ICFEr com deficiência de ferro',
+    kw: ['ferro endovenoso', 'carboximaltose', 'deficiencia de ferro', 'ferropenia', 'icfer', 'anemia'],
+    resumo: 'ICFEr/ICFElr sintomática com deficiência de ferro (ferritina <100 ou 100–299 com TSAT <20%): ferro EV melhora sintomas e reduz hospitalização.',
+    recs: [{ soc: 'ESC', cls: 'IIa', niv: 'A', fonte: 'ESC IC — atualização 2023' }, { soc: 'AHA/ACC', cls: 'IIa', niv: 'B', fonte: 'AHA/ACC/HFSA 2022' }] },
+  { area: 'Insuficiência cardíaca avançada', doc: 'ic', titulo: 'Transplante cardíaco na IC avançada refratária',
+    kw: ['transplante cardiaco', 'ic avancada', 'estagio d', 'refrataria', 'transplante'],
+    resumo: 'IC avançada (estágio D) refratária à terapia otimizada, sem contraindicações: transplante cardíaco.',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'C', fonte: 'ESC IC 2021' }, { soc: 'AHA/ACC', cls: 'I', niv: 'C', fonte: 'AHA/ACC/HFSA 2022' }] },
+  { area: 'Insuficiência cardíaca avançada', doc: 'ic', titulo: 'Suporte circulatório mecânico de longa duração (LVAD)',
+    kw: ['lvad', 'suporte circulatorio', 'dispositivo de assistencia ventricular', 'ic avancada', 'ponte para transplante'],
+    resumo: 'IC avançada selecionada (ponte para transplante ou terapia de destino): dispositivo de assistência ventricular esquerda.',
+    recs: [{ soc: 'ESC', cls: 'IIa', niv: 'A', fonte: 'ESC IC 2021' }, { soc: 'AHA/ACC', cls: 'IIa', niv: 'A', fonte: 'AHA/ACC/HFSA 2022' }] },
+
+  // ===================== VALVOPATIA (adicional) =====================
+  { area: 'Valvopatia', doc: 'valva', titulo: 'Valvoplastia mitral percutânea na estenose mitral reumática',
+    kw: ['estenose mitral', 'valvoplastia mitral', 'comissurotomia percutanea', 'reumatica', 'balao'],
+    resumo: 'Estenose mitral reumática grave sintomática com anatomia favorável e sem trombo/IM significativa: valvoplastia mitral percutânea por balão.',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EACTS Valva 2021' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC Valva 2020' }] },
+  { area: 'Valvopatia', doc: 'valva', titulo: 'Cirurgia na estenose aórtica grave assintomática com FEVE < 50%',
+    kw: ['estenose aortica assintomatica', 'fevе reduzida', 'disfuncao de ve', 'cirurgia aortica', 'troca valvar'],
+    resumo: 'Estenose aórtica grave assintomática com disfunção de VE (FEVE <50%) sem outra causa: intervenção indicada.',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EACTS Valva 2021' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC Valva 2020' }] },
+  { area: 'Valvopatia', doc: 'valva', titulo: 'Intervenção na regurgitação tricúspide grave',
+    kw: ['regurgitacao tricuspide', 'insuficiencia tricuspide', 'cirurgia tricuspide', 'teer tricuspide'],
+    resumo: 'IT primária grave sintomática, ou IT grave em paciente submetido a cirurgia de valva esquerda: intervenção (cirúrgica; transcateter em selecionados).',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'C', fonte: 'ESC/EACTS Valva 2021' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC Valva 2020' }] },
+
+  // ===================== HIPERTENSÃO PULMONAR =====================
+  { area: 'Hipertensão pulmonar', doc: 'hp', titulo: 'Cateterismo cardíaco direito para diagnóstico de HP',
+    kw: ['hipertensao pulmonar', 'cateterismo direito', 'hap', 'pressao de arteria pulmonar', 'diagnostico hp'],
+    resumo: 'Confirmação diagnóstica e classificação da hipertensão pulmonar exigem cateterismo cardíaco direito.',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'C', fonte: 'ESC/ERS HP 2022' }] },
+  { area: 'Hipertensão pulmonar', doc: 'hp', titulo: 'Terapia combinada inicial na HAP (grupo 1)',
+    kw: ['hap', 'hipertensao arterial pulmonar', 'terapia combinada', 'sildenafila', 'ambrisentana', 'bosentana', 'grupo 1'],
+    resumo: 'HAP (grupo 1) de risco baixo/intermediário sem cardiopatia/comorbidade: terapia combinada inicial (inibidor de PDE5 + antagonista de endotelina).',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/ERS HP 2022' }] },
+
+  // ===================== CARDIOPATIAS CONGÊNITAS DO ADULTO =====================
+  { area: 'Cardiopatia congênita do adulto', doc: 'congenita', titulo: 'Fechamento de comunicação interatrial (CIA) com sobrecarga de VD',
+    kw: ['cia', 'comunicacao interatrial', 'sobrecarga de vd', 'shunt', 'fechamento percutaneo'],
+    resumo: 'CIA com sobrecarga de volume do VD e sem hipertensão pulmonar proibitiva: fechamento (percutâneo se ostium secundum favorável).',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC Congênitas 2020' }] },
+  { area: 'Cardiopatia congênita do adulto', doc: 'congenita', titulo: 'Intervenção na coarctação de aorta significativa',
+    kw: ['coarctacao de aorta', 'coarctacao', 'gradiente', 'hipertensao', 'stent aortico'],
+    resumo: 'Coarctação com gradiente significativo (≥20 mmHg) ou hipertensão/colaterais: intervenção (cirúrgica ou por cateter).',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'C', fonte: 'ESC Congênitas 2020' }] },
+
+  // ===================== SÍNCOPE =====================
+  { area: 'Síncope', doc: 'sincope', titulo: 'Marcapasso na síncope por bradiarritmia documentada',
+    kw: ['sincope', 'marcapasso', 'bradicardia', 'doenca do no sinusal', 'bav', 'pausa sintomatica'],
+    resumo: 'Síncope com correlação a bradiarritmia documentada (BAV avançado, pausas, disfunção do nó sinusal): marcapasso.',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'C', fonte: 'ESC Síncope 2018' }] },
+  { area: 'Síncope', doc: 'sincope', titulo: 'Síncope reflexa: educação e medidas não farmacológicas',
+    kw: ['sincope reflexa', 'vasovagal', 'medidas fisicas', 'manobras de contrapressao', 'hidratacao', 'sal'],
+    resumo: 'Síncope reflexa/vasovagal: educação, reconhecimento de pródromos, manobras de contrapressão, hidratação e sal — primeira linha.',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC Síncope 2018' }] },
+
+  // ===================== DOENÇA ARTERIAL PERIFÉRICA / CARÓTIDA =====================
+  { area: 'Doença vascular', doc: 'dap', titulo: 'Estatina e antiagregante na doença arterial periférica sintomática',
+    kw: ['dap', 'doenca arterial periferica', 'claudicacao', 'estatina', 'antiagregante', 'aas', 'clopidogrel'],
+    resumo: 'DAP sintomática: estatina e antiagregante plaquetário únicos reduzem eventos CV e de membro; cessar tabagismo.',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC DAP 2017/2024' }, { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC PAD 2024' }] },
+  { area: 'Doença vascular', doc: 'avc', titulo: 'Endarterectomia na estenose carotídea sintomática 70–99%',
+    kw: ['endarterectomia', 'estenose carotidea', 'avc', 'carotida sintomatica', 'revascularizacao carotidea'],
+    resumo: 'Estenose carotídea sintomática 70–99% (AVC/AIT recente): endarterectomia (ou stent em selecionados) reduz recorrência.',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC DAP 2017' }, { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ASA AVC' }] },
+  { area: 'Doença vascular', doc: 'avc', titulo: 'Anticoagulação no AVC isquêmico cardioembólico por FA',
+    kw: ['avc cardioembolico', 'fibrilacao atrial', 'anticoagulacao', 'doac', 'prevencao secundaria avc'],
+    resumo: 'AVC isquêmico/AIT por FA: anticoagulação oral (preferir DOAC) para prevenção secundária, com timing conforme o tamanho do infarto.',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC FA 2024' }, { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ASA AVC 2021' }] },
+
+  // ===================== REABILITAÇÃO E PREVENÇÃO (adicional) =====================
+  { area: 'Reabilitação cardíaca', doc: 'reab', titulo: 'Reabilitação cardíaca baseada em exercício pós-evento',
+    kw: ['reabilitacao cardiaca', 'exercicio', 'pos iam', 'pos cirurgia', 'ic', 'condicionamento'],
+    resumo: 'Pós-SCA, pós-revascularização e na ICFEr estável: reabilitação cardíaca baseada em exercício reduz mortalidade e reinternação.',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC Prevenção 2021' }, { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC' }] },
+  { area: 'Prevenção', doc: 'prev', titulo: 'Atividade física regular',
+    kw: ['atividade fisica', 'exercicio', 'sedentarismo', '150 minutos', 'prevencao'],
+    resumo: 'Recomenda-se ≥150 min/semana de atividade física aeróbica moderada (ou 75 min vigorosa) para reduzir morbimortalidade CV.',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC Prevenção 2021' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC Prevenção 2019' }] },
+  { area: 'Prevenção', doc: 'prev', titulo: 'Vacinação contra influenza em doença cardiovascular',
+    kw: ['vacina', 'influenza', 'gripe', 'prevencao', 'dcv'],
+    resumo: 'Vacinação anual contra influenza em pacientes com DCV estabelecida — reduz eventos cardiovasculares.',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC Prevenção 2021' }] },
+  { area: 'Dislipidemia', doc: 'lipid', titulo: 'Dosar lipoproteína(a) ao menos uma vez na vida',
+    kw: ['lipoproteina a', 'lp(a)', 'lpa', 'risco residual', 'historia familiar'],
+    resumo: 'Medir Lp(a) ao menos uma vez na vida adulta para refinar o risco — valores muito altos conferem risco CV aumentado.',
+    recs: [{ soc: 'ESC', cls: 'IIa', niv: 'C', fonte: 'ESC/EAS Dislipidemia 2019' }] },
+
+  // ===================== CARDIO-ONCOLOGIA =====================
+  { area: 'Cardio-oncologia', doc: 'onco', titulo: 'Monitorização da FEVE durante quimioterapia cardiotóxica',
+    kw: ['cardiotoxicidade', 'antraciclina', 'trastuzumabe', 'fevе', 'monitorizacao', 'cardio-oncologia'],
+    resumo: 'Pacientes em antraciclinas/anti-HER2: avaliação de FEVE e strain (basal e seriada) para detecção precoce de cardiotoxicidade.',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC Cardio-oncologia 2022' }] },
+  { area: 'Cardio-oncologia', doc: 'onco', titulo: 'IECA/BB na disfunção de VE induzida por quimioterapia',
+    kw: ['cardiotoxicidade', 'disfuncao de ve', 'ieca', 'betabloqueador', 'queda de fevе', 'tratamento'],
+    resumo: 'Queda significativa da FEVE relacionada ao câncer: iniciar IECA/BRA e betabloqueador, como na ICFEr.',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC Cardio-oncologia 2022' }] },
+
+  // ===================== CHAGAS =====================
+  { area: 'Doença de Chagas', doc: 'chagas', titulo: 'CDI na cardiopatia chagásica com TV sustentada/PCR',
+    kw: ['chagas', 'cardiopatia chagasica', 'cdi', 'tv sustentada', 'morte subita', 'prevencao secundaria'],
+    resumo: 'Cardiopatia chagásica crônica com TV sustentada ou PCR abortada: CDI para prevenção secundária.',
+    recs: [{ soc: 'SBC', cls: 'I', niv: 'B', fonte: 'SBC Chagas 2023' }] },
+  { area: 'Doença de Chagas', doc: 'chagas', titulo: 'Tratamento etiológico (benznidazol) na fase aguda/crônica recente',
+    kw: ['chagas', 'benznidazol', 'tratamento etiologico', 'fase aguda', 'antiparasitario'],
+    resumo: 'Doença de Chagas aguda, congênita, reativação ou crônica recente (e adultos <50 anos sem cardiopatia avançada): tratamento com benznidazol.',
+    recs: [{ soc: 'SBC', cls: 'I', niv: 'B', fonte: 'SBC Chagas 2023' }] },
+
+  // ===================== SCA / IC (Classe III úteis) =====================
+  { area: 'Síndrome coronariana', doc: 'sca', titulo: 'Oxigênio suplementar de rotina na SCA sem hipoxemia (NÃO usar)',
+    kw: ['oxigenio', 'o2', 'rotina', 'sca', 'sem hipoxemia', 'satO2'],
+    resumo: 'NÃO administrar O2 de rotina se SatO₂ ≥90% — sem benefício e possível dano. Ofertar apenas se SatO₂ <90%.',
+    recs: [{ soc: 'ESC', cls: 'III', niv: 'B', fonte: 'ESC SCA 2023' }, { soc: 'AHA/ACC', cls: 'III', niv: 'B', fonte: 'AHA/ACC SCA 2025' }] },
+  { area: 'Síndrome coronariana', doc: 'sca', titulo: 'Inibidor de P2Y12 potente (ticagrelor/prasugrel) preferível ao clopidogrel',
+    kw: ['ticagrelor', 'prasugrel', 'clopidogrel', 'p2y12', 'sca', 'antiagregante potente'],
+    resumo: 'Na SCA, preferir ticagrelor ou prasugrel ao clopidogrel (salvo alto risco de sangramento ou contraindicação).',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC SCA 2023' }, { soc: 'AHA/ACC', cls: 'IIa', niv: 'B', fonte: 'AHA/ACC SCA 2025' }] },
+  { area: 'Doença coronariana crônica', doc: 'scc', titulo: 'Antianginoso de primeira linha (betabloqueador ou BCC) na angina estável',
+    kw: ['angina estavel', 'antianginoso', 'betabloqueador', 'bcc', 'nitrato', 'dac estavel'],
+    resumo: 'Angina estável: betabloqueador e/ou BCC como primeira linha para controle de sintomas; nitrato de ação curta para alívio.',
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC SCC 2024' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC CCD 2023' }] }
 ];
 
 // Base curada de condutas cardiológicas consolidadas.
@@ -2897,15 +3083,29 @@ window.GUIAS = [
 
     // se chegou uma LR vinda da biblioteca, preenche e calcula
     if (pendingLR) {
+      const hadLR = (pendingLR.lrp !== null && pendingLR.lrp !== undefined) || (pendingLR.lrn !== null && pendingLR.lrn !== undefined);
       if (pendingLR.lrp !== null && pendingLR.lrp !== undefined) document.getElementById('mb-lrp').value = pendingLR.lrp;
       if (pendingLR.lrn !== null && pendingLR.lrn !== undefined) document.getElementById('mb-lrn').value = pendingLR.lrn;
-      document.getElementById('mb-pre').value = pendingLR.pre || 20;
+      document.getElementById('mb-pre').value = (pendingLR.pre !== null && pendingLR.pre !== undefined) ? pendingLR.pre : 20;
+      const veioPre = pendingLR.pre !== null && pendingLR.pre !== undefined;
       pendingLR = null;
-      calc();
+      if (hadLR) calc();
       const out = document.getElementById('mb-out');
-      out.insertAdjacentHTML('afterbegin', '<div class="sc-conduta" style="margin-bottom:8px"><b>Ajuste a probabilidade pré-teste</b> ao seu paciente — preenchi 20% como ponto de partida.</div>');
+      const msg = (veioPre && !hadLR)
+        ? '<b>Probabilidade pré-teste preenchida (' + document.getElementById('mb-pre').value + '%).</b> Agora informe a sensibilidade/especificidade ou a LR do exame e clique em Calcular.'
+        : '<b>Ajuste a probabilidade pré-teste</b> ao seu paciente.';
+      out.insertAdjacentHTML('afterbegin', '<div class="sc-conduta" style="margin-bottom:8px">' + msg + '</div>');
     }
   }
+
+  // permite que a aba Pré-teste envie a probabilidade para o cálculo de Bayes
+  window.MBE_setPreTeste = function (pre) {
+    const tab = document.querySelector('.tab[data-view="mbe"]');
+    if (tab) tab.click();
+    pendingLR = { pre: pre, lrp: null, lrn: null };
+    irPara('post');
+    if (window.toast) window.toast('Pré-teste enviado: ' + pre + '%');
+  };
 
   // ------------------------------------------------------------------
   // 2) MEDIDAS DE EFEITO — RRA, RRR, NNT/NNH, RR, OR
@@ -3093,6 +3293,101 @@ window.GUIAS = [
     t.fn();
   }
   irPara('post');
+})();
+
+// Aba "Pré-teste": probabilidade pré-teste de DAC obstrutiva (ESC 2019) por idade, sexo e sintoma,
+// com interpretação e envio direto ao cálculo de Bayes (aba MBE).
+(function () {
+  const root = document.getElementById('pretest-root');
+  if (!root) return;
+
+  // ESC 2019 CCS — probabilidade pré-teste de DAC obstrutiva (%). [homem, mulher]
+  const PTP = {
+    tipica:   { '30-39': [3, 5],  '40-49': [22, 10], '50-59': [32, 13], '60-69': [44, 16], '70+': [52, 27] },
+    atipica:  { '30-39': [4, 3],  '40-49': [10, 6],  '50-59': [17, 6],  '60-69': [26, 11], '70+': [34, 19] },
+    nao:      { '30-39': [1, 1],  '40-49': [3, 2],   '50-59': [11, 3],  '60-69': [22, 6],  '70+': [24, 10] },
+    dispneia: { '30-39': [0, 3],  '40-49': [12, 3],  '50-59': [20, 9],  '60-69': [27, 14], '70+': [32, 12] }
+  };
+  const FAIXAS = ['30-39', '40-49', '50-59', '60-69', '70+'];
+  const TIPOS = [
+    { id: 'tipica', t: 'Angina típica' },
+    { id: 'atipica', t: 'Angina atípica' },
+    { id: 'nao', t: 'Dor não anginosa' },
+    { id: 'dispneia', t: 'Dispneia (sintoma principal)' }
+  ];
+
+  function nivel(p) {
+    if (p > 15) return { cls: 'cls-iii', txt: '<b>Probabilidade alta (&gt;15%)</b> — teste não invasivo claramente indicado: angio-TC de coronárias ou teste funcional de isquemia (eco/cintilografia/RM de estresse).' };
+    if (p >= 5) return { cls: 'cls-iib', txt: '<b>Probabilidade intermediária (5–15%)</b> — considerar teste após avaliar a probabilidade clínica (modificadores). A angio-TC de coronárias é uma boa opção para excluir DAC.' };
+    return { cls: 'cls-i', txt: '<b>Probabilidade baixa (≤5%)</b> — DAC obstrutiva improvável; em geral adiar testes de rotina e investigar outras causas (reavaliar se houver modificadores que aumentem a probabilidade clínica).' };
+  }
+  function cor(p) { return p > 15 ? '#c10e21' : (p >= 5 ? '#b07414' : '#1f9d57'); }
+
+  const defs =
+    '<div class="pt-defs"><b>Como classificar a dor torácica (ESC):</b> considere 3 características — (1) desconforto retroesternal típico em qualidade e duração; (2) desencadeada por esforço/emoção; (3) aliviada por repouso ou nitrato. ' +
+    '<u>Angina típica</u> = as 3; <u>atípica</u> = 2 de 3; <u>não anginosa</u> = 0–1 de 3. <u>Dispneia</u> = falta de ar como sintoma dominante.</div>';
+
+  // ---- seletor interativo ----
+  const seletor =
+    '<div class="pt-card">' +
+    '<h3 class="sc-title">Calcule a probabilidade pré-teste (DAC)</h3>' +
+    '<div class="sc-campos">' +
+    '<label class="sc-campo"><span>Sexo</span><select id="pt-sexo"><option value="0">Masculino</option><option value="1">Feminino</option></select></label>' +
+    '<label class="sc-campo"><span>Faixa etária</span><select id="pt-idade">' + FAIXAS.map(f => '<option value="' + f + '">' + f + ' anos</option>').join('') + '</select></label>' +
+    '<label class="sc-campo"><span>Tipo de sintoma</span><select id="pt-tipo">' + TIPOS.map(t => '<option value="' + t.id + '">' + t.t + '</option>').join('') + '</select></label>' +
+    '</div>' +
+    '<div id="pt-out" class="sc-result sc-info"></div>' +
+    '</div>';
+
+  // ---- tabela de referência completa ----
+  function tabela(sexoIdx) {
+    let h = '<table class="pt-table"><thead><tr><th>Idade</th>' + TIPOS.map(t => '<th>' + t.t.replace(' (sintoma principal)', '') + '</th>').join('') + '</tr></thead><tbody>';
+    FAIXAS.forEach(f => {
+      h += '<tr><td class="pt-age">' + f + '</td>';
+      TIPOS.forEach(t => {
+        const p = PTP[t.id][f][sexoIdx];
+        h += '<td class="pt-cell" style="background:' + cor(p) + '">' + p + '%</td>';
+      });
+      h += '</tr>';
+    });
+    h += '</tbody></table>';
+    return h;
+  }
+
+  const modifiers =
+    '<div class="pt-card"><h3 class="sc-title">Modificadores da probabilidade clínica</h3>' +
+    '<p class="muted small">Na faixa intermediária (5–15%), estes fatores ajudam a decidir. <b>Aumentam</b> a probabilidade: fatores de risco (dislipidemia, diabetes, hipertensão, tabagismo, história familiar), alterações no ECG de repouso (ondas Q, alterações de ST/T), disfunção de VE compatível com isquemia, ECG de esforço anormal e escore de cálcio coronário elevado. <b>Reduzem</b>: ECG de esforço normal e escore de cálcio zero.</p>' +
+    '<p class="muted small">A ESC 2024 (SCC) refinou isso no modelo de <b>likelihood clínica ponderada por fatores de risco (RF-CL)</b>, que ajusta a probabilidade acima conforme o número de fatores de risco. Use esta tabela como base e ajuste pela clínica.</p></div>';
+
+  function render() {
+    root.innerHTML = defs + seletor +
+      '<div class="pt-card"><h3 class="sc-title">Tabela de referência (ESC 2019) — probabilidade de DAC obstrutiva</h3>' +
+      '<div class="pt-legenda"><span class="lr-chip" style="background:#1f9d57">≤5%</span> baixa · <span class="lr-chip" style="background:#b07414">5–15%</span> intermediária · <span class="lr-chip" style="background:#c10e21">&gt;15%</span> alta</div>' +
+      '<div class="pt-tabwrap"><div class="pt-sexlabel">Homens</div>' + tabela(0) + '</div>' +
+      '<div class="pt-tabwrap"><div class="pt-sexlabel">Mulheres</div>' + tabela(1) + '</div>' +
+      '<p class="muted small">Fonte: ESC 2019 — Síndromes Coronarianas Crônicas (Knuuti et al.). Valores de DAC obstrutiva em pacientes sintomáticos.</p></div>' +
+      modifiers;
+
+    const calc = () => {
+      const sexo = +document.getElementById('pt-sexo').value;
+      const idade = document.getElementById('pt-idade').value;
+      const tipo = document.getElementById('pt-tipo').value;
+      const p = PTP[tipo][idade][sexo];
+      const nv = nivel(p);
+      const out = document.getElementById('pt-out');
+      out.className = 'sc-result ' + (p > 15 ? 'sc-bad' : (p >= 5 ? 'sc-warn' : 'sc-ok'));
+      out.innerHTML = '<div class="sc-valor">Probabilidade pré-teste ≈ ' + p + '%</div>' +
+        '<div class="sc-conduta">' + nv.txt +
+        '<br><button id="pt-bayes" class="mbe-usar" style="margin-top:10px">→ usar no cálculo de Bayes</button></div>';
+      const b = document.getElementById('pt-bayes');
+      if (b) b.addEventListener('click', () => { if (window.MBE_setPreTeste) window.MBE_setPreTeste(p); });
+    };
+    document.getElementById('pt-sexo').addEventListener('change', calc);
+    document.getElementById('pt-idade').addEventListener('change', calc);
+    document.getElementById('pt-tipo').addEventListener('change', calc);
+    calc();
+  }
+  render();
 })();
 
 // Navegação entre abas + utilidades compartilhadas
