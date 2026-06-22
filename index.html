@@ -393,6 +393,14 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .rec-fonte { font-size: 12px; color: var(--muted); text-align: right; }
 .rec-fonte-link { color: var(--blue); text-decoration: none; font-weight: 600; }
 .rec-fonte-link:hover { text-decoration: underline; }
+.rec-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px; }
+.rec-diverg { background: #fdecee; color: #c10e21; border: 1px solid #f3b6bd; border-radius: 20px; padding: 2px 9px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.rec-diverg-inline { background: #fdecee; color: #c10e21; border: 1px solid #f3b6bd; border-radius: 20px; padding: 1px 7px; font-size: 11px; font-weight: 700; }
+.rec-card-diverg { border-left-color: #b07414; }
+.rec-classe-out { outline: 2px dashed rgba(20,26,31,.55); outline-offset: 2px; }
+.rec-meta { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--muted); }
+.rec-meta-diverg { color: #b07414; font-weight: 600; }
+.rec-revbanner { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 10px; padding: 10px 13px; font-size: 12.5px; color: var(--text); margin-bottom: 14px; line-height: 1.5; }
 
 /* ===== Pré-teste ===== */
 .pt-defs { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-size: 13.5px; line-height: 1.55; margin-bottom: 14px; }
@@ -2099,24 +2107,59 @@ window.GUIAS = [
       : niv === 'C' ? 'consenso de especialistas / estudos pequenos' : '';
   }
 
+  // ordem de "força" das classes para detectar divergência relevante
+  const ORDEM = { 'I': 4, 'IIa': 3, 'IIb': 2, 'III': 0 };
+  function anoRecente(item) {
+    let y = 0;
+    item.recs.forEach(r => { const m = (r.fonte || '').match(/20\d{2}/g); if (m) m.forEach(x => { if (+x > y) y = +x; }); });
+    return y || null;
+  }
+  function classeModal(recs) {
+    const c = {}; recs.forEach(r => { c[r.cls] = (c[r.cls] || 0) + 1; });
+    return Object.keys(c).sort((a, b) => c[b] - c[a])[0];
+  }
+  function divergencia(recs) {
+    if (recs.length < 2) return null;
+    const cls = recs.map(r => r.cls);
+    const distintas = [...new Set(cls)];
+    if (distintas.length < 2) return null;
+    // diferença de pelo menos 1 nível de classe entre sociedades
+    const vals = cls.map(c => ORDEM[c]);
+    const forte = (Math.max(...vals) - Math.min(...vals)) >= 1;
+    return forte ? recs.map(r => r.soc + ' ' + r.cls).join(' × ') : null;
+  }
+
   function card(item) {
     const links = LINKS[item.doc] || {};
+    const modal = classeModal(item.recs);
+    const diverg = divergencia(item.recs);
+    const ano = anoRecente(item);
     const linhas = item.recs.map(r => {
       const niv = r.niv ? '<span class="rec-niv" title="Nível ' + esc(r.niv) + ': ' + esc(nivelTexto(r.niv)) + '">Nível ' + esc(r.niv) + '</span>' : '<span class="rec-niv rec-niv-na">—</span>';
       const url = links[r.soc];
       const fonte = url
-        ? '<a class="rec-fonte rec-fonte-link" href="' + esc(url) + '" target="_blank" rel="noopener" title="Abrir diretriz">' + esc(r.fonte) + ' 📄</a>'
+        ? '<a class="rec-fonte rec-fonte-link" href="' + esc(url) + '" target="_blank" rel="noopener" title="Abrir a diretriz (PDF/portal) — confira a recomendação na fonte">' + esc(r.fonte) + ' 📄</a>'
         : '<span class="rec-fonte">' + esc(r.fonte) + '</span>';
+      const out = (diverg && r.cls !== modal) ? ' rec-classe-out' : '';
       return '<div class="rec-row">' +
         '<span class="rec-soc">' + esc(r.soc) + '</span>' +
-        '<span class="rec-classe ' + classeCss(r.cls) + '" title="' + esc(classeTexto(r.cls)) + '">Classe ' + esc(r.cls) + '</span>' +
+        '<span class="rec-classe ' + classeCss(r.cls) + out + '" title="' + esc(classeTexto(r.cls)) + '">Classe ' + esc(r.cls) + '</span>' +
         niv + fonte + '</div>';
     }).join('');
-    return '<div class="rec-card">' +
-      '<span class="rec-area">' + esc(item.area) + '</span>' +
+    const badge = diverg
+      ? '<span class="rec-diverg" title="As sociedades divergem na classe de recomendação: ' + esc(diverg) + '">⚠ Divergência entre sociedades</span>'
+      : '';
+    const meta = '<div class="rec-meta">' +
+      (ano ? 'Diretriz mais recente: <b>' + ano + '</b> · ' : '') +
+      'revisado em jun/2026' +
+      (diverg ? ' · <span class="rec-meta-diverg">divergência: ' + esc(diverg) + '</span>' : '') +
+      '</div>';
+    return '<div class="rec-card' + (diverg ? ' rec-card-diverg' : '') + '">' +
+      '<div class="rec-head"><span class="rec-area">' + esc(item.area) + '</span>' + badge + '</div>' +
       '<h4 class="rec-titulo">' + esc(item.titulo) + '</h4>' +
       '<p class="rec-resumo">' + esc(item.resumo) + '</p>' +
       '<div class="rec-tabela">' + linhas + '</div>' +
+      meta +
       '</div>';
   }
 
@@ -2130,16 +2173,18 @@ window.GUIAS = [
         'Tente o nome do fármaco, da classe ou da condição (ex.: BB, IECA, anticoagulação), ou veja a aba <b>Diretrizes</b>.</div>';
       return;
     }
-    resultsEl.innerHTML = '<p class="rec-count">' + ranked.length + ' conduta(s) encontrada(s) — recomendação mais atual de cada sociedade:</p>' +
+    resultsEl.innerHTML = REVNOTE + '<p class="rec-count">' + ranked.length + ' conduta(s) encontrada(s) — recomendação mais atual de cada sociedade:</p>' +
       ranked.map(card).join('');
   }
+
+  const REVNOTE = '<div class="rec-revbanner">Recomendações <b>revisadas em jun/2026</b> — cada fonte abre a diretriz original (📄). O selo <span class="rec-diverg-inline">⚠ Divergência</span> aparece quando as sociedades discordam da classe de recomendação.</div>';
 
   function renderInicial() {
     const areas = [...new Set(BASE.map(i => i.area))];
     const amostraTermos = ['Sacubitril', 'Anticoagulação na FA', 'Mavacamten', 'Meta de LDL'];
     const itens = [];
     amostraTermos.forEach(t => { const m = BASE.map(it => ({ it, s: score(it, expandir(t), t) })).sort((a, b) => b.s - a.s)[0]; if (m && m.s > 0 && !itens.includes(m.it)) itens.push(m.it); });
-    resultsEl.innerHTML =
+    resultsEl.innerHTML = REVNOTE +
       '<div class="rec-legenda">' +
       '<span class="rec-classe cls-i">Classe I</span> recomendado · ' +
       '<span class="rec-classe cls-iia">IIa</span> considerar · ' +
