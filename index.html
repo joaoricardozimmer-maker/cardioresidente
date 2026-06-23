@@ -413,6 +413,38 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .pt-table th:first-child { text-align: left; }
 .pt-age { font-weight: 700; padding: 6px 8px; border: 1px solid var(--line); }
 .pt-cell { color: #fff; font-weight: 700; text-align: center; padding: 6px 8px; border: 1px solid rgba(255,255,255,.5); }
+/* ===== Navegação em hubs + busca global ===== */
+.globalsearch { position: relative; background: #fff; padding: 10px 20px; border-bottom: 1px solid var(--line); }
+.globalsearch #gsearch { display: block; width: 100%; max-width: 1180px; margin: 0 auto; padding: 11px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 14px; background: var(--bg-soft); }
+.globalsearch #gsearch:focus { outline: 2px solid var(--accent); background: #fff; }
+.gsearch-results { position: absolute; left: 20px; right: 20px; top: 58px; max-width: 1180px; margin: 0 auto; background: #fff; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 12px 32px rgba(0,0,0,.16); max-height: 62vh; overflow-y: auto; z-index: 60; display: none; }
+.gsearch-results.show { display: block; }
+.gs-item { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 9px 12px; cursor: pointer; font-size: 13.5px; }
+.gs-item:hover { background: var(--bg-soft); }
+.gs-item:last-child { border-bottom: none; }
+.gs-type { flex: 0 0 auto; font-size: 10px; font-weight: 700; color: #fff; border-radius: 20px; padding: 2px 8px; text-transform: uppercase; letter-spacing: .03em; }
+.gs-cond { background: #c10e21; } .gs-score { background: #14679e; } .gs-dose { background: #1f9d57; } .gs-guia { background: #b07414; } .gs-ens { background: #6b3fa0; }
+.gs-label { flex: 1 1 auto; font-weight: 600; color: var(--text); }
+.gs-sub { flex: 0 0 auto; color: var(--muted); font-size: 11px; max-width: 38%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gs-empty { padding: 14px; color: var(--muted); font-size: 13px; }
+
+.tabs-bar { background: #fff; }
+.hubs { display: flex; gap: 4px; max-width: 1180px; margin: 0 auto; padding: 0 12px; flex-wrap: wrap; }
+.hub { background: none; border: 0; padding: 12px 16px; font-size: 14.5px; font-weight: 700; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; }
+.hub.active { color: var(--accent); border-bottom-color: var(--accent); }
+.hub:hover { color: var(--text); }
+.subtabs { display: flex; gap: 6px; max-width: 1180px; margin: 0 auto; padding: 8px 12px; flex-wrap: wrap; background: var(--bg-soft); border-top: 1px solid var(--line); }
+.subtab { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 5px 13px; font-size: 13px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.subtab.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+.subtab:hover { border-color: var(--accent); }
+@media (max-width: 600px) {
+  .globalsearch { padding: 8px 12px; }
+  .gsearch-results { left: 12px; right: 12px; top: 52px; }
+  .hubs, .subtabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .hubs::-webkit-scrollbar, .subtabs::-webkit-scrollbar { display: none; }
+  .hub { padding: 10px 12px; font-size: 13.5px; }
+}
+
 /* ===== Doses ===== */
 .dz-table td { font-size: 13px; }
 .dz-nome { font-weight: 700; white-space: nowrap; }
@@ -449,19 +481,13 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
         </a>
       </div>
     </div>
+    <div class="globalsearch">
+      <input id="gsearch" type="search" autocomplete="off" placeholder="🔎 Buscar em tudo: conduta, score, dose, ensaio, diretriz..." />
+      <div id="gsearch-results" class="gsearch-results"></div>
+    </div>
     <div class="tabs-bar">
-    <nav class="tabs" id="tabs">
-      <button class="tab active" data-view="evidencia">🔎 Evidências</button>
-      <button class="tab" data-view="guias">📚 Diretrizes</button>
-      <button class="tab" data-view="ensaios">🧪 Ensaios pivotais</button>
-      <button class="tab" data-view="mbe">📐 MBE</button>
-      <button class="tab" data-view="pretest">🎯 Pré-teste</button>
-      <button class="tab" data-view="scores">🧮 Scores</button>
-      <button class="tab" data-view="doses">💊 Doses</button>
-      <button class="tab" data-view="transcricao">📝 Transcrever laudo</button>
-      <button class="tab" data-view="evolucoes">🗂️ Evoluções</button>
-      <button class="tab" data-view="sobre">ℹ️ Sobre</button>
-    </nav>
+      <nav class="hubs" id="hubs"></nav>
+      <nav class="subtabs" id="subtabs"></nav>
     </div>
   </header>
 
@@ -3092,6 +3118,9 @@ window.DOSES = [
   // seleciona o primeiro
   const first=menu.querySelector('.evol-item');
   if(first) select(first.dataset.id, first);
+
+  // expõe a lista para a busca global
+  window.SCORES_LIST = SCORES.map(s => ({ id: s.id, nome: s.nome, grupo: s.grupo, desc: s.desc || '' }));
 })();
 
 // Aba "Doses": busca rápida de doses e ajuste renal de fármacos cardiológicos.
@@ -3259,8 +3288,7 @@ window.DOSES = [
 
   // permite que a aba Pré-teste envie a probabilidade para o cálculo de Bayes
   window.MBE_setPreTeste = function (pre) {
-    const tab = document.querySelector('.tab[data-view="mbe"]');
-    if (tab) tab.click();
+    if (window.cardioGoView) window.cardioGoView('mbe');
     pendingLR = { pre: pre, lrp: null, lrn: null };
     irPara('post');
     if (window.toast) window.toast('Pré-teste enviado: ' + pre + '%');
@@ -3590,47 +3618,119 @@ window.DOSES = [
   render();
 })();
 
-// Navegação entre abas + utilidades compartilhadas
+// Navegação em hubs (2 níveis) + busca global + utilidades compartilhadas
 (function () {
-  const tabs = document.querySelectorAll('.tab');
-  const views = document.querySelectorAll('.view');
+  const HUBS = [
+    { id: 'evidencias', label: '📚 Evidências', views: [['evidencia', '🔎 Recomendações'], ['guias', '📚 Diretrizes'], ['ensaios', '🧪 Ensaios pivotais']] },
+    { id: 'ferramentas', label: '🧮 Ferramentas', views: [['scores', '🧮 Scores'], ['pretest', '🎯 Pré-teste'], ['mbe', '📐 MBE'], ['doses', '💊 Doses']] },
+    { id: 'prontuario', label: '📝 Prontuário', views: [['transcricao', '📝 Transcrever laudo'], ['evolucoes', '🗂️ Evoluções']] },
+    { id: 'sobre', label: 'ℹ️ Sobre', views: [['sobre', 'ℹ️ Sobre']] }
+  ];
+  const viewHub = {};
+  HUBS.forEach(h => h.views.forEach(v => { viewHub[v[0]] = h; }));
 
-  function show(view) {
-    tabs.forEach(t => t.classList.toggle('active', t.dataset.view === view));
-    views.forEach(v => v.classList.toggle('active', v.id === 'view-' + view));
-    history.replaceState(null, '', '#' + view);
+  const hubsEl = document.getElementById('hubs');
+  const subEl = document.getElementById('subtabs');
+  const sections = document.querySelectorAll('.view');
+
+  function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+  function norm(s) { return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+
+  function renderHubs(activeHubId) {
+    hubsEl.innerHTML = HUBS.map(h => '<button class="hub' + (h.id === activeHubId ? ' active' : '') + '" data-hub="' + h.id + '">' + h.label + '</button>').join('');
+    hubsEl.querySelectorAll('.hub').forEach(b => b.addEventListener('click', () => {
+      const h = HUBS.find(x => x.id === b.dataset.hub);
+      showView(h.views[0][0]);
+    }));
   }
-
-  tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.view)));
+  function renderSub(hub, activeView) {
+    if (hub.views.length <= 1) { subEl.innerHTML = ''; subEl.style.display = 'none'; return; }
+    subEl.style.display = '';
+    subEl.innerHTML = hub.views.map(v => '<button class="subtab' + (v[0] === activeView ? ' active' : '') + '" data-view="' + v[0] + '">' + v[1] + '</button>').join('');
+    subEl.querySelectorAll('.subtab').forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
+  }
+  function showView(view) {
+    const hub = viewHub[view]; if (!hub) return;
+    renderHubs(hub.id);
+    renderSub(hub, view);
+    sections.forEach(s => s.classList.toggle('active', s.id === 'view-' + view));
+    history.replaceState(null, '', '#' + view);
+    window.scrollTo({ top: 0, behavior: 'instant' in document.body.style ? 'instant' : 'auto' });
+  }
+  window.cardioGoView = showView;
 
   const initial = (location.hash || '#evidencia').slice(1);
-  if (document.getElementById('view-' + initial)) show(initial);
+  showView(viewHub[initial] ? initial : 'evidencia');
 
-  // Toast global
+  // ---------------- Busca global ----------------
+  const gi = document.getElementById('gsearch');
+  const gr = document.getElementById('gsearch-results');
+  const IDX = [];
+  let built = false;
+  function buildIndex() {
+    IDX.length = 0;
+    (window.RECOMENDACOES || []).forEach(r => IDX.push({
+      label: r.titulo, sub: r.area, type: 'Conduta', kw: (r.kw || []).join(' '),
+      run: () => { showView('evidencia'); const i = document.getElementById('busca-input'); if (i) { i.value = r.titulo; document.getElementById('busca-form').dispatchEvent(new Event('submit', { cancelable: true })); } }
+    }));
+    (window.SCORES_LIST || []).forEach(s => IDX.push({
+      label: s.nome, sub: s.grupo, type: 'Score', kw: s.desc || '',
+      run: () => { showView('scores'); const b = document.querySelector('#scores-menu .evol-item[data-id="' + s.id + '"]'); if (b) { b.click(); b.scrollIntoView({ block: 'center' }); } }
+    }));
+    (window.DOSES || []).forEach(d => IDX.push({
+      label: d.nome, sub: d.g, type: 'Dose', kw: (d.dose || '') + ' ' + (d.obs || ''),
+      run: () => { showView('doses'); const i = document.getElementById('dz-busca'); if (i) { i.value = d.nome; i.dispatchEvent(new Event('input')); } }
+    }));
+    (window.GUIAS || []).forEach(g => IDX.push({
+      label: g.t, sub: 'Diretriz por tema', type: 'Diretriz', kw: '',
+      run: () => { showView('guias'); const i = document.getElementById('guias-busca'); if (i) { i.value = g.t; i.dispatchEvent(new Event('input')); } }
+    }));
+    // ensaios pivotais: estrutura { sec, t:[{n,a,...}] }
+    (window.ENSAIOS || []).forEach(sec => {
+      (sec.t || []).forEach(tr => { if (tr && tr.n) IDX.push({
+        label: tr.n + (tr.a ? ' (' + tr.a + ')' : ''), sub: 'Ensaio pivotal', type: 'Ensaio', kw: (tr.i || '') + ' ' + (tr.x || '') + ' ' + (tr.d || ''),
+        run: () => { showView('ensaios'); const i = document.getElementById('ensaios-busca'); if (i) { i.value = tr.n; i.dispatchEvent(new Event('input')); } }
+      }); });
+    });
+    built = true;
+  }
+  function badgeClass(t) { return 'gs-' + ({ 'Conduta': 'cond', 'Score': 'score', 'Dose': 'dose', 'Diretriz': 'guia', 'Ensaio': 'ens' }[t] || 'cond'); }
+
+  if (gi && gr) {
+    const run = () => {
+      if (!built) buildIndex();
+      const q = norm(gi.value); if (q.length < 2) { gr.innerHTML = ''; gr.classList.remove('show'); return; }
+      const terms = q.split(/\s+/).filter(Boolean);
+      const res = IDX.map(it => {
+        const hay = norm(it.label + ' ' + it.sub + ' ' + it.type + ' ' + it.kw);
+        let s = 0; terms.forEach(t => { if (hay.includes(t)) s++; });
+        if (norm(it.label).includes(q)) s += 3;
+        return { it, s };
+      }).filter(x => x.s > 0).sort((a, b) => b.s - a.s).slice(0, 14);
+      gr.innerHTML = res.length
+        ? res.map(x => '<button class="gs-item" data-i="' + IDX.indexOf(x.it) + '"><span class="gs-type ' + badgeClass(x.it.type) + '">' + x.it.type + '</span><span class="gs-label">' + esc(x.it.label) + '</span><span class="gs-sub">' + esc(x.it.sub) + '</span></button>').join('')
+        : '<div class="gs-empty">Nada encontrado para "' + esc(gi.value) + '".</div>';
+      gr.classList.add('show');
+      gr.querySelectorAll('.gs-item').forEach(b => b.addEventListener('click', () => {
+        const it = IDX[+b.dataset.i]; gr.classList.remove('show'); gi.value = ''; if (it) it.run();
+      }));
+    };
+    gi.addEventListener('input', run);
+    gi.addEventListener('focus', () => { if (gi.value.length >= 2) run(); });
+    document.addEventListener('click', e => { if (!e.target.closest('.globalsearch')) gr.classList.remove('show'); });
+    gi.addEventListener('keydown', e => { if (e.key === 'Escape') { gr.classList.remove('show'); gi.blur(); } });
+  }
+
+  // ---------------- utilidades ----------------
   let toastEl;
   window.toast = function (msg) {
-    if (!toastEl) {
-      toastEl = document.createElement('div');
-      toastEl.className = 'toast';
-      document.body.appendChild(toastEl);
-    }
-    toastEl.textContent = msg;
-    toastEl.classList.add('show');
-    clearTimeout(toastEl._t);
-    toastEl._t = setTimeout(() => toastEl.classList.remove('show'), 1800);
+    if (!toastEl) { toastEl = document.createElement('div'); toastEl.className = 'toast'; document.body.appendChild(toastEl); }
+    toastEl.textContent = msg; toastEl.classList.add('show');
+    clearTimeout(toastEl._t); toastEl._t = setTimeout(() => toastEl.classList.remove('show'), 1800);
   };
-
-  // Copiar para a área de transferência
   window.copyText = async function (text) {
-    try {
-      await navigator.clipboard.writeText(text);
-      window.toast('Copiado!');
-    } catch (e) {
-      const ta = document.createElement('textarea');
-      ta.value = text; document.body.appendChild(ta); ta.select();
-      document.execCommand('copy'); document.body.removeChild(ta);
-      window.toast('Copiado!');
-    }
+    try { await navigator.clipboard.writeText(text); window.toast('Copiado!'); }
+    catch (e) { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); window.toast('Copiado!'); }
   };
 })();
 
