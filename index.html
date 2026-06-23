@@ -455,6 +455,27 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .tema-link { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 20px; padding: 6px 13px; font-size: 12.5px; font-weight: 600; color: var(--text); cursor: pointer; }
 .tema-link:hover { border-color: var(--accent); color: var(--accent); }
 .tl-score:hover { border-color: var(--blue); color: var(--blue); }
+.tema-fisio { background: var(--bg-soft); border-left: 3px solid var(--blue); padding: 10px 14px; border-radius: 0 8px 8px 0; }
+
+/* ===== Polimento mobile ===== */
+@media (max-width: 860px) {
+  .evol-menu { flex-direction: row; flex-wrap: wrap; gap: 6px; }
+  .evol-menu .evol-item { flex: 0 0 auto; padding: 7px 12px; border-radius: 18px; font-size: 12.5px; }
+  .evol-group-title { width: 100%; margin-top: 8px; }
+}
+@media (max-width: 600px) {
+  input, select, textarea { font-size: 16px; }
+  .globalsearch #gsearch { font-size: 16px; }
+  .rec-card, .pt-card, .sc-panel, .evi-card, .ens-card, .gv-card, .sobre { padding: 15px; }
+  .rec-titulo { font-size: 16px; }
+  .hero p { font-size: 14px; }
+  .pt-tabwrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .pt-table { min-width: 520px; }
+  .gs-sub { display: none; }
+  .creator-badge .cb-name { font-size: 11px; }
+  .tema-links { gap: 6px; }
+  .tema-link { font-size: 12px; padding: 6px 11px; }
+}
 
 /* ===== Doses ===== */
 .dz-table td { font-size: 13px; }
@@ -705,76 +726,93 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
     <span class="footer-meta">CardioResidente · atualizado em junho/2026</span>
   </footer>
 <script>
-// Temas — resumos clínicos baseados em diretrizes/ensaios, para leitura rápida e estudo.
-// Cada tema: resumo (HTML), trials [{n,t}], recs [[termo,rotulo]], scores [ids], guia (termo p/ aba Diretrizes), pretest (bool).
+// Temas — fisiopatologia + resumo clínico baseados em fontes confiáveis (Braunwald, Harrison
+// e diretrizes ESC/AHA/SBC), com ensaios-chave e links internos.
+// Campos: fisio (HTML), resumo (HTML), trials [{n,t}], recs [[termo,rotulo]], scores [ids], guia (termo p/ Diretrizes), pretest (bool).
 window.TEMAS = [
   {
     id: 'fa', nome: 'Fibrilação atrial', area: 'Arritmia',
+    fisio:
+      '<p>Há dois mecanismos centrais: <b>gatilhos</b> (focos de disparo rápido nas veias pulmonares) e um <b>substrato atrial</b> que perpetua a arritmia. O remodelamento elétrico (encurtamento do período refratário) e estrutural (fibrose, dilatação atrial) favorece múltiplos circuitos de reentrada e rotores — "FA gera FA".</p>' +
+      '<p>A perda da contração atrial reduz o débito (~15–20%) e a estase no <b>apêndice atrial esquerdo</b> favorece trombo e embolia (AVC cardioembólico). A resposta ventricular rápida e irregular pode causar taquicardiomiopatia.</p>',
     resumo:
-      '<p>Arritmia supraventricular sustentada mais comum; aumenta risco de AVC, IC e mortalidade. O manejo segue o esquema <b>AF-CARE</b> (ESC 2024): <b>C</b>omorbidades/fatores de risco, <b>A</b>nticoagulação para evitar AVC, <b>R</b>edução de sintomas (controle de FC/ritmo) e <b>E</b>valiação dinâmica.</p>' +
-      '<p><b>Anticoagulação:</b> indicada se <b>CHA₂DS₂-VA ≥ 2</b> (considerar se = 1), preferindo <b>DOAC</b> à varfarina (exceto prótese mecânica ou estenose mitral reumática moderada/grave). Avalie sangramento (HAS-BLED) para corrigir fatores modificáveis, não para contraindicar.</p>' +
-      '<p><b>Controle de frequência:</b> betabloqueador ou BCC não-diidropiridínico (diltiazem/verapamil — evitar na ICFEr), alvo inicial frouxo &lt; 110 bpm. <b>Controle de ritmo:</b> antiarrítmico ou ablação em sintomáticos; a <b>ablação</b> é 1ª linha em FA paroxística selecionada e superior a fármaco na ICFEr. O controle de ritmo <b>precoce</b> (≤ 1 ano) reduz desfechos (EAST-AFNET 4).</p>',
+      '<p>Manejo pelo esquema <b>AF-CARE</b> (ESC 2024): <b>C</b>omorbidades/fatores de risco, <b>A</b>nticoagulação, <b>R</b>edução de sintomas e <b>E</b>valiação dinâmica.</p>' +
+      '<p><b>Anticoagulação</b> se <b>CHA₂DS₂-VA ≥ 2</b> (considerar se = 1), preferindo <b>DOAC</b> (exceto prótese mecânica/estenose mitral reumática moderada-grave). <b>Controle de frequência</b> com betabloqueador ou BCC não-diidropiridínico (evitar na ICFEr), alvo &lt; 110 bpm. <b>Controle de ritmo</b> (antiarrítmico/ablação) em sintomáticos; ablação é 1ª linha em paroxística selecionada e superior a fármaco na ICFEr. Controle de ritmo precoce reduz desfechos (EAST-AFNET 4).</p>',
     trials: [
       { n: 'RE-LY / ROCKET-AF / ARISTOTLE / ENGAGE AF', t: 'DOACs não inferiores/superiores à varfarina, com menos hemorragia intracraniana.' },
-      { n: 'EAST-AFNET 4 (2020)', t: 'Controle de ritmo precoce reduz desfechos cardiovasculares na FA recente.' },
-      { n: 'CASTLE-AF (2018)', t: 'Ablação reduz morte/internação por IC na FA com ICFEr.' },
-      { n: 'CABANA (2019)', t: 'Ablação vs fármaco — melhora sintomas/qualidade de vida.' }
+      { n: 'EAST-AFNET 4 (2020)', t: 'Controle de ritmo precoce reduz desfechos na FA recente.' },
+      { n: 'CASTLE-AF (2018)', t: 'Ablação reduz morte/internação por IC na FA com ICFEr.' }
     ],
-    recs: [['anticoagulação fibrilação atrial', 'Anticoagulação na FA'], ['DOAC varfarina', 'DOAC preferível'], ['ablação FA', 'Ablação por cateter'], ['controle de frequência FA', 'Controle de frequência']],
+    recs: [['anticoagulação fibrilação atrial', 'Anticoagulação na FA'], ['DOAC varfarina', 'DOAC preferível'], ['ablação FA', 'Ablação'], ['controle de frequência FA', 'Controle de FC']],
     scores: ['chadsvasc', 'hasbled'], guia: 'Fibrilação', pretest: false
   },
   {
     id: 'ic', nome: 'Insuficiência cardíaca', area: 'Insuficiência cardíaca',
+    fisio:
+      '<p>Uma agressão inicial (isquemia, sobrecarga, toxinas) reduz o débito e ativa mecanismos neuro-hormonais compensatórios — <b>sistema renina-angiotensina-aldosterona</b> e <b>simpático</b> — que, cronicamente, tornam-se deletérios: retenção de sódio/água, vasoconstrição, fibrose e <b>remodelamento ventricular</b> (dilatação e hipertrofia).</p>' +
+      '<p>Na <b>ICFEr</b> predomina disfunção sistólica; na <b>ICFEp</b>, disfunção diastólica com enchimento prejudicado e pressões de enchimento elevadas, frequentemente ligada a hipertensão, obesidade e envelhecimento. O peptídeo natriurético (BNP) sobe pela distensão miocárdica.</p>',
     resumo:
-      '<p>Síndrome clínica de congestão e/ou baixo débito. Classificar pela FEVE: <b>ICFEr ≤ 40%</b>, <b>levemente reduzida 41–49%</b>, <b>preservada ≥ 50%</b>. Diagnóstico: clínica + <b>BNP/NT-proBNP</b> + ecocardiograma.</p>' +
-      '<p><b>ICFEr — quatro pilares</b>, iniciados e titulados rapidamente, pois reduzem mortalidade: <b>ARNI</b> (ou IECA/BRA), <b>betabloqueador</b>, <b>antagonista mineralocorticoide</b> e <b>iSGLT2</b>. Diurético de alça para congestão (sintomático). Considerar <b>CDI</b> (FEVE ≤ 35% sintomática) e <b>TRC</b> (BRE, QRS ≥ 150 ms). Avançada/refratária: transplante, suporte circulatório.</p>' +
-      '<p><b>ICFEp e levemente reduzida:</b> <b>iSGLT2</b> reduz hospitalização/morte CV (I-A, ESC 2023); tratar congestão e comorbidades. Ferro EV se ferropenia sintomática.</p>',
+      '<p>Classificar pela FEVE (ICFEr ≤ 40%, levemente reduzida 41–49%, preservada ≥ 50%). Diagnóstico: clínica + BNP/NT-proBNP + eco.</p>' +
+      '<p><b>ICFEr — quatro pilares</b> (reduzem mortalidade, iniciar/titular rápido): ARNI (ou IECA/BRA), betabloqueador, antagonista mineralocorticoide e iSGLT2; diurético para congestão. Considerar CDI (FEVE ≤ 35%) e TRC (BRE, QRS ≥ 150 ms). <b>ICFEp/levemente reduzida:</b> iSGLT2 (I-A, ESC 2023); tratar congestão e comorbidades; ferro EV se ferropenia sintomática.</p>',
     trials: [
       { n: 'PARADIGM-HF (2014)', t: 'Sacubitril/valsartana superior ao enalapril na ICFEr.' },
       { n: 'DAPA-HF / EMPEROR-Reduced', t: 'iSGLT2 reduz morte CV/hospitalização na ICFEr.' },
-      { n: 'RALES / EMPHASIS-HF', t: 'Espironolactona/eplerenona reduzem mortalidade.' },
       { n: 'DELIVER / EMPEROR-Preserved', t: 'iSGLT2 beneficia ICFEp e levemente reduzida.' }
     ],
-    recs: [['sacubitril ICFEr', 'ARNI na ICFEr'], ['betabloqueador ICFEr', 'Betabloqueador'], ['iSGLT2 insuficiência', 'iSGLT2'], ['espironolactona', 'Antagonista mineralocorticoide'], ['CDI prevenção primária', 'CDI'], ['ressincronização', 'TRC']],
+    recs: [['sacubitril ICFEr', 'ARNI'], ['betabloqueador ICFEr', 'Betabloqueador'], ['iSGLT2 insuficiência', 'iSGLT2'], ['espironolactona', 'MRA'], ['CDI prevenção primária', 'CDI'], ['ressincronização', 'TRC']],
     scores: ['h2fpef', 'hfapeff', 'maggic'], guia: 'Insuficiência', pretest: false
   },
   {
     id: 'sca', nome: 'Síndrome coronariana aguda', area: 'Doença coronariana',
+    fisio:
+      '<p>O evento desencadeante é, na maioria, a <b>rotura ou erosão de uma placa aterosclerótica</b> vulnerável (capa fina, grande núcleo lipídico, inflamação), expondo material trombogênico e ativando plaquetas e coagulação → <b>trombo coronário</b>.</p>' +
+      '<p>Trombo <b>oclusivo</b> com isquemia transmural gera supra de ST (<b>STEMI</b>) e necrose; trombo <b>suboclusivo</b>/embolização distal causa NSTEMI/angina instável. A necrose libera troponina. Sem reperfusão rápida, a área isquêmica evolui para infarto ("tempo é músculo").</p>',
     resumo:
-      '<p>Espectro do IAM com supra (STEMI) e sem supra (NSTE-ACS). Diagnóstico: clínica + ECG + troponina (algoritmos 0/1 h).</p>' +
-      '<p><b>STEMI:</b> reperfusão imediata — <b>ICP primária</b> se exequível em ≤ 120 min do diagnóstico; senão fibrinólise e transferência. Revascularização <b>completa</b> no multiarterial sem choque.</p>' +
-      '<p><b>NSTE-ACS:</b> estratégia invasiva conforme o risco — imediata se instabilidade; <b>precoce (&lt; 24 h)</b> no alto risco (GRACE &gt; 140, troponina dinâmica, ΔST). <b>Terapia comum:</b> AAS + inibidor de P2Y12 (ticagrelor/prasugrel preferíveis) por 12 meses, anticoagulação parenteral, estatina de alta intensidade precoce, betabloqueador e IECA/BRA se disfunção de VE/IC.</p>',
+      '<p><b>STEMI:</b> reperfusão imediata — ICP primária ≤ 120 min do diagnóstico, senão fibrinólise e transferência; revascularização completa no multiarterial sem choque. <b>NSTE-ACS:</b> estratégia invasiva conforme risco (imediata se instável; precoce &lt; 24 h se GRACE &gt; 140/troponina dinâmica).</p>' +
+      '<p><b>Terapia:</b> AAS + inibidor de P2Y12 (ticagrelor/prasugrel preferíveis) por 12 meses, anticoagulação parenteral, estatina de alta intensidade precoce, betabloqueador e IECA/BRA se disfunção de VE/IC. Não dar O₂ se SatO₂ ≥ 90%.</p>',
     trials: [
-      { n: 'ISIS-2 (1988)', t: 'AAS (e estreptoquinase) reduzem mortalidade no IAM.' },
+      { n: 'ISIS-2 (1988)', t: 'AAS e estreptoquinase reduzem mortalidade no IAM.' },
       { n: 'PLATO (2009)', t: 'Ticagrelor superior ao clopidogrel na SCA.' },
-      { n: 'TRITON-TIMI 38', t: 'Prasugrel reduz eventos isquêmicos (mais sangramento).' },
       { n: 'COMPLETE (2019)', t: 'Revascularização completa de rotina reduz MACE no STEMI.' }
     ],
-    recs: [['AAS síndrome coronariana', 'AAS na SCA'], ['DAPT', 'Dupla antiagregação'], ['estratégia invasiva NSTEMI', 'Invasiva precoce'], ['revascularização completa STEMI', 'Revasc completa'], ['ICP primária', 'ICP primária']],
+    recs: [['AAS síndrome coronariana', 'AAS'], ['DAPT', 'DAPT'], ['estratégia invasiva NSTEMI', 'Invasiva precoce'], ['revascularização completa STEMI', 'Revasc completa'], ['ICP primária', 'ICP primária']],
     scores: ['heart', 'timi_nstemi', 'timi_stemi', 'grace', 'killip', 'crusade', 'dapt'], guia: 'coronariana aguda', pretest: false
   },
   {
-    id: 'dislipidemia', nome: 'Dislipidemia', area: 'Prevenção',
+    id: 'scc', nome: 'Doença coronariana crônica (angina estável)', area: 'Doença coronariana',
+    fisio:
+      '<p>Placas ateroscleróticas estáveis reduzem o lúmen coronário; quando a estenose é significativa (≥ 70%), a <b>reserva de fluxo coronário</b> não atende ao aumento de demanda no esforço → <b>isquemia por desequilíbrio oferta/demanda</b>, manifestada como angina. Também há disfunção <b>microvascular</b> e <b>vasoespasmo</b> (ANOCA/INOCA), que causam isquemia sem obstrução epicárdica.</p>',
     resumo:
-      '<p>O LDL-colesterol é fator causal de aterosclerose — "quanto mais baixo, melhor; mais cedo, melhor". Estratifique o risco (muito alto / alto / moderado / baixo) para definir a <b>meta de LDL</b>.</p>' +
-      '<p><b>Metas (muito alto risco):</b> LDL &lt; 55 mg/dL e redução ≥ 50% do basal (ESC); a SBC adota &lt; 50 mg/dL. <b>Escalonamento:</b> estatina de alta intensidade na dose máxima tolerada → <b>ezetimiba</b> → <b>inibidor de PCSK9</b> se ainda fora da meta. Dosar <b>Lp(a)</b> ao menos uma vez na vida. <b>Icosapenta de etila</b> se triglicérides altos e alto risco.</p>',
+      '<p>Estimar a <b>likelihood clínica</b> de DAC (modelo RF-CL, ESC 2024) e testar conforme a probabilidade (angio-TC ou imagem funcional; invasivo se muito alta). <b>Tratamento de base:</b> antiagregante, estatina de alta intensidade, controle de fatores de risco e estilo de vida. <b>Antianginosos</b> de 1ª linha: betabloqueador e/ou BCC; nitrato para alívio. <b>Revascularização</b> (ICP/CRM) para sintomas refratários ou anatomia de alto risco (TCE, triarterial). Em DM com DCV, iSGLT2/GLP-1.</p>',
     trials: [
-      { n: 'CTT / 4S / LIPID', t: 'Estatinas reduzem eventos proporcionalmente à queda do LDL.' },
-      { n: 'IMPROVE-IT (2015)', t: 'Ezetimiba + estatina reduz eventos.' },
-      { n: 'FOURIER / ODYSSEY OUTCOMES', t: 'Inibidores de PCSK9 reduzem eventos no muito alto risco.' },
-      { n: 'REDUCE-IT (2019)', t: 'Icosapenta de etila reduz eventos com TG elevados.' }
+      { n: 'COURAGE (2007) / ISCHEMIA (2020)', t: 'ICP não reduz morte/IAM vs terapia otimizada na DAC estável; melhora sintomas.' },
+      { n: 'ORBITA (2018)', t: 'Benefício antianginoso da ICP é em parte placebo-dependente.' }
     ],
-    recs: [['estatina prevenção secundária', 'Estatina alta intensidade'], ['meta LDL', 'Meta de LDL'], ['ezetimiba', 'Ezetimiba'], ['PCSK9', 'iPCSK9'], ['lipoproteína a', 'Lp(a)']],
+    recs: [['revascularização DAC estável', 'Revascularização'], ['antianginoso angina estável', 'Antianginosos'], ['iSGLT2 GLP-1 diabetes', 'iSGLT2/GLP-1 no DM']],
+    scores: ['syntax', 'prevent'], guia: 'crônica', pretest: true
+  },
+  {
+    id: 'dislipidemia', nome: 'Dislipidemia', area: 'Prevenção',
+    fisio:
+      '<p>As <b>lipoproteínas que contêm apoB</b> (LDL e remanescentes) atravessam o endotélio e ficam <b>retidas</b> na íntima, onde são oxidadas e fagocitadas por macrófagos → <b>células espumosas</b> e estria gordurosa. A inflamação crônica forma a placa de ateroma. O efeito é <b>cumulativo</b> com a exposição ao longo da vida — daí "quanto mais baixo e mais cedo, melhor".</p>',
+    resumo:
+      '<p>Estratificar o risco para definir a <b>meta de LDL</b> (muito alto risco &lt; 55 mg/dL e ↓ ≥ 50%; SBC &lt; 50). <b>Escalonar:</b> estatina de alta intensidade → ezetimiba → inibidor de PCSK9 se fora da meta. Dosar <b>Lp(a)</b> ao menos uma vez; icosapenta se triglicérides altos e alto risco.</p>',
+    trials: [
+      { n: 'CTT / 4S', t: 'Estatinas reduzem eventos proporcionalmente à queda do LDL.' },
+      { n: 'IMPROVE-IT', t: 'Ezetimiba + estatina reduz eventos.' },
+      { n: 'FOURIER / ODYSSEY OUTCOMES', t: 'Inibidores de PCSK9 reduzem eventos.' }
+    ],
+    recs: [['estatina prevenção secundária', 'Estatina'], ['meta LDL', 'Meta de LDL'], ['ezetimiba', 'Ezetimiba'], ['PCSK9', 'iPCSK9'], ['lipoproteína a', 'Lp(a)']],
     scores: ['score2', 'prevent', 'ckdepi'], guia: 'Dislipidemia', pretest: false
   },
   {
     id: 'has', nome: 'Hipertensão arterial', area: 'Hipertensão',
+    fisio:
+      '<p>A PA = débito cardíaco × resistência vascular periférica. Na HAS essencial há aumento da <b>resistência periférica</b> por disfunção endotelial, remodelamento arteriolar, ativação do <b>SRAA</b> e do <b>simpático</b> e retenção renal de sódio. Cronicamente leva a <b>lesão de órgão-alvo</b>: hipertrofia de VE, nefroesclerose, retinopatia e aterosclerose acelerada.</p>',
     resumo:
-      '<p>Confirme o diagnóstico fora do consultório (MAPA/MRPA). <b>Meta &lt; 130/80 mmHg</b> na maioria, se tolerado (ESC 2024 mira PAS 120–129 mmHg); individualize em idosos frágeis.</p>' +
-      '<p><b>Tratamento:</b> mudança de estilo de vida sempre + início com <b>combinação dupla</b> (IECA ou BRA + BCC ou diurético tiazídico), de preferência em comprimido único. Subir para tripla; <b>HAS resistente</b> (3 fármacos incluindo diurético) → adicionar <b>espironolactona</b>. Rastrear causas secundárias quando indicado.</p>',
+      '<p>Confirmar fora do consultório (MAPA/MRPA). <b>Meta &lt; 130/80 mmHg</b> (ESC 2024 mira PAS 120–129 se tolerado). Estilo de vida sempre + início com <b>combinação dupla</b> (IECA/BRA + BCC/tiazídico) em comprimido único; subir para tripla; <b>resistente</b> → adicionar espironolactona. Rastrear causas secundárias quando indicado.</p>',
     trials: [
-      { n: 'SPRINT (2015)', t: 'Alvo intensivo (<120) reduz eventos e morte em alto risco selecionado.' },
-      { n: 'ACCOMPLISH', t: 'IECA + BCC superior a IECA + tiazídico.' },
+      { n: 'SPRINT (2015)', t: 'Alvo intensivo reduz eventos e morte em alto risco selecionado.' },
       { n: 'PATHWAY-2', t: 'Espironolactona é o melhor 4º fármaco na HAS resistente.' }
     ],
     recs: [['meta de pressão', 'Meta de PA'], ['combinação dupla', 'Combinação dupla'], ['espironolactona resistente', 'HAS resistente']],
@@ -782,79 +820,185 @@ window.TEMAS = [
   },
   {
     id: 'valvopatia', nome: 'Valvopatias', area: 'Valvopatia',
+    fisio:
+      '<p>A <b>estenose aórtica</b> (calcífica degenerativa) gera sobrecarga de pressão → hipertrofia concêntrica de VE, disfunção diastólica e, tardiamente, falência sistólica. A <b>insuficiência</b> valvar gera sobrecarga de volume → dilatação excêntrica e, eventualmente, disfunção. A <b>estenose mitral</b> (reumática) eleva a pressão atrial esquerda → congestão pulmonar, hipertensão pulmonar e FA.</p>',
     resumo:
-      '<p>Quantificar gravidade por ecocardiograma e correlacionar com sintomas e função de VE; decisões pelo <b>Heart Team</b>.</p>' +
-      '<p><b>Estenose aórtica</b> grave sintomática → intervenção: <b>TAVI</b> (≥ 75 anos ou alto risco) ou <b>cirurgia</b> (&lt; 75 anos e baixo risco). <b>Insuficiência mitral primária</b> grave sintomática → cirurgia (preferir plastia); também se disfunção de VE assintomática. <b>IM secundária</b> sintomática apesar de terapia otimizada → <b>TEER</b> em selecionados. <b>Estenose mitral reumática</b> favorável → valvoplastia por balão. Prótese mecânica exige varfarina (DOAC contraindicado).</p>',
+      '<p>Quantificar gravidade por eco e correlacionar com sintomas/função de VE; decisões pelo <b>Heart Team</b>. EAo grave sintomática → TAVI (≥ 75 anos/alto risco) ou cirurgia (&lt; 75 e baixo risco). IM primária grave sintomática → cirurgia (plastia). IM secundária sintomática → TEER selecionado. EM reumática favorável → valvoplastia por balão. Prótese mecânica exige varfarina.</p>',
     trials: [
-      { n: 'PARTNER / Evolut Low Risk', t: 'TAVI não inferior/superior à cirurgia, inclusive em baixo risco.' },
+      { n: 'PARTNER / Evolut Low Risk', t: 'TAVI não inferior/superior à cirurgia, inclusive baixo risco.' },
       { n: 'COAPT (2018)', t: 'TEER reduz internação/morte na IM secundária selecionada.' }
     ],
-    recs: [['estenose aórtica', 'EAo grave'], ['TAVI', 'TAVI'], ['insuficiência mitral primária', 'IM primária'], ['TEER mitral', 'TEER'], ['valvoplastia mitral', 'Valvoplastia mitral']],
+    recs: [['estenose aórtica', 'EAo grave'], ['TAVI', 'TAVI'], ['insuficiência mitral primária', 'IM primária'], ['TEER mitral', 'TEER'], ['valvoplastia mitral', 'EM reumática']],
     scores: ['euroscore', 'sts'], guia: 'Valvopatia', pretest: false
   },
   {
     id: 'tep', nome: 'Tromboembolismo pulmonar', area: 'Tromboembolismo',
+    fisio:
+      '<p>Trombos (em geral de TVP de membros inferiores — <b>tríade de Virchow</b>: estase, lesão endotelial, hipercoagulabilidade) embolizam para a circulação pulmonar. A obstrução vascular e a vasoconstrição hipóxica elevam a <b>resistência vascular pulmonar</b> → sobrecarga aguda do <b>ventrículo direito</b>, que pode dilatar e falir (interdependência ventricular, queda do débito do VE e choque). Hipoxemia por desequilíbrio ventilação/perfusão.</p>',
     resumo:
-      '<p>Suspeita → <b>probabilidade clínica</b> (Wells/Genebra). Baixa probabilidade: <b>D-dímero</b> (com corte ajustado pela idade); se negativo, exclui. Alta probabilidade ou D-dímero positivo: <b>angio-TC</b> de tórax.</p>' +
-      '<p><b>Estratificação de risco:</b> <b>alto risco</b> (instabilidade/choque) → <b>trombólise sistêmica</b> (ou embolectomia/cateter se contraindicada); <b>intermediário</b> → anticoagular e monitorar o VD; <b>baixo</b> (sPESI 0, sem disfunção de VD) → considerar tratamento ambulatorial. Anticoagulação preferindo <b>DOAC</b>.</p>',
+      '<p>Suspeita → probabilidade clínica (Wells) → D-dímero (corte ajustado pela idade) se baixa; angio-TC se alta/D-dímero positivo. <b>Estratificar risco:</b> alto (instável) → trombólise; intermediário → anticoagular e monitorar VD; baixo (sPESI 0) → considerar ambulatorial. DOAC preferível.</p>',
     trials: [
       { n: 'PEITHO (2014)', t: 'Trombólise no risco intermediário-alto: menos colapso, mais sangramento.' },
-      { n: 'EINSTEIN-PE / AMPLIFY / Hokusai-VTE', t: 'DOACs eficazes e mais seguros que varfarina no TEV.' }
+      { n: 'EINSTEIN-PE / AMPLIFY', t: 'DOACs eficazes e mais seguros que varfarina no TEV.' }
     ],
-    recs: [['anticoagulação TEP', 'Anticoagulação no TEP'], ['trombólise TEP', 'Trombólise no TEP']],
+    recs: [['anticoagulação TEP', 'Anticoagulação'], ['trombólise TEP', 'Trombólise']],
     scores: ['wells_tep', 'spesi', 'wells_tvp'], guia: 'Tromboembolismo', pretest: false
   },
   {
     id: 'cmh', nome: 'Cardiomiopatia hipertrófica', area: 'Cardiomiopatia',
+    fisio:
+      '<p>Doença <b>sarcomérica</b> (mutações em genes do sarcômero, herança autossômica dominante) que causa hipertrofia de VE com <b>desarranjo dos miócitos</b> e fibrose. Pode haver <b>obstrução dinâmica da via de saída do VE</b> por movimento sistólico anterior da mitral (SAM), agravada por hipovolemia e vasodilatação. A fibrose e o desarranjo são substrato para arritmias e morte súbita.</p>',
     resumo:
-      '<p>Hipertrofia de VE não explicada por sobrecarga; pode haver <b>obstrução dinâmica da via de saída</b> (VSVE). Diagnóstico por eco/RM; rastrear história familiar.</p>' +
-      '<p><b>Sintomas (forma obstrutiva):</b> betabloqueador ou BCC não-diidropiridínico; refratário → <b>mavacamten</b> (inibidor de miosina), disopiramida ou <b>redução septal</b> (miectomia/ablação alcoólica). Evitar desidratação e vasodilatadores. <b>Morte súbita:</b> estratificar (HCM Risk-SCD/critérios maiores) → <b>CDI</b>; CDI sempre na prevenção secundária (PCR/TV).</p>',
+      '<p>Diagnóstico por eco/RM; rastrear familiares. <b>Forma obstrutiva sintomática:</b> betabloqueador ou BCC não-diidropiridínico; refratário → mavacamten (inibidor de miosina), disopiramida ou redução septal (miectomia/ablação alcoólica). Evitar desidratação e vasodilatadores. <b>Morte súbita:</b> estratificar (HCM Risk-SCD/critérios) → CDI; CDI sempre na prevenção secundária.</p>',
     trials: [
       { n: 'EXPLORER-HCM (2020)', t: 'Mavacamten melhora sintomas e reduz a obstrução.' },
       { n: 'VALOR-HCM', t: 'Mavacamten reduz a necessidade de redução septal.' }
     ],
-    recs: [['mavacamten', 'Mavacamten'], ['CDI prevenção secundária CMH', 'CDI na CMH'], ['miectomia', 'Redução septal']],
+    recs: [['mavacamten', 'Mavacamten'], ['CDI prevenção secundária CMH', 'CDI'], ['miectomia', 'Redução septal']],
     scores: ['qtc'], guia: 'Cardiomiopatia', pretest: false
   },
   {
-    id: 'pericardite', nome: 'Pericardite e tamponamento', area: 'Pericárdio',
+    id: 'amiloidose', nome: 'Amiloidose cardíaca', area: 'Cardiomiopatia',
+    fisio:
+      '<p>Deposição extracelular de fibrilas de amiloide no miocárdio, causando <b>cardiomiopatia restritiva</b> e infiltrativa. Os dois tipos principais: <b>ATTR</b> (transtirretina — selvagem, do idoso, ou hereditária) e <b>AL</b> (cadeias leves, discrasia de plasmócitos). O infiltrado enrijece o ventrículo (disfunção diastólica grave), espessa as paredes e infiltra o sistema de condução.</p>',
     resumo:
-      '<p><b>Pericardite aguda:</b> ≥ 2 de — dor torácica pleurítica que melhora ao sentar/inclinar, atrito pericárdico, supra de ST difuso com infra de PR, derrame. Tratamento: <b>AINE/AAS + colchicina</b> (reduz recorrência); corticoide é 2ª linha. Restrição de exercício até resolução.</p>' +
-      '<p><b>Tamponamento:</b> tríade de Beck, <b>pulso paradoxal</b> e turgência jugular; confirmação ecocardiográfica → <b>pericardiocentese</b>. Pulso paradoxal &gt; 10 mmHg aumenta a probabilidade (ver biblioteca de LRs na aba MBE).</p>',
+      '<p>Suspeitar em HVE "inexplicada" com baixa voltagem no ECG, ICFEp, espessamento valvar/septal, síndrome do túnel do carpo. Diagnóstico: cintilografia óssea (PYP/DPD) para ATTR + exclusão de cadeias leves; biópsia se dúvida. <b>ATTR-CM (NYHA I–III):</b> tafamidis (estabilizador) reduz mortalidade/hospitalização. Cuidado com digoxina e BCC (ligam-se ao amiloide).</p>',
     trials: [
-      { n: 'ICAP (2013) / COPE / CORP', t: 'Colchicina reduz recorrência e sintomas na pericardite.' }
+      { n: 'ATTR-ACT (2018)', t: 'Tafamidis reduz mortalidade e hospitalização na ATTR-CM.' }
+    ],
+    recs: [['tafamidis amiloidose', 'Tafamidis']],
+    scores: [], guia: 'Cardiomiopatia', pretest: false
+  },
+  {
+    id: 'pericardite', nome: 'Pericardite e tamponamento', area: 'Pericárdio',
+    fisio:
+      '<p>Inflamação do pericárdio (viral/idiopática na maioria) gera dor, atrito e, às vezes, <b>derrame</b>. O acúmulo de líquido eleva a <b>pressão intrapericárdica</b>; quando supera a pressão de enchimento das câmaras direitas surge <b>tamponamento</b> — restrição diastólica, interdependência ventricular exagerada (pulso paradoxal) e queda do débito. A pericardite crônica pode evoluir para <b>constrição</b>.</p>',
+    resumo:
+      '<p><b>Pericardite aguda:</b> ≥ 2 de — dor pleurítica que melhora sentado, atrito, supra de ST difuso com infra de PR, derrame. Tratar com <b>AINE/AAS + colchicina</b> (reduz recorrência); corticoide é 2ª linha. <b>Tamponamento:</b> tríade de Beck, pulso paradoxal, turgência jugular → ecocardiograma e <b>pericardiocentese</b>.</p>',
+    trials: [
+      { n: 'ICAP (2013) / CORP', t: 'Colchicina reduz recorrência e sintomas na pericardite.' }
     ],
     recs: [['colchicina pericardite', 'Colchicina']],
     scores: [], guia: 'Pericardite', pretest: false
   },
   {
-    id: 'arritmias', nome: 'Arritmias e dispositivos', area: 'Arritmia',
+    id: 'miocardite', nome: 'Miocardite', area: 'Miocárdio',
+    fisio:
+      '<p>Inflamação do miocárdio, mais comumente <b>viral</b> (ou pós-viral imunomediada); também por fármacos, toxinas e doenças autoimunes (e miocardite por inibidores de checkpoint). A lesão direta e a resposta imune causam necrose de miócitos e edema, com disfunção contrátil e risco de <b>arritmias</b>. Pode resolver, evoluir para cardiomiopatia dilatada ou, na forma fulminante, choque cardiogênico.</p>',
     resumo:
-      '<p><b>Taquiarritmia com instabilidade</b> (hipotensão, isquemia, IC, rebaixamento) → <b>cardioversão elétrica sincronizada</b> imediata. <b>TSV</b> estável → manobra vagal e <b>adenosina</b>; recorrente → ablação (curativa).</p>' +
-      '<p><b>TV/FV:</b> ACLS; <b>CDI</b> na prevenção secundária (PCR/TV sustentada sem causa reversível) e primária em cardiopatas selecionados. <b>Bradiarritmia</b> sintomática (BAV avançado/total, doença do nó sinusal) → <b>marcapasso</b>. <b>Canalopatias:</b> QT longo → betabloqueador; Brugada com PCR/TV → CDI.</p>',
+      '<p>Apresenta-se como dor torácica (mimetizando IAM com coronárias normais), IC aguda ou arritmia, geralmente após quadro viral, com troponina elevada. <b>RM cardíaca</b> (critérios de Lake Louise) é central; biópsia em casos graves/refratários. Tratamento de suporte e da IC/arritmia; suporte circulatório na forma fulminante; imunossupressão em etiologias específicas.</p>',
+    trials: [],
+    recs: [],
+    scores: ['qtc'], guia: 'miocardite', pretest: false
+  },
+  {
+    id: 'endocardite', nome: 'Endocardite infecciosa', area: 'Infecção',
+    fisio:
+      '<p>Lesão endotelial valvar + <b>bacteremia</b> levam à adesão de microrganismos e formação de <b>vegetações</b> (agregados de plaquetas, fibrina e germes). As vegetações destroem a valva (regurgitação, abscesso), embolizam (AVC, êmbolos sépticos) e mantêm bacteremia. Fatores de risco: próteses valvares, valvopatia, dispositivos, uso de drogas IV.</p>',
+    resumo:
+      '<p>Diagnóstico pelos <b>critérios de Duke</b> (hemoculturas + eco/eco transesofágico). Tratamento: <b>antibioticoterapia</b> prolongada guiada por cultura. <b>Cirurgia precoce</b> em IC por regurgitação grave, infecção não controlada (abscesso) ou alto risco embólico. <b>Profilaxia antibiótica</b> antes de procedimento dentário invasivo apenas em alto risco (prótese, EI prévia, cardiopatia cianótica).</p>',
+    trials: [
+      { n: 'POET (2019)', t: 'Antibiótico oral (step-down) não inferior ao IV em EI esquerda estável selecionada.' }
+    ],
+    recs: [['profilaxia endocardite', 'Profilaxia'], ['cirurgia endocardite', 'Cirurgia precoce']],
+    scores: [], guia: '', pretest: false
+  },
+  {
+    id: 'arritmias', nome: 'Arritmias e dispositivos', area: 'Arritmia',
+    fisio:
+      '<p>As arritmias surgem por <b>distúrbios de automatismo</b> (foco ectópico), <b>atividade deflagrada</b> (pós-despolarizações) ou <b>reentrada</b> (circuito com bloqueio unidirecional e condução lenta — mecanismo da maioria das taqui sustentadas). As bradiarritmias decorrem de falha do nó sinusal ou de bloqueio na condução AV. Canalopatias (QT longo, Brugada) são alterações de canais iônicos com risco de morte súbita.</p>',
+    resumo:
+      '<p><b>Taqui com instabilidade</b> → cardioversão elétrica sincronizada. <b>TSV</b> estável → manobra vagal/adenosina; recorrente → ablação. <b>TV/FV</b> → ACLS; CDI na prevenção secundária e primária selecionada. <b>Bradiarritmia</b> sintomática (BAV avançado, doença do nó sinusal) → marcapasso. Canalopatias: QT longo → betabloqueador; Brugada com PCR/TV → CDI.</p>',
     trials: [
       { n: 'MADIT-II / SCD-HeFT', t: 'CDI na prevenção primária em ICFEr reduz mortalidade.' },
-      { n: 'AVID / CIDS / CASH', t: 'CDI superior a antiarrítmico na prevenção secundária.' }
+      { n: 'AVID / CIDS', t: 'CDI superior a antiarrítmico na prevenção secundária.' }
     ],
-    recs: [['ablação TSV', 'Ablação de TSV'], ['CDI prevenção secundária morte súbita', 'CDI'], ['marcapasso BAV', 'Marcapasso'], ['betabloqueador QT longo', 'QT longo'], ['Brugada', 'Brugada']],
+    recs: [['ablação TSV', 'Ablação TSV'], ['CDI prevenção secundária morte súbita', 'CDI'], ['marcapasso BAV', 'Marcapasso'], ['betabloqueador QT longo', 'QT longo'], ['Brugada', 'Brugada']],
     scores: ['qtc'], guia: 'Arritmias', pretest: false
   },
   {
     id: 'sincope', nome: 'Síncope', area: 'Síncope',
+    fisio:
+      '<p>Perda transitória de consciência por <b>hipoperfusão cerebral global</b> autolimitada. Mecanismos: <b>reflexa</b> (vasovagal/situacional — hiperatividade vagal com vasodilatação e/ou bradicardia), <b>hipotensão ortostática</b> (falha autonômica/hipovolemia) e <b>cardíaca</b> (arritmia ou obstrução estrutural reduzindo agudamente o débito — a de pior prognóstico).</p>',
     resumo:
-      '<p>Perda transitória de consciência por hipoperfusão cerebral global. Classificar: <b>reflexa</b> (vasovagal/situacional), <b>hipotensão ortostática</b> e <b>cardíaca</b> (arrítmica ou estrutural — a de pior prognóstico).</p>' +
-      '<p><b>Avaliação inicial:</b> história/testemunho, exame, <b>ECG</b> e PA ortostática — estratifica risco. <b>Reflexa:</b> educação, reconhecimento de pródromos, manobras de contrapressão, hidratação/sal. <b>Suspeita cardíaca</b> (cardiopatia, ECG anormal, síncope ao esforço/supino): investigar (monitorização prolongada, eco, estudo eletrofisiológico). <b>Bradiarritmia documentada</b> → marcapasso.</p>',
-    trials: [
-      { n: 'ISSUE / studies de monitor implantável', t: 'Documentação prolongada eleva o diagnóstico na síncope inexplicada.' }
-    ],
+      '<p>Avaliação inicial: história/testemunho, exame, <b>ECG</b> e PA ortostática — estratifica o risco. <b>Reflexa:</b> educação, reconhecimento de pródromos, manobras de contrapressão, hidratação/sal. <b>Suspeita cardíaca</b> (cardiopatia, ECG anormal, síncope ao esforço/supino) → investigar (monitorização prolongada, eco, EEF). Bradiarritmia documentada → marcapasso.</p>',
+    trials: [],
     recs: [['marcapasso bradiarritmia', 'Marcapasso'], ['síncope reflexa', 'Síncope reflexa']],
     scores: [], guia: 'Arritmias', pretest: false
   },
   {
-    id: 'prevencao', nome: 'Prevenção cardiovascular', area: 'Prevenção',
+    id: 'hp', nome: 'Hipertensão pulmonar', area: 'Circulação pulmonar',
+    fisio:
+      '<p>Definida por <b>pressão média de artéria pulmonar &gt; 20 mmHg</b> ao cateterismo direito. Na <b>HAP (grupo 1)</b> há remodelamento das arteríolas pulmonares (proliferação, vasoconstrição, trombose in situ) elevando a resistência vascular pulmonar. As causas mais comuns globalmente são doença de VE (grupo 2) e doença pulmonar/hipóxia (grupo 3). O resultado final é <b>sobrecarga e falência do ventrículo direito</b>.</p>',
     resumo:
-      '<p>Estime o risco global (<b>SCORE2/SCORE2-OP</b> na Europa, <b>PREVENT</b> nos EUA) para calibrar a intensidade das intervenções.</p>' +
-      '<p><b>Estilo de vida (base de tudo):</b> cessação do tabagismo (maior impacto isolado), atividade física ≥ 150 min/semana, dieta saudável e controle de peso. <b>Farmacológico:</b> estatina conforme risco/meta de LDL; controle de PA e de diabetes. <b>AAS NÃO</b> é recomendado de rotina na prevenção primária. Vacina de influenza em DCV. Em DM de alto risco, iSGLT2/GLP-1 com benefício CV.</p>',
+      '<p>Confirmar e classificar por <b>cateterismo cardíaco direito</b> (diferenciar pré de pós-capilar). <b>HAP (grupo 1)</b> de risco baixo/intermediário sem comorbidades: <b>terapia combinada inicial</b> (inibidor de PDE5 + antagonista de endotelina), escalando conforme o risco. Tratar a causa de base nos grupos 2 e 3. Encaminhar a centro especializado.</p>',
+    trials: [
+      { n: 'AMBITION (2015)', t: 'Combinação inicial ambrisentana + tadalafila superior à monoterapia na HAP.' },
+      { n: 'SERAPHIN', t: 'Macitentana reduz morbimortalidade na HAP.' }
+    ],
+    recs: [['cateterismo direito HP', 'Diagnóstico (CCD)'], ['terapia combinada HAP', 'Terapia combinada']],
+    scores: [], guia: '', pretest: false
+  },
+  {
+    id: 'aorta', nome: 'Doença da aorta', area: 'Aorta',
+    fisio:
+      '<p>O <b>aneurisma</b> resulta de degeneração da média (perda de elastina/colágeno, necrose cística da média — acentuada em Marfan, valva bicúspide), com dilatação progressiva (lei de Laplace: tensão de parede ∝ pressão × raio). A <b>dissecção</b> ocorre quando há rotura da íntima e o sangue disseca a média criando uma falsa luz — emergência com risco de rotura, tamponamento e má-perfusão de ramos.</p>',
+    resumo:
+      '<p><b>Aneurisma de aorta ascendente:</b> cirurgia ao atingir ≥ 55 mm (limiares menores em Marfan, valva bicúspide ou rápida progressão). <b>Dissecção tipo A</b> → cirurgia de emergência; <b>tipo B</b> não complicada → tratamento clínico (controle rigoroso de PA e FC com betabloqueador), TEVAR se complicada. Controle pressórico e cessação do tabagismo são pilares.</p>',
+    trials: [],
+    recs: [['aneurisma de aorta ascendente', 'Cirurgia do aneurisma'], ['dissecção de aorta', 'Controle de PA/FC']],
+    scores: [], guia: '', pretest: false
+  },
+  {
+    id: 'dap', nome: 'Doença arterial periférica / carótida', area: 'Doença vascular',
+    fisio:
+      '<p>Aterosclerose sistêmica reduz o fluxo arterial dos membros (e carótidas). Na <b>DAP</b>, a estenose limita o fluxo ao exercício → <b>claudicação intermitente</b>; em casos graves, isquemia crítica (dor de repouso, úlceras). Na <b>doença carotídea</b>, a placa pode embolizar ou ocluir → AVC/AIT. A DAP é marcador de alto risco coronariano.</p>',
+    resumo:
+      '<p>Diagnóstico da DAP pelo <b>índice tornozelo-braquial</b> + Doppler. Tratamento: <b>estatina + antiagregante</b>, cessação do tabagismo, exercício supervisionado; revascularização na isquemia crítica/limitante. <b>Estenose carotídea sintomática 70–99%</b> → endarterectomia (ou stent). AVC cardioembólico por FA → anticoagulação.</p>',
+    trials: [
+      { n: 'COMPASS (2017)', t: 'Rivaroxabana baixa dose + AAS reduz eventos na DAC/DAP estável.' }
+    ],
+    recs: [['doença arterial periférica', 'DAP'], ['endarterectomia estenose carotídea', 'Carótida'], ['AVC cardioembólico', 'AVC por FA']],
+    scores: [], guia: 'carótidas', pretest: false
+  },
+  {
+    id: 'chagas', nome: 'Cardiopatia chagásica', area: 'Cardiomiopatia',
+    fisio:
+      '<p>Infecção crônica pelo <b>Trypanosoma cruzi</b>. Décadas após a fase aguda, mecanismos de <b>inflamação persistente, autoimunidade, lesão microvascular e disautonomia</b> levam a fibrose miocárdica focal (clássico <b>aneurisma apical</b>), distúrbios de condução (bloqueio de ramo direito + hemibloqueio anterior esquerdo), arritmias ventriculares e cardiomiopatia dilatada com IC.</p>',
+    resumo:
+      '<p>Avaliar com ECG, eco e Holter; estratificar risco de morte súbita (escore de Rassi). <b>Tratamento etiológico</b> (benznidazol) na fase aguda/congênita, reativação e crônica recente. Manejo da IC como na ICFEr; <b>CDI</b> na prevenção secundária (TV sustentada/PCR); anticoagulação se trombo/FA/aneurisma com risco embólico. Marcapasso nos distúrbios de condução.</p>',
+    trials: [
+      { n: 'BENEFIT (2015)', t: 'Benznidazol na cardiopatia chagásica crônica estabelecida não reduziu desfechos CV.' }
+    ],
+    recs: [['CDI cardiopatia chagásica', 'CDI'], ['benznidazol', 'Tratamento etiológico']],
+    scores: [], guia: 'Chagas', pretest: false
+  },
+  {
+    id: 'congenita', nome: 'Cardiopatia congênita do adulto', area: 'Congênita',
+    fisio:
+      '<p>Lesões com <b>shunt</b> (CIA, CIV, PCA) desviam sangue esquerda→direita, sobrecarregando as câmaras direitas/circulação pulmonar; se não corrigidas, podem inverter o shunt (<b>síndrome de Eisenmenger</b>). Lesões obstrutivas (coarctação, estenose pulmonar) geram sobrecarga de pressão. Muitos adultos chegam após correção na infância, com sequelas (arritmias, disfunção ventricular, lesões residuais).</p>',
+    resumo:
+      '<p>Acompanhamento em centro especializado (GUCH/ACHD). <b>CIA</b> com sobrecarga de VD → fechamento (percutâneo se ostium secundum favorável). <b>Coarctação</b> com gradiente significativo/HAS → intervenção. Avaliar hipertensão pulmonar, arritmias e necessidade de profilaxia de endocardite em lesões de alto risco.</p>',
+    trials: [],
+    recs: [['comunicação interatrial', 'CIA'], ['coarctação de aorta', 'Coarctação']],
+    scores: [], guia: '', pretest: false
+  },
+  {
+    id: 'onco', nome: 'Cardio-oncologia', area: 'Cardio-oncologia',
+    fisio:
+      '<p>Terapias oncológicas lesam o coração por mecanismos distintos: <b>antraciclinas</b> causam dano oxidativo e morte de miócitos (dose-dependente, em parte irreversível); <b>anti-HER2 (trastuzumabe)</b> causa disfunção em geral reversível; <b>inibidores de checkpoint</b> podem causar miocardite imunomediada; inibidores de VEGF causam hipertensão; radioterapia leva a doença coronária/valvar/pericárdica tardia.</p>',
+    resumo:
+      '<p>Estratificar risco basal e <b>monitorar FEVE e strain</b> (basal e seriado) durante antraciclinas/anti-HER2. Queda significativa da FEVE → iniciar <b>IECA/BRA + betabloqueador</b> (como na ICFEr) e discutir a continuidade do tratamento oncológico com a oncologia. Suspeita de miocardite por checkpoint → suspender e corticoide. Controlar fatores de risco CV.</p>',
+    trials: [],
+    recs: [['cardiotoxicidade', 'Cardiotoxicidade']],
+    scores: [], guia: 'Cardio-oncologia', pretest: false
+  },
+  {
+    id: 'prevencao', nome: 'Prevenção cardiovascular', area: 'Prevenção',
+    fisio:
+      '<p>A aterosclerose começa cedo e progride silenciosamente por décadas, dirigida por <b>fatores de risco modificáveis</b> (LDL elevado, tabagismo, hipertensão, diabetes, obesidade, sedentarismo) que promovem disfunção endotelial, inflamação e acúmulo de placa. O risco é <b>cumulativo e multiplicativo</b> — controlar vários fatores cedo tem efeito sinérgico.</p>',
+    resumo:
+      '<p>Estimar o risco global (SCORE2/SCORE2-OP, PREVENT). <b>Estilo de vida</b> é a base: cessação do tabagismo (maior impacto), atividade física ≥ 150 min/semana, dieta e controle de peso. <b>Farmacológico:</b> estatina conforme risco/meta de LDL; controle de PA e diabetes. <b>AAS não</b> de rotina na prevenção primária. Vacina de influenza em DCV; iSGLT2/GLP-1 no DM de alto risco.</p>',
     trials: [
       { n: 'SELECT (2023)', t: 'Semaglutida reduz eventos CV em obesos sem diabetes com DCV.' },
       { n: 'SPRINT / REDUCE-IT', t: 'Controle intensivo de PA e icosapenta reduzem eventos.' }
@@ -3817,7 +3961,8 @@ window.DOSES = [
 
   function render(t) {
     let h = '<h3 class="sc-title">' + esc(t.nome) + '</h3><span class="rec-area">' + esc(t.area) + '</span>';
-    h += '<div class="tema-resumo">' + t.resumo + '</div>';
+    if (t.fisio) h += '<h4 class="tema-h">Fisiopatologia</h4><div class="tema-resumo tema-fisio">' + t.fisio + '</div>';
+    h += '<h4 class="tema-h">Resumo clínico</h4><div class="tema-resumo">' + t.resumo + '</div>';
     if (t.trials && t.trials.length) {
       h += '<h4 class="tema-h">Ensaios-chave</h4><ul class="tema-trials">' +
         t.trials.map(tr => '<li><b>' + esc(tr.n) + '</b> — ' + esc(tr.t) + '</li>').join('') + '</ul>';
@@ -3829,6 +3974,7 @@ window.DOSES = [
     if (t.pretest) h += '<button class="tema-link tl-pre">🎯 Pré-teste</button>';
     h += '<button class="tema-link tl-ens" data-ens="' + esc(t.nome) + '">🧪 Ensaios pivotais</button>';
     h += '</div>';
+    h += '<p class="muted small" style="margin-top:14px">Fisiopatologia baseada em Braunwald/Harrison e nas diretrizes ESC/AHA/SBC. Resumo de apoio ao estudo — confira sempre a diretriz original.</p>';
     panel.innerHTML = h;
     panel.querySelectorAll('.tl-rec').forEach(b => b.addEventListener('click', () => irRec(b.dataset.termo)));
     panel.querySelectorAll('.tl-score').forEach(b => b.addEventListener('click', () => irScore(b.dataset.id)));
