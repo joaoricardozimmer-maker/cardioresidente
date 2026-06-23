@@ -445,6 +445,17 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
   .hub { padding: 10px 12px; font-size: 13.5px; }
 }
 
+/* ===== Temas ===== */
+.tema-resumo { margin: 10px 0 4px; line-height: 1.62; font-size: 14.5px; }
+.tema-resumo p { margin: 0 0 10px; }
+.tema-h { margin: 18px 0 8px; font-size: 14px; color: var(--accent); text-transform: uppercase; letter-spacing: .03em; }
+.tema-trials { margin: 0; padding-left: 18px; }
+.tema-trials li { margin-bottom: 7px; font-size: 13.5px; line-height: 1.5; }
+.tema-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.tema-link { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 20px; padding: 6px 13px; font-size: 12.5px; font-weight: 600; color: var(--text); cursor: pointer; }
+.tema-link:hover { border-color: var(--accent); color: var(--accent); }
+.tl-score:hover { border-color: var(--blue); color: var(--blue); }
+
 /* ===== Doses ===== */
 .dz-table td { font-size: 13px; }
 .dz-nome { font-weight: 700; white-space: nowrap; }
@@ -492,6 +503,18 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
   </header>
 
   <main id="app">
+    <!-- ============ TEMAS ============ -->
+    <section class="view" id="view-temas">
+      <div class="hero">
+        <h2>Temas — resumos para leitura rápida</h2>
+        <p>Os principais temas da cardiologia em resumos clínicos baseados em diretrizes e ensaios, com os trials que embasam e atalhos para as recomendações, scores e diretrizes do site.</p>
+      </div>
+      <div class="evol-grid">
+        <aside class="evol-menu" id="temas-menu"></aside>
+        <div class="sc-panel" id="temas-panel"></div>
+      </div>
+    </section>
+
     <!-- ============ EVIDÊNCIAS ============ -->
     <section class="view active" id="view-evidencia">
       <div class="hero">
@@ -682,6 +705,165 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
     <span class="footer-meta">CardioResidente · atualizado em junho/2026</span>
   </footer>
 <script>
+// Temas — resumos clínicos baseados em diretrizes/ensaios, para leitura rápida e estudo.
+// Cada tema: resumo (HTML), trials [{n,t}], recs [[termo,rotulo]], scores [ids], guia (termo p/ aba Diretrizes), pretest (bool).
+window.TEMAS = [
+  {
+    id: 'fa', nome: 'Fibrilação atrial', area: 'Arritmia',
+    resumo:
+      '<p>Arritmia supraventricular sustentada mais comum; aumenta risco de AVC, IC e mortalidade. O manejo segue o esquema <b>AF-CARE</b> (ESC 2024): <b>C</b>omorbidades/fatores de risco, <b>A</b>nticoagulação para evitar AVC, <b>R</b>edução de sintomas (controle de FC/ritmo) e <b>E</b>valiação dinâmica.</p>' +
+      '<p><b>Anticoagulação:</b> indicada se <b>CHA₂DS₂-VA ≥ 2</b> (considerar se = 1), preferindo <b>DOAC</b> à varfarina (exceto prótese mecânica ou estenose mitral reumática moderada/grave). Avalie sangramento (HAS-BLED) para corrigir fatores modificáveis, não para contraindicar.</p>' +
+      '<p><b>Controle de frequência:</b> betabloqueador ou BCC não-diidropiridínico (diltiazem/verapamil — evitar na ICFEr), alvo inicial frouxo &lt; 110 bpm. <b>Controle de ritmo:</b> antiarrítmico ou ablação em sintomáticos; a <b>ablação</b> é 1ª linha em FA paroxística selecionada e superior a fármaco na ICFEr. O controle de ritmo <b>precoce</b> (≤ 1 ano) reduz desfechos (EAST-AFNET 4).</p>',
+    trials: [
+      { n: 'RE-LY / ROCKET-AF / ARISTOTLE / ENGAGE AF', t: 'DOACs não inferiores/superiores à varfarina, com menos hemorragia intracraniana.' },
+      { n: 'EAST-AFNET 4 (2020)', t: 'Controle de ritmo precoce reduz desfechos cardiovasculares na FA recente.' },
+      { n: 'CASTLE-AF (2018)', t: 'Ablação reduz morte/internação por IC na FA com ICFEr.' },
+      { n: 'CABANA (2019)', t: 'Ablação vs fármaco — melhora sintomas/qualidade de vida.' }
+    ],
+    recs: [['anticoagulação fibrilação atrial', 'Anticoagulação na FA'], ['DOAC varfarina', 'DOAC preferível'], ['ablação FA', 'Ablação por cateter'], ['controle de frequência FA', 'Controle de frequência']],
+    scores: ['chadsvasc', 'hasbled'], guia: 'Fibrilação', pretest: false
+  },
+  {
+    id: 'ic', nome: 'Insuficiência cardíaca', area: 'Insuficiência cardíaca',
+    resumo:
+      '<p>Síndrome clínica de congestão e/ou baixo débito. Classificar pela FEVE: <b>ICFEr ≤ 40%</b>, <b>levemente reduzida 41–49%</b>, <b>preservada ≥ 50%</b>. Diagnóstico: clínica + <b>BNP/NT-proBNP</b> + ecocardiograma.</p>' +
+      '<p><b>ICFEr — quatro pilares</b>, iniciados e titulados rapidamente, pois reduzem mortalidade: <b>ARNI</b> (ou IECA/BRA), <b>betabloqueador</b>, <b>antagonista mineralocorticoide</b> e <b>iSGLT2</b>. Diurético de alça para congestão (sintomático). Considerar <b>CDI</b> (FEVE ≤ 35% sintomática) e <b>TRC</b> (BRE, QRS ≥ 150 ms). Avançada/refratária: transplante, suporte circulatório.</p>' +
+      '<p><b>ICFEp e levemente reduzida:</b> <b>iSGLT2</b> reduz hospitalização/morte CV (I-A, ESC 2023); tratar congestão e comorbidades. Ferro EV se ferropenia sintomática.</p>',
+    trials: [
+      { n: 'PARADIGM-HF (2014)', t: 'Sacubitril/valsartana superior ao enalapril na ICFEr.' },
+      { n: 'DAPA-HF / EMPEROR-Reduced', t: 'iSGLT2 reduz morte CV/hospitalização na ICFEr.' },
+      { n: 'RALES / EMPHASIS-HF', t: 'Espironolactona/eplerenona reduzem mortalidade.' },
+      { n: 'DELIVER / EMPEROR-Preserved', t: 'iSGLT2 beneficia ICFEp e levemente reduzida.' }
+    ],
+    recs: [['sacubitril ICFEr', 'ARNI na ICFEr'], ['betabloqueador ICFEr', 'Betabloqueador'], ['iSGLT2 insuficiência', 'iSGLT2'], ['espironolactona', 'Antagonista mineralocorticoide'], ['CDI prevenção primária', 'CDI'], ['ressincronização', 'TRC']],
+    scores: ['h2fpef', 'hfapeff', 'maggic'], guia: 'Insuficiência', pretest: false
+  },
+  {
+    id: 'sca', nome: 'Síndrome coronariana aguda', area: 'Doença coronariana',
+    resumo:
+      '<p>Espectro do IAM com supra (STEMI) e sem supra (NSTE-ACS). Diagnóstico: clínica + ECG + troponina (algoritmos 0/1 h).</p>' +
+      '<p><b>STEMI:</b> reperfusão imediata — <b>ICP primária</b> se exequível em ≤ 120 min do diagnóstico; senão fibrinólise e transferência. Revascularização <b>completa</b> no multiarterial sem choque.</p>' +
+      '<p><b>NSTE-ACS:</b> estratégia invasiva conforme o risco — imediata se instabilidade; <b>precoce (&lt; 24 h)</b> no alto risco (GRACE &gt; 140, troponina dinâmica, ΔST). <b>Terapia comum:</b> AAS + inibidor de P2Y12 (ticagrelor/prasugrel preferíveis) por 12 meses, anticoagulação parenteral, estatina de alta intensidade precoce, betabloqueador e IECA/BRA se disfunção de VE/IC.</p>',
+    trials: [
+      { n: 'ISIS-2 (1988)', t: 'AAS (e estreptoquinase) reduzem mortalidade no IAM.' },
+      { n: 'PLATO (2009)', t: 'Ticagrelor superior ao clopidogrel na SCA.' },
+      { n: 'TRITON-TIMI 38', t: 'Prasugrel reduz eventos isquêmicos (mais sangramento).' },
+      { n: 'COMPLETE (2019)', t: 'Revascularização completa de rotina reduz MACE no STEMI.' }
+    ],
+    recs: [['AAS síndrome coronariana', 'AAS na SCA'], ['DAPT', 'Dupla antiagregação'], ['estratégia invasiva NSTEMI', 'Invasiva precoce'], ['revascularização completa STEMI', 'Revasc completa'], ['ICP primária', 'ICP primária']],
+    scores: ['heart', 'timi_nstemi', 'timi_stemi', 'grace', 'killip', 'crusade', 'dapt'], guia: 'coronariana aguda', pretest: false
+  },
+  {
+    id: 'dislipidemia', nome: 'Dislipidemia', area: 'Prevenção',
+    resumo:
+      '<p>O LDL-colesterol é fator causal de aterosclerose — "quanto mais baixo, melhor; mais cedo, melhor". Estratifique o risco (muito alto / alto / moderado / baixo) para definir a <b>meta de LDL</b>.</p>' +
+      '<p><b>Metas (muito alto risco):</b> LDL &lt; 55 mg/dL e redução ≥ 50% do basal (ESC); a SBC adota &lt; 50 mg/dL. <b>Escalonamento:</b> estatina de alta intensidade na dose máxima tolerada → <b>ezetimiba</b> → <b>inibidor de PCSK9</b> se ainda fora da meta. Dosar <b>Lp(a)</b> ao menos uma vez na vida. <b>Icosapenta de etila</b> se triglicérides altos e alto risco.</p>',
+    trials: [
+      { n: 'CTT / 4S / LIPID', t: 'Estatinas reduzem eventos proporcionalmente à queda do LDL.' },
+      { n: 'IMPROVE-IT (2015)', t: 'Ezetimiba + estatina reduz eventos.' },
+      { n: 'FOURIER / ODYSSEY OUTCOMES', t: 'Inibidores de PCSK9 reduzem eventos no muito alto risco.' },
+      { n: 'REDUCE-IT (2019)', t: 'Icosapenta de etila reduz eventos com TG elevados.' }
+    ],
+    recs: [['estatina prevenção secundária', 'Estatina alta intensidade'], ['meta LDL', 'Meta de LDL'], ['ezetimiba', 'Ezetimiba'], ['PCSK9', 'iPCSK9'], ['lipoproteína a', 'Lp(a)']],
+    scores: ['score2', 'prevent', 'ckdepi'], guia: 'Dislipidemia', pretest: false
+  },
+  {
+    id: 'has', nome: 'Hipertensão arterial', area: 'Hipertensão',
+    resumo:
+      '<p>Confirme o diagnóstico fora do consultório (MAPA/MRPA). <b>Meta &lt; 130/80 mmHg</b> na maioria, se tolerado (ESC 2024 mira PAS 120–129 mmHg); individualize em idosos frágeis.</p>' +
+      '<p><b>Tratamento:</b> mudança de estilo de vida sempre + início com <b>combinação dupla</b> (IECA ou BRA + BCC ou diurético tiazídico), de preferência em comprimido único. Subir para tripla; <b>HAS resistente</b> (3 fármacos incluindo diurético) → adicionar <b>espironolactona</b>. Rastrear causas secundárias quando indicado.</p>',
+    trials: [
+      { n: 'SPRINT (2015)', t: 'Alvo intensivo (<120) reduz eventos e morte em alto risco selecionado.' },
+      { n: 'ACCOMPLISH', t: 'IECA + BCC superior a IECA + tiazídico.' },
+      { n: 'PATHWAY-2', t: 'Espironolactona é o melhor 4º fármaco na HAS resistente.' }
+    ],
+    recs: [['meta de pressão', 'Meta de PA'], ['combinação dupla', 'Combinação dupla'], ['espironolactona resistente', 'HAS resistente']],
+    scores: ['prevent', 'score2'], guia: 'Hipertensão', pretest: false
+  },
+  {
+    id: 'valvopatia', nome: 'Valvopatias', area: 'Valvopatia',
+    resumo:
+      '<p>Quantificar gravidade por ecocardiograma e correlacionar com sintomas e função de VE; decisões pelo <b>Heart Team</b>.</p>' +
+      '<p><b>Estenose aórtica</b> grave sintomática → intervenção: <b>TAVI</b> (≥ 75 anos ou alto risco) ou <b>cirurgia</b> (&lt; 75 anos e baixo risco). <b>Insuficiência mitral primária</b> grave sintomática → cirurgia (preferir plastia); também se disfunção de VE assintomática. <b>IM secundária</b> sintomática apesar de terapia otimizada → <b>TEER</b> em selecionados. <b>Estenose mitral reumática</b> favorável → valvoplastia por balão. Prótese mecânica exige varfarina (DOAC contraindicado).</p>',
+    trials: [
+      { n: 'PARTNER / Evolut Low Risk', t: 'TAVI não inferior/superior à cirurgia, inclusive em baixo risco.' },
+      { n: 'COAPT (2018)', t: 'TEER reduz internação/morte na IM secundária selecionada.' }
+    ],
+    recs: [['estenose aórtica', 'EAo grave'], ['TAVI', 'TAVI'], ['insuficiência mitral primária', 'IM primária'], ['TEER mitral', 'TEER'], ['valvoplastia mitral', 'Valvoplastia mitral']],
+    scores: ['euroscore', 'sts'], guia: 'Valvopatia', pretest: false
+  },
+  {
+    id: 'tep', nome: 'Tromboembolismo pulmonar', area: 'Tromboembolismo',
+    resumo:
+      '<p>Suspeita → <b>probabilidade clínica</b> (Wells/Genebra). Baixa probabilidade: <b>D-dímero</b> (com corte ajustado pela idade); se negativo, exclui. Alta probabilidade ou D-dímero positivo: <b>angio-TC</b> de tórax.</p>' +
+      '<p><b>Estratificação de risco:</b> <b>alto risco</b> (instabilidade/choque) → <b>trombólise sistêmica</b> (ou embolectomia/cateter se contraindicada); <b>intermediário</b> → anticoagular e monitorar o VD; <b>baixo</b> (sPESI 0, sem disfunção de VD) → considerar tratamento ambulatorial. Anticoagulação preferindo <b>DOAC</b>.</p>',
+    trials: [
+      { n: 'PEITHO (2014)', t: 'Trombólise no risco intermediário-alto: menos colapso, mais sangramento.' },
+      { n: 'EINSTEIN-PE / AMPLIFY / Hokusai-VTE', t: 'DOACs eficazes e mais seguros que varfarina no TEV.' }
+    ],
+    recs: [['anticoagulação TEP', 'Anticoagulação no TEP'], ['trombólise TEP', 'Trombólise no TEP']],
+    scores: ['wells_tep', 'spesi', 'wells_tvp'], guia: 'Tromboembolismo', pretest: false
+  },
+  {
+    id: 'cmh', nome: 'Cardiomiopatia hipertrófica', area: 'Cardiomiopatia',
+    resumo:
+      '<p>Hipertrofia de VE não explicada por sobrecarga; pode haver <b>obstrução dinâmica da via de saída</b> (VSVE). Diagnóstico por eco/RM; rastrear história familiar.</p>' +
+      '<p><b>Sintomas (forma obstrutiva):</b> betabloqueador ou BCC não-diidropiridínico; refratário → <b>mavacamten</b> (inibidor de miosina), disopiramida ou <b>redução septal</b> (miectomia/ablação alcoólica). Evitar desidratação e vasodilatadores. <b>Morte súbita:</b> estratificar (HCM Risk-SCD/critérios maiores) → <b>CDI</b>; CDI sempre na prevenção secundária (PCR/TV).</p>',
+    trials: [
+      { n: 'EXPLORER-HCM (2020)', t: 'Mavacamten melhora sintomas e reduz a obstrução.' },
+      { n: 'VALOR-HCM', t: 'Mavacamten reduz a necessidade de redução septal.' }
+    ],
+    recs: [['mavacamten', 'Mavacamten'], ['CDI prevenção secundária CMH', 'CDI na CMH'], ['miectomia', 'Redução septal']],
+    scores: ['qtc'], guia: 'Cardiomiopatia', pretest: false
+  },
+  {
+    id: 'pericardite', nome: 'Pericardite e tamponamento', area: 'Pericárdio',
+    resumo:
+      '<p><b>Pericardite aguda:</b> ≥ 2 de — dor torácica pleurítica que melhora ao sentar/inclinar, atrito pericárdico, supra de ST difuso com infra de PR, derrame. Tratamento: <b>AINE/AAS + colchicina</b> (reduz recorrência); corticoide é 2ª linha. Restrição de exercício até resolução.</p>' +
+      '<p><b>Tamponamento:</b> tríade de Beck, <b>pulso paradoxal</b> e turgência jugular; confirmação ecocardiográfica → <b>pericardiocentese</b>. Pulso paradoxal &gt; 10 mmHg aumenta a probabilidade (ver biblioteca de LRs na aba MBE).</p>',
+    trials: [
+      { n: 'ICAP (2013) / COPE / CORP', t: 'Colchicina reduz recorrência e sintomas na pericardite.' }
+    ],
+    recs: [['colchicina pericardite', 'Colchicina']],
+    scores: [], guia: 'Pericardite', pretest: false
+  },
+  {
+    id: 'arritmias', nome: 'Arritmias e dispositivos', area: 'Arritmia',
+    resumo:
+      '<p><b>Taquiarritmia com instabilidade</b> (hipotensão, isquemia, IC, rebaixamento) → <b>cardioversão elétrica sincronizada</b> imediata. <b>TSV</b> estável → manobra vagal e <b>adenosina</b>; recorrente → ablação (curativa).</p>' +
+      '<p><b>TV/FV:</b> ACLS; <b>CDI</b> na prevenção secundária (PCR/TV sustentada sem causa reversível) e primária em cardiopatas selecionados. <b>Bradiarritmia</b> sintomática (BAV avançado/total, doença do nó sinusal) → <b>marcapasso</b>. <b>Canalopatias:</b> QT longo → betabloqueador; Brugada com PCR/TV → CDI.</p>',
+    trials: [
+      { n: 'MADIT-II / SCD-HeFT', t: 'CDI na prevenção primária em ICFEr reduz mortalidade.' },
+      { n: 'AVID / CIDS / CASH', t: 'CDI superior a antiarrítmico na prevenção secundária.' }
+    ],
+    recs: [['ablação TSV', 'Ablação de TSV'], ['CDI prevenção secundária morte súbita', 'CDI'], ['marcapasso BAV', 'Marcapasso'], ['betabloqueador QT longo', 'QT longo'], ['Brugada', 'Brugada']],
+    scores: ['qtc'], guia: 'Arritmias', pretest: false
+  },
+  {
+    id: 'sincope', nome: 'Síncope', area: 'Síncope',
+    resumo:
+      '<p>Perda transitória de consciência por hipoperfusão cerebral global. Classificar: <b>reflexa</b> (vasovagal/situacional), <b>hipotensão ortostática</b> e <b>cardíaca</b> (arrítmica ou estrutural — a de pior prognóstico).</p>' +
+      '<p><b>Avaliação inicial:</b> história/testemunho, exame, <b>ECG</b> e PA ortostática — estratifica risco. <b>Reflexa:</b> educação, reconhecimento de pródromos, manobras de contrapressão, hidratação/sal. <b>Suspeita cardíaca</b> (cardiopatia, ECG anormal, síncope ao esforço/supino): investigar (monitorização prolongada, eco, estudo eletrofisiológico). <b>Bradiarritmia documentada</b> → marcapasso.</p>',
+    trials: [
+      { n: 'ISSUE / studies de monitor implantável', t: 'Documentação prolongada eleva o diagnóstico na síncope inexplicada.' }
+    ],
+    recs: [['marcapasso bradiarritmia', 'Marcapasso'], ['síncope reflexa', 'Síncope reflexa']],
+    scores: [], guia: 'Arritmias', pretest: false
+  },
+  {
+    id: 'prevencao', nome: 'Prevenção cardiovascular', area: 'Prevenção',
+    resumo:
+      '<p>Estime o risco global (<b>SCORE2/SCORE2-OP</b> na Europa, <b>PREVENT</b> nos EUA) para calibrar a intensidade das intervenções.</p>' +
+      '<p><b>Estilo de vida (base de tudo):</b> cessação do tabagismo (maior impacto isolado), atividade física ≥ 150 min/semana, dieta saudável e controle de peso. <b>Farmacológico:</b> estatina conforme risco/meta de LDL; controle de PA e de diabetes. <b>AAS NÃO</b> é recomendado de rotina na prevenção primária. Vacina de influenza em DCV. Em DM de alto risco, iSGLT2/GLP-1 com benefício CV.</p>',
+    trials: [
+      { n: 'SELECT (2023)', t: 'Semaglutida reduz eventos CV em obesos sem diabetes com DCV.' },
+      { n: 'SPRINT / REDUCE-IT', t: 'Controle intensivo de PA e icosapenta reduzem eventos.' }
+    ],
+    recs: [['estatina prevenção primária', 'Estatina'], ['cessação tabagismo', 'Tabagismo'], ['atividade física', 'Atividade física'], ['AAS prevenção primária', 'AAS (não rotina)'], ['vacinação influenza', 'Vacina influenza']],
+    scores: ['score2', 'prevent', 'imc'], guia: 'Dislipidemia', pretest: false
+  }
+];
+
 // Base de recomendações por sociedade (ESC, AHA/ACC, SBC).
 // Cada conduta traz Classe (I | IIa | IIb | III) e Nível (A | B | C | '' = —) da diretriz
 // mais recente de cada sociedade, com link para o PDF/portal da diretriz (campo doc).
@@ -3618,9 +3800,61 @@ window.DOSES = [
   render();
 })();
 
+// Aba "Temas": resumos clínicos com ensaios-chave e links internos (recomendações, scores, diretriz).
+(function () {
+  const menu = document.getElementById('temas-menu');
+  const panel = document.getElementById('temas-panel');
+  if (!menu || !panel) return;
+  const T = window.TEMAS || [];
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  function nomeScore(id) { const s = (window.SCORES_LIST || []).find(x => x.id === id); return s ? s.nome : id; }
+
+  function irRec(termo) { if (window.cardioGoView) window.cardioGoView('evidencia'); const i = document.getElementById('busca-input'); if (i) { i.value = termo; const f = document.getElementById('busca-form'); if (f) f.dispatchEvent(new Event('submit', { cancelable: true })); } }
+  function irScore(id) { if (window.cardioGoView) window.cardioGoView('scores'); const b = document.querySelector('#scores-menu .evol-item[data-id="' + id + '"]'); if (b) { b.click(); b.scrollIntoView({ block: 'center' }); } }
+  function irGuia(termo) { if (window.cardioGoView) window.cardioGoView('guias'); const i = document.getElementById('guias-busca'); if (i) { i.value = termo; i.dispatchEvent(new Event('input')); } }
+  function irPretest() { if (window.cardioGoView) window.cardioGoView('pretest'); }
+
+  function render(t) {
+    let h = '<h3 class="sc-title">' + esc(t.nome) + '</h3><span class="rec-area">' + esc(t.area) + '</span>';
+    h += '<div class="tema-resumo">' + t.resumo + '</div>';
+    if (t.trials && t.trials.length) {
+      h += '<h4 class="tema-h">Ensaios-chave</h4><ul class="tema-trials">' +
+        t.trials.map(tr => '<li><b>' + esc(tr.n) + '</b> — ' + esc(tr.t) + '</li>').join('') + '</ul>';
+    }
+    h += '<h4 class="tema-h">No site</h4><div class="tema-links">';
+    (t.recs || []).forEach(r => h += '<button class="tema-link tl-rec" data-termo="' + esc(r[0]) + '">📋 ' + esc(r[1]) + '</button>');
+    (t.scores || []).forEach(id => h += '<button class="tema-link tl-score" data-id="' + esc(id) + '">🧮 ' + esc(nomeScore(id)) + '</button>');
+    if (t.guia) h += '<button class="tema-link tl-guia" data-guia="' + esc(t.guia) + '">📚 Diretriz</button>';
+    if (t.pretest) h += '<button class="tema-link tl-pre">🎯 Pré-teste</button>';
+    h += '<button class="tema-link tl-ens" data-ens="' + esc(t.nome) + '">🧪 Ensaios pivotais</button>';
+    h += '</div>';
+    panel.innerHTML = h;
+    panel.querySelectorAll('.tl-rec').forEach(b => b.addEventListener('click', () => irRec(b.dataset.termo)));
+    panel.querySelectorAll('.tl-score').forEach(b => b.addEventListener('click', () => irScore(b.dataset.id)));
+    panel.querySelectorAll('.tl-guia').forEach(b => b.addEventListener('click', () => irGuia(b.dataset.guia)));
+    panel.querySelectorAll('.tl-pre').forEach(b => b.addEventListener('click', irPretest));
+    panel.querySelectorAll('.tl-ens').forEach(b => b.addEventListener('click', () => {
+      if (window.cardioGoView) window.cardioGoView('ensaios');
+      const i = document.getElementById('ensaios-busca'); if (i) { i.value = ''; i.dispatchEvent(new Event('input')); }
+    }));
+  }
+
+  // menu
+  T.forEach(t => {
+    const b = document.createElement('button');
+    b.className = 'evol-item'; b.textContent = t.nome; b.dataset.id = t.id;
+    b.addEventListener('click', () => { menu.querySelectorAll('.evol-item').forEach(x => x.classList.toggle('active', x === b)); render(t); });
+    menu.appendChild(b);
+  });
+  const first = menu.querySelector('.evol-item');
+  if (first) { first.classList.add('active'); render(T[0]); }
+})();
+
 // Navegação em hubs (2 níveis) + busca global + utilidades compartilhadas
 (function () {
   const HUBS = [
+    { id: 'temas', label: '🫀 Temas', views: [['temas', '🫀 Temas']] },
     { id: 'evidencias', label: '📚 Evidências', views: [['evidencia', '🔎 Recomendações'], ['guias', '📚 Diretrizes'], ['ensaios', '🧪 Ensaios pivotais']] },
     { id: 'ferramentas', label: '🧮 Ferramentas', views: [['scores', '🧮 Scores'], ['pretest', '🎯 Pré-teste'], ['mbe', '📐 MBE'], ['doses', '💊 Doses']] },
     { id: 'prontuario', label: '📝 Prontuário', views: [['transcricao', '📝 Transcrever laudo'], ['evolucoes', '🗂️ Evoluções']] },
