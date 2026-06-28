@@ -456,6 +456,19 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .tema-link:hover { border-color: var(--accent); color: var(--accent); }
 .tl-score:hover { border-color: var(--blue); color: var(--blue); }
 .tema-fisio { background: var(--bg-soft); border-left: 3px solid var(--blue); padding: 10px 14px; border-radius: 0 8px 8px 0; }
+.tema-fonte-fisio { margin-top: 8px; font-size: 11.5px; color: var(--muted); font-style: italic; }
+.tema-trial-link { color: var(--blue); text-decoration: none; }
+.tema-trial-link:hover { text-decoration: underline; }
+.rec-motivo { background: #fff7ef; border: 1px solid #f0d9b8; border-radius: 8px; padding: 8px 11px; font-size: 12.5px; color: var(--text); margin-top: 8px; }
+.rec-niv-c { border-style: dashed; color: var(--muted); font-style: italic; }
+/* changelog / atualizações */
+.nv-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin-bottom: 12px; border-left: 4px solid var(--accent); }
+.nv-head { display: flex; align-items: center; gap: 10px; margin-bottom: 2px; }
+.nv-ano { background: var(--accent); color: #fff; font-weight: 700; font-size: 12px; border-radius: 6px; padding: 2px 9px; }
+.nv-area { font-weight: 700; font-size: 16px; }
+.nv-fonte { color: var(--blue); font-size: 12.5px; font-weight: 600; margin-bottom: 8px; }
+.nv-itens { margin: 0; padding-left: 18px; }
+.nv-itens li { margin-bottom: 6px; font-size: 13.5px; line-height: 1.5; }
 .tema-crit { background: var(--bg-soft); border-left: 3px solid var(--green); padding: 4px 14px; border-radius: 0 8px 8px 0; font-size: 13.5px; }
 .tema-crit ul { margin: 8px 0; padding-left: 18px; }
 .tema-crit li { margin-bottom: 6px; line-height: 1.5; }
@@ -697,6 +710,15 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
         <input type="text" id="guias-busca" placeholder="Buscar tema... (ex: fibrilação, valvopatia, dislipidemia)" />
       </div>
       <div id="guias-root"></div>
+    </section>
+
+    <!-- ============ ATUALIZAÇÕES ============ -->
+    <section class="view" id="view-novidades">
+      <div class="hero">
+        <h2>Atualizações das diretrizes</h2>
+        <p>O que mudou recentemente nas principais diretrizes (ESC, AHA/ACC), para você manter as condutas em dia. Atualizado em junho/2026.</p>
+      </div>
+      <div id="novidades-root"></div>
     </section>
 
     <!-- ============ SOBRE ============ -->
@@ -1037,6 +1059,73 @@ window.TEMAS_CRIT = {
   prevencao: '<ul><li><b>SCORE2 (&lt; 50 anos):</b> baixo-moderado &lt; 2,5% · alto 2,5–7,5% · muito alto ≥ 7,5% (10 anos).</li><li><b>50–69 anos:</b> &lt; 5 · 5–10 · ≥ 10%. <b>≥ 70 (SCORE2-OP):</b> &lt; 7,5 · 7,5–15 · ≥ 15%.</li><li>Meta de PA &lt; 130/80; metas de LDL conforme o risco.</li></ul>'
 };
 
+// Changelog de diretrizes — "o que mudou" recentemente. Curado a partir das publicações oficiais.
+window.MUDANCAS = [
+  {
+    ano: '2025', area: 'Dislipidemia',
+    fonte: 'ESC/EAS — Atualização focada 2025 (das diretrizes de 2019)',
+    itens: [
+      'Mantidas as metas de LDL por categoria de risco (muito alto < 55 mg/dL e ↓ ≥ 50%).',
+      'Orientações específicas para LDL em contextos especiais: pós-SCA, câncer e HIV.',
+      'Recomendado o uso dos algoritmos atualizados SCORE2 e SCORE2-OP.',
+      'Reforço do papel de ezetimiba, ácido bempedoico e inibidores de PCSK9 (incluindo inclisirana) para atingir a meta.'
+    ]
+  },
+  {
+    ano: '2025', area: 'Valvopatias',
+    fonte: 'ESC/EACTS 2025 (atualiza 2021)',
+    itens: [
+      'Papel central do Heart Team e dos Heart Valve Centres.',
+      'Critérios mais claros para valvopatias complexas e avanços em imagem diagnóstica.',
+      'Refinamento das indicações e limiares de intervenção (cirúrgica e transcateter).'
+    ]
+  },
+  {
+    ano: '2025', area: 'Miocardite e pericardite',
+    fonte: 'ESC 2025 (substitui a diretriz de pericardite de 2015)',
+    itens: [
+      'Primeira diretriz ESC a cobrir todo o espectro de miocardite e pericardite num único documento.',
+      'Mantida a colchicina como pilar (com AINE/AAS) na pericardite, reduzindo recorrência.',
+      'Critérios de RM (Lake Louise) e fluxo diagnóstico para miocardite.'
+    ]
+  },
+  {
+    ano: '2025', area: 'Hipertensão arterial',
+    fonte: 'AHA/ACC 2025',
+    itens: [
+      'Mantido o limiar de diagnóstico/tratamento de 130/80 mmHg.',
+      'Ênfase em controle mais precoce e intensivo para reduzir AVC, IC e nefropatia diabética.',
+      'Reforço da medida fora do consultório (MAPA/MRPA) e da terapia combinada.'
+    ]
+  },
+  {
+    ano: '2025', area: 'Gravidez e cardiopatia',
+    fonte: 'ESC 2025',
+    itens: [
+      'Abandono do aconselhamento de "evitar gravidez" no alto risco em favor de decisão compartilhada.',
+      'Abordagem multidisciplinar individualizada (Pregnancy Heart Team).',
+      'Mantidas as contraindicações de IECA/BRA/ARNI e antagonistas mineralocorticoides.'
+    ]
+  },
+  {
+    ano: '2024', area: 'Síndromes coronarianas crônicas',
+    fonte: 'ESC 2024 (SCC)',
+    itens: [
+      'Novo modelo de probabilidade pré-teste: RF-CL (ponderado por fatores de risco).',
+      'Clopidogrel ganha destaque como monoterapia de longo prazo (I-A).',
+      'Colchicina 0,5 mg/dia como opção anti-inflamatória (IIb) na DAC crônica.'
+    ]
+  },
+  {
+    ano: '2024', area: 'Fibrilação atrial',
+    fonte: 'ESC 2024 (FA)',
+    itens: [
+      'Esquema AF-CARE e uso do escore CHA₂DS₂-VA (sem o ponto de sexo do antigo VASc).',
+      'Controle de ritmo precoce valorizado (EAST-AFNET 4).'
+    ]
+  }
+];
+
 // Base de recomendações por sociedade (ESC, AHA/ACC, SBC).
 // Cada conduta traz Classe (I | IIa | IIb | III) e Nível (A | B | C | '' = —) da diretriz
 // mais recente de cada sociedade, com link para o PDF/portal da diretriz (campo doc).
@@ -1092,6 +1181,7 @@ window.RECOMENDACOES = [
   { area: 'Insuficiência cardíaca', doc: 'ic', titulo: 'iSGLT2 na ICFEp e ICFE levemente reduzida',
     kw: ['isglt2', 'sglt2', 'dapagliflozina', 'empagliflozina', 'icfep', 'fe preservada', 'fe levemente reduzida', 'icfelr', 'hfpef'],
     resumo: 'IC com FEVE >40% (levemente reduzida ou preservada): reduz hospitalização por IC/morte CV (DELIVER, EMPEROR-Preserved).',
+    motivo: 'A atualização ESC 2023 incorporou DELIVER e EMPEROR-Preserved como I-A; a diretriz AHA 2022 é anterior a esses desfechos (IIa).',
     recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC IC — atualização 2023' }, { soc: 'AHA/ACC', cls: 'IIa', niv: 'B', fonte: 'AHA/ACC/HFSA 2022' }] },
   { area: 'Insuficiência cardíaca', doc: 'ic', titulo: 'IECA na ICFEr (quando ARNI não viável)',
     kw: ['ieca', 'inibidor da eca', 'enalapril', 'captopril', 'ramipril', 'lisinopril', 'icfer', 'fe reduzida'],
@@ -1178,6 +1268,7 @@ window.RECOMENDACOES = [
   { area: 'Síndrome coronariana', doc: 'sca', titulo: 'Estratégia invasiva precoce (<24h) no NSTE-ACS de alto risco',
     kw: ['estrategia invasiva', 'nstemi', 'nste-acs', 'sca sem supra', 'grace', 'cateterismo precoce', 'invasiva precoce'],
     resumo: 'NSTEMI de alto risco (GRACE >140, troponina dinâmica, alterações de ST). Imediata (<2 h) se muito alto risco/instabilidade (I-C).',
+    motivo: 'A ESC 2023 rebaixou a invasiva de rotina em <24 h para IIa (ensaios recentes neutros para mortalidade); a AHA/SBC mantêm I no alto risco.',
     recs: [{ soc: 'ESC', cls: 'IIa', niv: 'A', fonte: 'ESC SCA 2023' }, { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC SCA 2025' }, { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC SCA' }] },
   // ===================== SÍNDROME CORONARIANA CRÔNICA =====================
   { area: 'Doença coronariana crônica', doc: 'scc', titulo: 'Revascularização na DAC estável de alto risco anatômico',
@@ -1251,6 +1342,7 @@ window.RECOMENDACOES = [
   { area: 'Endocardite infecciosa', doc: 'endo', titulo: 'Profilaxia antibiótica antes de procedimento dentário invasivo (alto risco)',
     kw: ['profilaxia', 'endocardite', 'antibiotico dentario', 'procedimento dentario', 'alto risco', 'amoxicilina'],
     resumo: 'Profilaxia antibiótica antes de procedimento dentário invasivo em pacientes de alto risco (prótese valvar, EI prévia, cardiopatia congênita cianótica).',
+    motivo: 'A ESC 2023 reforçou a profilaxia no grupo de alto risco (elevando para Classe I); a AHA mantém recomendação IIa.',
     recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC Endocardite 2023' }, { soc: 'AHA/ACC', cls: 'IIa', niv: 'B', fonte: 'AHA 2021' }] },
   { area: 'Endocardite infecciosa', doc: 'endo', titulo: 'Cirurgia precoce na endocardite com IC ou regurgitação grave',
     kw: ['cirurgia endocardite', 'endocardite', 'insuficiencia cardiaca', 'regurgitacao grave', 'vegetacao', 'cirurgia precoce'],
@@ -1291,6 +1383,7 @@ window.RECOMENDACOES = [
   { area: 'Dislipidemia', doc: 'lipid', titulo: 'Ezetimiba se não atingir a meta com estatina',
     kw: ['ezetimiba', 'ezetimibe', 'meta de ldl', 'combinacao', 'colesterol'],
     resumo: 'Adicionar ezetimiba quando a meta de LDL não é alcançada com a dose máxima tolerada de estatina.',
+    motivo: 'A ESC trabalha com metas numéricas de LDL (I-B); a AHA 2018 usa abordagem por intensidade de estatina/limiar de LDL, classificando a ezetimiba como IIa.',
     recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EAS Dislipidemia 2025' }, { soc: 'AHA/ACC', cls: 'IIa', niv: 'B', fonte: 'AHA/ACC Colesterol 2018' }, { soc: 'SBC', cls: 'I', niv: 'B', fonte: 'SBC Dislipidemia' }] },
   { area: 'Dislipidemia', doc: 'lipid', titulo: 'Inibidor de PCSK9 se meta não atingida com estatina + ezetimiba',
     kw: ['pcsk9', 'evolocumabe', 'alirocumabe', 'inclisirana', 'muito alto risco', 'ldl refratario'],
@@ -2551,7 +2644,7 @@ window.GUIAS = [
     const diverg = divergencia(item.recs);
     const ano = anoRecente(item);
     const linhas = item.recs.map(r => {
-      const niv = r.niv ? '<span class="rec-niv" title="Nível ' + esc(r.niv) + ': ' + esc(nivelTexto(r.niv)) + '">Nível ' + esc(r.niv) + '</span>' : '<span class="rec-niv rec-niv-na">—</span>';
+      const niv = r.niv ? '<span class="rec-niv rec-niv-' + esc(r.niv.toLowerCase()) + '" title="Nível ' + esc(r.niv) + ': ' + esc(nivelTexto(r.niv)) + '">Nível ' + esc(r.niv) + '</span>' : '<span class="rec-niv rec-niv-na">—</span>';
       const url = links[r.soc];
       const fonte = url
         ? '<a class="rec-fonte rec-fonte-link" href="' + esc(url) + '" target="_blank" rel="noopener" title="Abrir a diretriz (PDF/portal) — confira a recomendação na fonte">' + esc(r.fonte) + ' 📄</a>'
@@ -2570,12 +2663,13 @@ window.GUIAS = [
       'revisado em jun/2026' +
       (diverg ? ' · <span class="rec-meta-diverg">divergência: ' + esc(diverg) + '</span>' : '') +
       '</div>';
+    const motivoHtml = item.motivo ? '<div class="rec-motivo"><b>Por que diverge:</b> ' + esc(item.motivo) + '</div>' : '';
     return '<div class="rec-card' + (diverg ? ' rec-card-diverg' : '') + '">' +
       '<div class="rec-head"><span class="rec-area">' + esc(item.area) + '</span>' + badge + '</div>' +
       '<h4 class="rec-titulo">' + esc(item.titulo) + '</h4>' +
       '<p class="rec-resumo">' + esc(item.resumo) + '</p>' +
       '<div class="rec-tabela">' + linhas + '</div>' +
-      meta +
+      motivoHtml + meta +
       '</div>';
   }
 
@@ -2593,7 +2687,7 @@ window.GUIAS = [
       ranked.map(card).join('');
   }
 
-  const REVNOTE = '<div class="rec-revbanner">Recomendações <b>revisadas em jun/2026</b> — cada fonte abre a diretriz original (📄). O selo <span class="rec-diverg-inline">⚠ Divergência</span> aparece quando as sociedades discordam da classe de recomendação.</div>';
+  const REVNOTE = '<div class="rec-revbanner">Recomendações <b>revisadas em jun/2026</b> — cada fonte abre a diretriz original (📄). O selo <span class="rec-diverg-inline">⚠ Divergência</span> aparece quando as sociedades discordam, com o motivo. <b>Nível de evidência:</b> A = vários ECR/metanálises · B = um ECR ou estudos grandes · <b>C = consenso/opinião</b> (interpretar com cautela).</div>';
 
   function renderInicial() {
     const areas = [...new Set(BASE.map(i => i.area))];
@@ -4008,13 +4102,13 @@ window.DOSES = [
 
   function render(t) {
     let h = '<h3 class="sc-title">' + esc(t.nome) + '</h3><span class="rec-area">' + esc(t.area) + '</span>';
-    if (t.fisio) h += '<h4 class="tema-h">Fisiopatologia</h4><div class="tema-resumo tema-fisio">' + t.fisio + '</div>';
+    if (t.fisio) h += '<h4 class="tema-h">Fisiopatologia</h4><div class="tema-resumo tema-fisio">' + t.fisio + '<div class="tema-fonte-fisio">Fonte: Braunwald’s Heart Disease (12ª ed.) e Harrison’s Principles of Internal Medicine; conduta conforme a diretriz do tema.</div></div>';
     h += '<h4 class="tema-h">Resumo clínico</h4><div class="tema-resumo">' + t.resumo + '</div>';
     const crit = (window.TEMAS_CRIT || {})[t.id];
     if (crit) h += '<h4 class="tema-h">Critérios e cortes</h4><div class="tema-crit">' + crit + '</div>';
     if (t.trials && t.trials.length) {
       h += '<h4 class="tema-h">Ensaios-chave</h4><ul class="tema-trials">' +
-        t.trials.map(tr => '<li><b>' + esc(tr.n) + '</b> — ' + esc(tr.t) + '</li>').join('') + '</ul>';
+        t.trials.map(tr => '<li><b><a class="tema-trial-link" href="https://pubmed.ncbi.nlm.nih.gov/?term=' + encodeURIComponent(tr.n) + '&sort=relevance" target="_blank" rel="noopener" title="Abrir no PubMed">' + esc(tr.n) + '</a></b> — ' + esc(tr.t) + '</li>').join('') + '</ul>';
     }
     h += '<h4 class="tema-h">No site</h4><div class="tema-links">';
     (t.recs || []).forEach(r => h += '<button class="tema-link tl-rec" data-termo="' + esc(r[0]) + '">📋 ' + esc(r[1]) + '</button>');
@@ -4046,6 +4140,19 @@ window.DOSES = [
   if (first) { first.classList.add('active'); render(T[0]); }
 })();
 
+// Aba "Atualizações": changelog de diretrizes (o que mudou e quando).
+(function () {
+  const root = document.getElementById('novidades-root');
+  if (!root) return;
+  const M = window.MUDANCAS || [];
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  root.innerHTML = M.map(m =>
+    '<div class="nv-card"><div class="nv-head"><span class="nv-ano">' + esc(m.ano) + '</span><span class="nv-area">' + esc(m.area) + '</span></div>' +
+    '<div class="nv-fonte">' + esc(m.fonte) + '</div>' +
+    '<ul class="nv-itens">' + m.itens.map(i => '<li>' + esc(i) + '</li>').join('') + '</ul></div>'
+  ).join('');
+})();
+
 // Navegação em hubs (2 níveis) + busca global + utilidades compartilhadas
 (function () {
   const HUBS = [
@@ -4053,7 +4160,7 @@ window.DOSES = [
     { id: 'evidencias', label: '📚 Evidências', views: [['evidencia', '🔎 Recomendações'], ['guias', '📚 Diretrizes'], ['ensaios', '🧪 Ensaios pivotais']] },
     { id: 'ferramentas', label: '🧮 Ferramentas', views: [['scores', '🧮 Scores'], ['pretest', '🎯 Pré-teste'], ['mbe', '📐 MBE'], ['doses', '💊 Doses']] },
     { id: 'prontuario', label: '📝 Prontuário', views: [['transcricao', '📝 Transcrever laudo'], ['evolucoes', '🗂️ Evoluções']] },
-    { id: 'sobre', label: 'ℹ️ Sobre', views: [['sobre', 'ℹ️ Sobre']] }
+    { id: 'sobre', label: 'ℹ️ Sobre', views: [['novidades', '🆕 Atualizações'], ['sobre', 'ℹ️ Sobre']] }
   ];
   const viewHub = {};
   HUBS.forEach(h => h.views.forEach(v => { viewHub[v[0]] = h; }));
