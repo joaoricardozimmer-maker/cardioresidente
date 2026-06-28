@@ -505,6 +505,12 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .pac-li-uso a { color: var(--blue); text-decoration: none; }
 .pac-li-uso a:hover { text-decoration: underline; }
 .pac-li-contra { background: #fbeeec; border-left: 3px solid #c0392b; }
+.pac-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.pac-go { font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; border: 1px solid var(--line); background: var(--card); color: var(--text); border-radius: 8px; padding: 7px 11px; transition: background .12s, border-color .12s; }
+.pac-go:hover { background: var(--bg-soft); border-color: var(--accent); }
+.pac-go-main { background: var(--bg-soft); }
+.pac-golinks { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+.pac-golinks .pac-go { font-size: 12px; padding: 5px 9px; }
 @media (max-width: 860px) { .pac-wrap { grid-template-columns: 1fr; } }
 
 /* ===== Plantão / protocolos ===== */
@@ -3971,6 +3977,31 @@ window.PROTOCOLOS = [
     panel.querySelectorAll('input,select').forEach(el=>el.addEventListener('change',()=>compute(s)));
   }
 
+  // ---------- integração com o hub Paciente: pré-preenchimento ----------
+  // mapeia window.PACIENTE -> valores dos campos de cada score
+  const FILLMAP = {
+    chadsvasc: P => ({ idade: P.idade, icc: P.ic, has: P.has, dm: P.dm, avc: P.avc, vasc: P.vascular }),
+    hasbled:   P => ({ has: P.has, renal: (P.cr != null && P.cr > 2.26), avc: P.avc, idoso: (P.idade != null && P.idade > 65), drogas: !!(P.m_aas || P.m_p2y12) }),
+    ckdepi:    P => ({ cr: P.cr, idade: P.idade, sexo: P.sexo === 'F' ? 'F' : 'M' }),
+    cockcroft: P => ({ idade: P.idade, cr: P.cr, sexo: P.sexo === 'F' ? 'F' : 'M' }),
+    rcri:      P => ({ dac: P.dcv, icc: P.ic, avc: P.avc, dm: P.dm, cr: (P.cr != null && P.cr > 2.0) })
+  };
+  window.cardioScoreFill = function (scoreId) {
+    const P = window.PACIENTE || {};
+    const btn = menu.querySelector('.evol-item[data-id="' + scoreId + '"]');
+    if (btn) select(scoreId, btn);
+    const map = FILLMAP[scoreId]; if (!map) return;
+    const vals = map(P);
+    Object.keys(vals).forEach(k => {
+      const el = document.getElementById('sc-' + k); if (!el) return;
+      if (el.type === 'checkbox') el.checked = !!vals[k];
+      else if (vals[k] != null && vals[k] !== '') el.value = vals[k];
+    });
+    const s = SCORES.find(x => x.id === scoreId);
+    if (s && s.campos) compute(s);
+    if (window.toast) window.toast('Preenchido com os dados do Paciente');
+  };
+
   // seleciona o primeiro
   const first=menu.querySelector('.evol-item');
   if(first) select(first.dataset.id, first);
@@ -4511,6 +4542,22 @@ window.PROTOCOLOS = [
     CPS.forEach(c => document.getElementById(c.id).addEventListener('change', compute));
     RFS.forEach(r => document.getElementById(r.id).addEventListener('change', compute));
     compute();
+
+    // integração com o hub Paciente: pré-preenche sexo/idade/fatores de risco
+    window.cardioPretestFill = function () {
+      const p = window.PACIENTE || {};
+      if (p.sexo) document.getElementById('pt-sexo').value = (p.sexo === 'F' ? 'W' : 'M');
+      if (p.idade != null) {
+        const a = p.idade; const idx = a < 40 ? 0 : a < 50 ? 1 : a < 60 ? 2 : a < 70 ? 3 : 4;
+        document.getElementById('pt-idade').value = idx;
+      }
+      document.getElementById('rf-tab').checked = !!p.tabag;
+      document.getElementById('rf-disl').checked = !!p.dislip;
+      document.getElementById('rf-has').checked = !!p.has;
+      document.getElementById('rf-dm').checked = !!p.dm;
+      compute();
+      if (window.toast) window.toast('Preenchido com os dados do Paciente');
+    };
   }
   render();
 })();
@@ -4609,9 +4656,11 @@ window.PROTOCOLOS = [
 
 </script>
   <script>
-// Hub "Paciente" — gêmeo digital + EVIDÊNCIA PERSONALIZADA.
+// Hub "Paciente" — gêmeo digital + EVIDÊNCIA PERSONALIZADA + integração com as outras abas.
 // Olha comorbidades + medicações em uso → mostra LACUNAS (terapias indicadas faltando) com NNT/estudo,
-// o que está EM USO (manter) e o que está CONTRAINDICADO/cautela. Apoio à decisão; não substitui o julgamento clínico.
+// o que está EM USO (manter) e o que está CONTRAINDICADO/cautela. Liga para Scores, Pré-teste, Doses e
+// Evidências já pré-preenchidos, e gera um texto de plano para colar no prontuário.
+// Apoio à decisão; não substitui o julgamento clínico.
 (function () {
   const root = document.getElementById('paciente-root');
   if (!root) return;
@@ -4633,49 +4682,112 @@ window.PROTOCOLOS = [
 
   // ---------- biblioteca de intervenções ----------
   // aplica/emUso/contra recebem (P, ctx); beneficio devolve {base,com,arr,nnt,horiz,txt} ou {txt} (qualitativo)
+  // opcionais: doses (termo p/ aba Doses) · score (id p/ aba Scores) · evid (termo p/ aba Evidências)
   const INTERV = [
-    { id: 'raas', nome: 'IECA/BRA ou ARNI', grupo: 'ICFEr',
+    // ---------------- ICFEr — 4 pilares ----------------
+    { id: 'raas', nome: 'IECA/BRA ou ARNI', grupo: 'ICFEr — pilares',
       aplica: (p, c) => c.icfer,
       emUso: p => p.m_ieca || p.m_arni,
       contra: (p, c) => p.gravidez ? 'contraindicado na gravidez' : (c.k != null && c.k > 5.5 ? 'K⁺ > 5,5 mEq/L' : (c.tfg != null && c.tfg < 15 ? 'TFG < 15 (cautela)' : null)),
       beneficio: () => ({ base: 39.7, com: 35.2, arr: 4.5, nnt: 22, horiz: '~3,5 anos', txt: 'Pilar da ICFEr — reduz mortalidade. <b>Preferir ARNI</b> (sacubitril/valsartana) ao IECA quando possível.' }),
-      estudo: { nome: 'SOLVD-Treatment (NEJM 1991)', q: 'SOLVD enalapril heart failure mortality 1991' } },
+      estudo: { nome: 'SOLVD-Treatment (NEJM 1991) / PARADIGM-HF (2014)', q: 'PARADIGM-HF sacubitril valsartan heart failure 2014' }, doses: 'sacubitril' },
 
-    { id: 'bb', nome: 'Betabloqueador', grupo: 'ICFEr',
+    { id: 'bb', nome: 'Betabloqueador', grupo: 'ICFEr — pilares',
       aplica: (p, c) => c.icfer,
       emUso: p => p.m_bb,
       contra: (p, c) => (c.fc != null && c.fc < 50) ? 'FC < 50 bpm' : (p.asma ? 'asma/DPOC grave (preferir beta-1 seletivo, cautela)' : null),
       beneficio: () => ({ base: 17.3, com: 11.8, arr: 5.5, nnt: 18, horiz: '~1,3 ano', txt: 'Pilar — reduz mortalidade. Iniciar com o paciente compensado e titular a cada 2 semanas.' }),
-      estudo: { nome: 'CIBIS-II (Lancet 1999)', q: 'CIBIS-II bisoprolol heart failure mortality 1999' } },
+      estudo: { nome: 'CIBIS-II (Lancet 1999)', q: 'CIBIS-II bisoprolol heart failure mortality 1999' }, doses: 'carvedilol' },
 
-    { id: 'mra', nome: 'Antagonista mineralocorticoide (espironolactona)', grupo: 'ICFEr',
+    { id: 'mra', nome: 'Antagonista mineralocorticoide (espironolactona)', grupo: 'ICFEr — pilares',
       aplica: (p, c) => c.icfer,
       emUso: p => p.m_mra,
       contra: (p, c) => (c.k != null && c.k > 5.0) ? 'K⁺ > 5,0 mEq/L' : (c.tfg != null && c.tfg < 30 ? 'TFG < 30' : null),
       beneficio: () => ({ base: 46, com: 35, arr: 11, nnt: 9, horiz: '~2 anos', txt: 'Pilar — reduz mortalidade na ICFEr sintomática. Monitorar K⁺ e função renal.' }),
-      estudo: { nome: 'RALES (NEJM 1999)', q: 'RALES spironolactone severe heart failure 1999' } },
+      estudo: { nome: 'RALES (NEJM 1999)', q: 'RALES spironolactone severe heart failure 1999' }, doses: 'espironolactona' },
 
-    { id: 'sglt2hf', nome: 'iSGLT2 (dapagliflozina/empagliflozina)', grupo: 'ICFEr',
+    { id: 'sglt2hf', nome: 'iSGLT2 (dapagliflozina/empagliflozina)', grupo: 'ICFEr — pilares',
       aplica: (p, c) => c.icfer,
       emUso: p => p.m_isglt2,
       contra: (p, c) => (c.tfg != null && c.tfg < 20) ? 'TFG < 20 (não iniciar)' : (p.gravidez ? 'gravidez' : null),
       beneficio: () => ({ base: 21.2, com: 16.3, arr: 4.9, nnt: 21, horiz: '~18 meses', txt: 'Quarto pilar — reduz morte CV/piora de IC, com ou sem diabetes. Pausar em doença aguda/jejum.' }),
-      estudo: { nome: 'DAPA-HF (NEJM 2019)', q: 'DAPA-HF dapagliflozin heart failure reduced ejection fraction 2019' } },
+      estudo: { nome: 'DAPA-HF (NEJM 2019)', q: 'DAPA-HF dapagliflozin heart failure reduced ejection fraction 2019' }, doses: 'dapagliflozina' },
 
-    { id: 'ivab', nome: 'Ivabradina', grupo: 'ICFEr',
+    // ---------------- ICFEr — congestão e linhas adicionais ----------------
+    { id: 'diur', nome: 'Diurético de alça (furosemida)', grupo: 'ICFEr — congestão',
+      aplica: (p, c) => c.icfer || c.icfep,
+      emUso: p => p.m_diur,
+      contra: () => null,
+      beneficio: () => ({ txt: 'Alívio de congestão/sintomas (sem benefício de mortalidade). Usar a menor dose eficaz, ajustar à diurese/peso e evitar hipovolemia que limite a titulação dos pilares.' }),
+      estudo: { nome: 'DOSE trial (NEJM 2011)', q: 'DOSE trial furosemide acute decompensated heart failure 2011' }, doses: 'furosemida' },
+
+    { id: 'ivab', nome: 'Ivabradina', grupo: 'ICFEr — congestão',
       aplica: (p, c) => c.icfer && p.m_bb && c.fc != null && c.fc >= 70,
-      emUso: () => false,
+      emUso: p => p.m_ivab,
       contra: () => null,
       beneficio: () => ({ base: 29, com: 24, arr: 5, nnt: 20, horiz: '~2 anos', txt: 'ICFEr em ritmo sinusal com FC ≥ 70 bpm apesar de betabloqueador otimizado.' }),
-      estudo: { nome: 'SHIFT (Lancet 2010)', q: 'SHIFT ivabradine heart failure 2010' } },
+      estudo: { nome: 'SHIFT (Lancet 2010)', q: 'SHIFT ivabradine heart failure 2010' }, doses: 'ivabradina' },
 
+    { id: 'ferro', nome: 'Reposição de ferro EV (carboximaltose férrica)', grupo: 'ICFEr — congestão',
+      aplica: (p, c) => c.icfer,
+      emUso: p => p.m_ferro,
+      contra: () => null,
+      beneficio: () => ({ txt: 'Verificar <b>deficiência de ferro</b> (ferritina &lt; 100 ng/mL, ou 100–299 com saturação de transferrina &lt; 20%) — se presente, ferro EV melhora sintomas/qualidade de vida e reduz hospitalização por IC. Não usar ferro oral nessa indicação.' }),
+      estudo: { nome: 'AFFIRM-AHF (Lancet 2020) / FAIR-HF', q: 'AFFIRM-AHF ferric carboxymaltose iron deficiency heart failure 2020' } },
+
+    { id: 'vericiguat', nome: 'Vericiguate', grupo: 'ICFEr — avançada',
+      aplica: (p, c) => c.icfer,
+      emUso: p => p.m_vericiguat,
+      contra: () => null,
+      beneficio: () => ({ base: 37.8, com: 33.6, arr: 4.2, nnt: 24, horiz: '~11 meses', txt: 'Opção em ICFEr com <b>piora recente</b> (hospitalização/uso de diurético EV) apesar da terapia otimizada — reduz morte CV/hospitalização por IC.' }),
+      estudo: { nome: 'VICTORIA (NEJM 2020)', q: 'VICTORIA vericiguat heart failure reduced ejection fraction 2020' } },
+
+    { id: 'hidnit', nome: 'Hidralazina + nitrato', grupo: 'ICFEr — avançada',
+      aplica: (p, c) => c.icfer,
+      emUso: p => p.m_hidnit,
+      contra: () => null,
+      beneficio: () => ({ base: 10.2, com: 6.2, arr: 4.0, nnt: 25, horiz: '~10 meses', txt: 'Benefício de mortalidade em <b>autodeclarados negros</b> com ICFEr sintomática (NYHA III–IV) apesar de GDMT; também é <b>alternativa</b> quando IECA/BRA/ARNI são contraindicados (ex.: TFG muito baixa, hipercalemia).' }),
+      estudo: { nome: 'A-HeFT (NEJM 2004)', q: 'A-HeFT isosorbide dinitrate hydralazine heart failure 2004' } },
+
+    // ---------------- Dispositivos ----------------
+    { id: 'cdi', nome: 'CDI (cardiodesfibrilador) — prevenção primária', grupo: 'Dispositivos',
+      aplica: (p, c) => c.icfer && p.feve != null && p.feve <= 35,
+      emUso: p => p.m_cdi,
+      contra: () => null,
+      beneficio: () => ({ txt: 'FEVE ≤ 35% sintomática (NYHA II–III) apesar de <b>≥ 3 meses</b> de GDMT otimizada, com expectativa de vida &gt; 1 ano. Maior benefício na cardiopatia <b>isquêmica</b>; na não isquêmica, individualizar (DANISH).' }),
+      estudo: { nome: 'SCD-HeFT (NEJM 2005) / MADIT-II', q: 'SCD-HeFT implantable defibrillator heart failure 2005' } },
+
+    { id: 'trc', nome: 'TRC (ressincronização cardíaca)', grupo: 'Dispositivos',
+      aplica: (p, c) => c.icfer && p.feve != null && p.feve <= 35,
+      emUso: p => p.m_trc,
+      contra: () => null,
+      beneficio: () => ({ txt: 'FEVE ≤ 35%, ritmo sinusal e <b>QRS largo</b> apesar de GDMT — maior benefício com morfologia de <b>BRE</b> e QRS ≥ 150 ms (benefício menor/incerto se QRS 130–149 ms ou não-BRE). Confirmar duração/morfologia do QRS no ECG.' }),
+      estudo: { nome: 'CARE-HF (NEJM 2005) / MADIT-CRT', q: 'CARE-HF cardiac resynchronization therapy heart failure 2005' } },
+
+    // ---------------- ICFEp / ICFEmr ----------------
+    { id: 'sglt2pef', nome: 'iSGLT2 (dapagliflozina/empagliflozina)', grupo: 'ICFEp / ICFEmr',
+      aplica: (p, c) => c.icfep,
+      emUso: p => p.m_isglt2,
+      contra: (p, c) => (c.tfg != null && c.tfg < 20) ? 'TFG < 20 (não iniciar)' : (p.gravidez ? 'gravidez' : null),
+      beneficio: () => ({ base: 19.5, com: 16.4, arr: 3.1, nnt: 32, horiz: '~2,3 anos', txt: 'Terapia de base na <b>IC com FE preservada ou levemente reduzida</b> (FEVE &gt; 40%) — reduz morte CV/piora de IC, independente de diabetes.' }),
+      estudo: { nome: 'DELIVER (NEJM 2022) / EMPEROR-Preserved', q: 'DELIVER dapagliflozin heart failure preserved ejection fraction 2022' }, doses: 'dapagliflozina' },
+
+    { id: 'mrapef', nome: 'Antagonista mineralocorticoide', grupo: 'ICFEp / ICFEmr',
+      aplica: (p, c) => c.icfep,
+      emUso: p => p.m_mra,
+      contra: (p, c) => (c.k != null && c.k > 5.0) ? 'K⁺ > 5,0 mEq/L' : (c.tfg != null && c.tfg < 30 ? 'TFG < 30' : null),
+      beneficio: () => ({ txt: 'Reduz eventos de piora de IC na FE preservada/levemente reduzida (FINEARTS-HF mostrou benefício da <b>finerenona</b>; espironolactona com sinal de benefício no TOPCAT, sobretudo FEVE mais baixa). Vigiar K⁺/função renal.' }),
+      estudo: { nome: 'FINEARTS-HF (NEJM 2024) / TOPCAT', q: 'FINEARTS-HF finerenone heart failure mildly reduced preserved ejection fraction 2024' }, doses: 'espironolactona' },
+
+    // ---------------- Fibrilação atrial ----------------
     { id: 'aco', nome: 'Anticoagulação na FA', grupo: 'Fibrilação atrial',
       aplica: (p, c) => p.fa && c.cv >= 1,
       emUso: p => p.m_aco,
       contra: () => null,
       beneficio: (p, c) => { const base = AVC_ANO[Math.min(c.cv, 9)]; const com = base * 0.36; return { base, com, arr: base - com, nnt: Math.max(1, Math.round(100 / (base - com))), horiz: 'por ano', txt: 'Risco de AVC por CHA₂DS₂-VA = ' + c.cv + '; anticoagulação reduz ~64%. <b>Preferir DOAC.</b> Pesar HAS-BLED.' }; },
-      estudo: { nome: 'Hart et al. (Ann Intern Med 2007)', q: 'antithrombotic therapy prevent stroke atrial fibrillation Hart meta-analysis' } },
+      estudo: { nome: 'Hart et al. (Ann Intern Med 2007)', q: 'antithrombotic therapy prevent stroke atrial fibrillation Hart meta-analysis' }, score: 'chadsvasc', doses: 'apixabana' },
 
+    // ---------------- Lípides / aterosclerose ----------------
     { id: 'estatina', nome: 'Estatina de alta intensidade', grupo: 'Lípides / aterosclerose',
       aplica: (p) => p.dcv || (p.risco10 != null && p.risco10 >= 7.5),
       emUso: p => p.m_estatina,
@@ -4686,35 +4798,36 @@ window.PROTOCOLOS = [
         const dmmol = Math.max(0, (p.ldl - alvo) / 38.7); const rrr = Math.min(0.6, 0.22 * dmmol);
         const com = base10 * (1 - rrr); return { base: base10, com, arr: base10 - com, nnt: Math.max(1, Math.round(100 / (base10 - com))), horiz: 'em 10 anos', txt: 'Meta LDL &lt; ' + alvo + '. RRR ~' + Math.round(rrr * 100) + '% sobre risco basal de ' + base10 + '% (10 anos).' };
       },
-      estudo: { nome: 'CTT Collaboration (Lancet 2010)', q: 'Cholesterol Treatment Trialists more intensive lowering LDL 2010' } },
+      estudo: { nome: 'CTT Collaboration (Lancet 2010)', q: 'Cholesterol Treatment Trialists more intensive lowering LDL 2010' }, evid: 'estatina', doses: 'atorvastatina' },
 
     { id: 'ezet', nome: 'Ezetimiba (associar à estatina)', grupo: 'Lípides / aterosclerose',
       aplica: (p) => (p.dcv) && p.m_estatina && p.ldl != null && p.ldl > 55,
       emUso: p => p.m_ezet,
       contra: () => null,
       beneficio: () => ({ base: 34.7, com: 32.7, arr: 2.0, nnt: 50, horiz: '~7 anos', txt: 'Quando a meta de LDL não é atingida com estatina na dose máxima tolerada.' }),
-      estudo: { nome: 'IMPROVE-IT (NEJM 2015)', q: 'IMPROVE-IT ezetimibe simvastatin acute coronary syndrome 2015' } },
+      estudo: { nome: 'IMPROVE-IT (NEJM 2015)', q: 'IMPROVE-IT ezetimibe simvastatin acute coronary syndrome 2015' }, evid: 'ezetimiba', doses: 'ezetimiba' },
 
     { id: 'pcsk9', nome: 'Inibidor de PCSK9', grupo: 'Lípides / aterosclerose',
       aplica: (p) => p.dcv && p.m_estatina && p.m_ezet && p.ldl != null && p.ldl > 55,
       emUso: p => p.m_pcsk9,
       contra: () => null,
       beneficio: () => ({ base: 11.3, com: 9.8, arr: 1.5, nnt: 67, horiz: '~2,2 anos', txt: 'Muito alto risco fora da meta de LDL apesar de estatina + ezetimiba.' }),
-      estudo: { nome: 'FOURIER (NEJM 2017)', q: 'FOURIER evolocumab cardiovascular outcomes 2017' } },
+      estudo: { nome: 'FOURIER (NEJM 2017)', q: 'FOURIER evolocumab cardiovascular outcomes 2017' }, evid: 'PCSK9' },
 
     { id: 'aas', nome: 'Antiagregante (AAS)', grupo: 'Prevenção secundária',
       aplica: (p) => p.dcv,
       emUso: p => p.m_aas || p.m_p2y12,
       contra: () => null,
       beneficio: () => ({ txt: 'Prevenção secundária: reduz ~19–22% os eventos vasculares graves. AAS 75–100 mg/dia indefinidamente.' }),
-      estudo: { nome: 'Antithrombotic Trialists (Lancet 2009)', q: 'Antithrombotic Trialists aspirin secondary prevention vascular events 2009' } },
+      estudo: { nome: 'Antithrombotic Trialists (Lancet 2009)', q: 'Antithrombotic Trialists aspirin secondary prevention vascular events 2009' }, doses: 'AAS' },
 
+    // ---------------- Diabetes e doença renal ----------------
     { id: 'sglt2dm', nome: 'iSGLT2 (proteção CV/renal)', grupo: 'Diabetes e doença renal',
-      aplica: (p, c) => p.dm && !c.icfer && (p.dcv || c.drc),
+      aplica: (p, c) => p.dm && !c.icfer && !c.icfep && (p.dcv || c.drc),
       emUso: p => p.m_isglt2,
       contra: (p, c) => (c.tfg != null && c.tfg < 20) ? 'TFG < 20 (não iniciar)' : (p.gravidez ? 'gravidez' : null),
       beneficio: () => ({ base: 14.5, com: 9.2, arr: 5.3, nnt: 19, horiz: '~2,4 anos', txt: 'DM2 com DCV ou DRC: reduz progressão renal e desfechos CV (desfecho renal composto).' }),
-      estudo: { nome: 'DAPA-CKD (NEJM 2020)', q: 'DAPA-CKD dapagliflozin chronic kidney disease 2020' } },
+      estudo: { nome: 'DAPA-CKD (NEJM 2020)', q: 'DAPA-CKD dapagliflozin chronic kidney disease 2020' }, doses: 'dapagliflozina' },
 
     { id: 'glp1', nome: 'Agonista de GLP-1', grupo: 'Diabetes e doença renal',
       aplica: (p, c) => p.dm && p.dcv && !c.icfer,
@@ -4724,13 +4837,14 @@ window.PROTOCOLOS = [
       estudo: { nome: 'LEADER (NEJM 2016)', q: 'LEADER liraglutide cardiovascular outcomes type 2 diabetes 2016' } },
 
     { id: 'finer', nome: 'Finerenona', grupo: 'Diabetes e doença renal',
-      aplica: (p, c) => p.dm && c.drc && !c.icfer,
+      aplica: (p, c) => p.dm && c.drc && !c.icfer && !c.icfep,
       emUso: () => false,
       contra: (p, c) => (c.k != null && c.k > 5.0) ? 'K⁺ > 5,0 mEq/L' : null,
       beneficio: () => ({ base: 21.1, com: 17.8, arr: 3.3, nnt: 30, horiz: '~2,6 anos', txt: 'DRC com DM2 e albuminúria, em adição a IECA/BRA e iSGLT2. Vigiar K⁺.' }),
       estudo: { nome: 'FIDELIO-DKD (NEJM 2020)', q: 'FIDELIO-DKD finerenone chronic kidney disease type 2 diabetes 2020' } }
   ];
 
+  // ---------- formulário ----------
   const CAMPOS = `
     <h3 class="sc-title">Perfil do paciente</h3>
     <div class="sc-campos pac-grid">
@@ -4748,11 +4862,14 @@ window.PROTOCOLOS = [
       ${[['has', 'Hipertensão'], ['dm', 'Diabetes'], ['dislip', 'Dislipidemia'], ['tabag', 'Tabagismo'], ['dcv', 'DCV aterosclerótica estabelecida'], ['fa', 'Fibrilação atrial'], ['ic', 'Insuficiência cardíaca'], ['avc', 'AVC/AIT prévio'], ['vascular', 'Doença vascular (IAM/DAP)'], ['asma', 'Asma/DPOC grave'], ['gravidez', 'Gestante']]
       .map(c => `<label class="sc-check"><input type="checkbox" id="pac-${c[0]}"><span>${c[1]}</span></label>`).join('')}
     </div>
-    <div class="pac-sec">Medicações em uso</div>
+    <div class="pac-sec">Medicações / terapias em uso</div>
     <div class="pac-checks">
-      ${[['m_ieca', 'IECA/BRA'], ['m_arni', 'ARNI (sacubitril/valsartana)'], ['m_bb', 'Betabloqueador'], ['m_mra', 'Espironolactona/eplerenona'], ['m_isglt2', 'iSGLT2'], ['m_estatina', 'Estatina'], ['m_ezet', 'Ezetimiba'], ['m_pcsk9', 'Inibidor de PCSK9'], ['m_aas', 'AAS'], ['m_p2y12', 'Clopidogrel/ticagrelor/prasugrel'], ['m_aco', 'Anticoagulante'], ['m_glp1', 'Agonista de GLP-1']]
+      ${[['m_ieca', 'IECA/BRA'], ['m_arni', 'ARNI (sacubitril/valsartana)'], ['m_bb', 'Betabloqueador'], ['m_mra', 'Espironolactona/eplerenona'], ['m_isglt2', 'iSGLT2'], ['m_diur', 'Diurético de alça'], ['m_ivab', 'Ivabradina'], ['m_vericiguat', 'Vericiguate'], ['m_hidnit', 'Hidralazina + nitrato'], ['m_ferro', 'Ferro EV'], ['m_cdi', 'CDI'], ['m_trc', 'TRC (ressincronizador)'], ['m_estatina', 'Estatina'], ['m_ezet', 'Ezetimiba'], ['m_pcsk9', 'Inibidor de PCSK9'], ['m_aas', 'AAS'], ['m_p2y12', 'Clopidogrel/ticagrelor/prasugrel'], ['m_aco', 'Anticoagulante'], ['m_glp1', 'Agonista de GLP-1']]
       .map(c => `<label class="sc-check"><input type="checkbox" id="pac-${c[0]}"><span>${c[1]}</span></label>`).join('')}
     </div>`;
+
+  const MED_KEYS = ['m_ieca', 'm_arni', 'm_bb', 'm_mra', 'm_isglt2', 'm_diur', 'm_ivab', 'm_vericiguat', 'm_hidnit', 'm_ferro', 'm_cdi', 'm_trc', 'm_estatina', 'm_ezet', 'm_pcsk9', 'm_aas', 'm_p2y12', 'm_aco', 'm_glp1'];
+  const COMORB_KEYS = ['has', 'dm', 'dislip', 'tabag', 'dcv', 'fa', 'ic', 'avc', 'vascular', 'asma', 'gravidez'];
 
   function read() {
     P.idade = n(document.getElementById('pac-idade').value);
@@ -4763,9 +4880,7 @@ window.PROTOCOLOS = [
     P.feve = n(document.getElementById('pac-feve').value);
     P.ldl = n(document.getElementById('pac-ldl').value);
     P.risco10 = n(document.getElementById('pac-risco10').value);
-    ['has', 'dm', 'dislip', 'tabag', 'dcv', 'fa', 'ic', 'avc', 'vascular', 'asma', 'gravidez',
-     'm_ieca', 'm_arni', 'm_bb', 'm_mra', 'm_isglt2', 'm_estatina', 'm_ezet', 'm_pcsk9', 'm_aas', 'm_p2y12', 'm_aco', 'm_glp1']
-      .forEach(k => { P[k] = document.getElementById('pac-' + k).checked; });
+    COMORB_KEYS.concat(MED_KEYS).forEach(k => { P[k] = document.getElementById('pac-' + k).checked; });
   }
 
   function ctxFrom() {
@@ -4775,8 +4890,9 @@ window.PROTOCOLOS = [
     if (id >= 75) cv += 2; else if (id >= 65) cv += 1;
     if (P.ic) cv += 1; if (P.has) cv += 1; if (P.dm) cv += 1; if (P.avc) cv += 2; if (P.vascular) cv += 1;
     const icfer = P.ic && P.feve != null && P.feve <= 40;
+    const icfep = P.ic && P.feve != null && P.feve > 40;
     const drc = tfg != null && tfg < 60;
-    return { tfg, k: P.k, fc: P.fc, cv, icfer, drc };
+    return { tfg, k: P.k, fc: P.fc, cv, icfer, icfep, drc };
   }
 
   function nums(b) {
@@ -4791,6 +4907,18 @@ window.PROTOCOLOS = [
   function estudoLink(e) {
     return `<div class="pac-estudo">📚 <b>Estudo-base:</b> <a class="tema-trial-link" href="https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(e.q)}&sort=relevance" target="_blank" rel="noopener">${esc(e.nome)}</a></div>`;
   }
+  function estudoLinkInline(e) {
+    return '<a class="tema-trial-link" href="https://pubmed.ncbi.nlm.nih.gov/?term=' + encodeURIComponent(e.q) + '&sort=relevance" target="_blank" rel="noopener">' + esc(e.nome) + '</a>';
+  }
+  function cardLinks(iv) {
+    const bts = [];
+    if (iv.doses) bts.push('<button class="pac-go" data-go="doses" data-arg="' + esc(iv.doses) + '">💊 Dose / ajuste renal</button>');
+    if (iv.score) bts.push('<button class="pac-go" data-go="score" data-arg="' + esc(iv.score) + '">🧮 Calcular score</button>');
+    if (iv.evid) bts.push('<button class="pac-go" data-go="evid" data-arg="' + esc(iv.evid) + '">📚 Ver recomendação</button>');
+    return bts.length ? '<div class="pac-golinks">' + bts.join('') + '</div>' : '';
+  }
+
+  let lastPlan = '';
 
   function compute() {
     read();
@@ -4800,7 +4928,7 @@ window.PROTOCOLOS = [
     let bits = [];
     if (c.tfg) bits.push('TFG ≈ <b>' + c.tfg + '</b>' + (c.tfg < 30 ? ' (DRC avançada)' : c.drc ? ' (DRC)' : ''));
     if (P.fa) bits.push('CHA₂DS₂-VA = <b>' + c.cv + '</b>');
-    if (P.feve != null) bits.push('FEVE <b>' + P.feve + '%</b>' + (c.icfer ? ' (ICFEr)' : ''));
+    if (P.feve != null) bits.push('FEVE <b>' + P.feve + '%</b>' + (c.icfer ? ' (ICFEr)' : c.icfep ? ' (ICFEp/ICFEmr)' : ''));
     if (P.k != null) bits.push('K⁺ ' + P.k);
     const resumo = '<div class="pac-resumo"><b>Gêmeo digital:</b> ' + (bits.length ? bits.join(' · ') : 'preencha o perfil ao lado') + '.</div>';
 
@@ -4813,7 +4941,14 @@ window.PROTOCOLOS = [
       gaps.push({ iv, b: iv.beneficio(P, c) });
     });
 
-    let html = resumo;
+    // barra de ações (integração)
+    const actions = '<div class="pac-actions">' +
+      '<button class="pac-go pac-go-main" data-go="score" data-arg="chadsvasc">🧮 Scores (CHA₂DS₂-VA, ClCr…)</button>' +
+      '<button class="pac-go pac-go-main" data-go="pretest" data-arg="">🎯 Pré-teste de DAC</button>' +
+      '<button class="pac-go pac-go-main" data-go="copy" data-arg="">📋 Copiar plano p/ prontuário</button>' +
+      '</div>';
+
+    let html = resumo + actions;
     const totalInd = gaps.length + uso.length + contra.length;
     if (totalInd) html += '<div class="pac-score">Terapias indicadas: <b>' + totalInd + '</b> · em uso <b>' + uso.length + '</b> · <b style="color:#b07414">oportunidades ' + gaps.length + '</b> · contraindicadas ' + contra.length + '</div>';
 
@@ -4822,7 +4957,7 @@ window.PROTOCOLOS = [
       gaps.forEach(g => {
         html += '<div class="pac-card"><div class="pac-card-h">' + esc(g.iv.nome) + ' <span class="pac-tag">' + esc(g.iv.grupo) + '</span></div>' +
           nums(g.b) + '<div class="pac-txt">' + g.b.txt + (g.b.arr != null ? ' <b>Redução absoluta ≈ ' + r1(g.b.arr) + '%.</b>' : '') + '</div>' +
-          estudoLink(g.iv.estudo) + '</div>';
+          estudoLink(g.iv.estudo) + cardLinks(g.iv) + '</div>';
       });
     }
     if (uso.length) {
@@ -4836,16 +4971,62 @@ window.PROTOCOLOS = [
     if (!totalInd) html += '<p class="muted small">Preencha as comorbidades e as medicações para ver as oportunidades de otimização (ex.: marque Insuficiência cardíaca + FEVE 30% e veja os 4 pilares).</p>';
 
     out.innerHTML = html;
+
+    // monta texto do plano
+    lastPlan = montarPlano(c, gaps, uso, contra);
   }
-  function estudoLinkInline(e) {
-    return '<a class="tema-trial-link" href="https://pubmed.ncbi.nlm.nih.gov/?term=' + encodeURIComponent(e.q) + '&sort=relevance" target="_blank" rel="noopener">' + esc(e.nome) + '</a>';
+
+  function montarPlano(c, gaps, uso, contra) {
+    const L = [];
+    L.push('PLANO — gêmeo digital (CardioResidente)');
+    let perfil = [];
+    if (P.idade) perfil.push(P.idade + 'a');
+    perfil.push(P.sexo === 'F' ? 'feminino' : 'masculino');
+    if (c.tfg) perfil.push('TFG ' + c.tfg);
+    if (P.feve != null) perfil.push('FEVE ' + P.feve + '%' + (c.icfer ? ' (ICFEr)' : c.icfep ? ' (ICFEp/ICFEmr)' : ''));
+    if (P.fa) perfil.push('CHA2DS2-VA ' + c.cv);
+    if (P.k != null) perfil.push('K ' + P.k);
+    L.push('Perfil: ' + perfil.join(', ') + '.');
+    L.push('');
+    L.push('OPORTUNIDADES (otimizar):');
+    if (gaps.length) gaps.forEach(g => L.push('- ' + g.iv.nome.replace(/<[^>]+>/g, '') + (g.b.nnt != null ? ' (NNT ' + g.b.nnt + ', ' + g.iv.estudo.nome.split(' (')[0] + ')' : '')));
+    else L.push('- (nenhuma identificada)');
+    L.push('');
+    L.push('EM USO (manter e titular):');
+    if (uso.length) uso.forEach(iv => L.push('- ' + iv.nome.replace(/<[^>]+>/g, '')));
+    else L.push('- (nenhuma registrada)');
+    L.push('');
+    L.push('CONTRAINDICADO / CAUTELA:');
+    if (contra.length) contra.forEach(x => L.push('- ' + x.iv.nome.replace(/<[^>]+>/g, '') + ' — ' + x.motivo));
+    else L.push('- (nenhuma)');
+    L.push('');
+    L.push('Obs.: apoio à decisão baseado em diretrizes; NNT assume RRR constante. Conferir e individualizar.');
+    return L.join('\n');
+  }
+
+  // navegação entre abas
+  function go(view, after) {
+    if (window.cardioGoView) window.cardioGoView(view);
+    if (after) setTimeout(after, 80);
+  }
+  function handleGo(act, arg) {
+    if (act === 'doses') go('doses', () => { const i = document.getElementById('dz-busca'); if (i) { i.value = arg; i.dispatchEvent(new Event('input')); } });
+    else if (act === 'score') go('scores', () => { if (window.cardioScoreFill) window.cardioScoreFill(arg); });
+    else if (act === 'pretest') go('pretest', () => { if (window.cardioPretestFill) window.cardioPretestFill(); });
+    else if (act === 'evid') go('evidencia', () => { const i = document.getElementById('busca-input'); if (i) { i.value = arg; const f = document.getElementById('busca-form'); if (f) f.dispatchEvent(new Event('submit', { cancelable: true })); } });
+    else if (act === 'copy') { if (window.copyText) window.copyText(lastPlan); else navigator.clipboard.writeText(lastPlan); }
   }
 
   root.innerHTML =
-    '<div class="rec-revbanner">Monte o paciente (comorbidades + o que ele <b>já usa</b>) e o gêmeo digital mostra as <b>lacunas de tratamento</b> com o benefício absoluto/NNT e o estudo, o que está <b>em uso</b> e o que está <b>contraindicado</b>. Apoio à decisão compartilhada (assume RRR constante); não substitui o julgamento clínico.</div>' +
+    '<div class="rec-revbanner">Monte o paciente (comorbidades + o que ele <b>já usa</b>) e o gêmeo digital mostra as <b>lacunas de tratamento</b> com benefício absoluto/NNT e estudo, o que está <b>em uso</b> e o que está <b>contraindicado</b>. Os botões levam a <b>Scores, Pré-teste e Doses já preenchidos</b>, e você pode <b>copiar o plano</b> para o prontuário. Apoio à decisão (assume RRR constante); não substitui o julgamento clínico.</div>' +
     '<div class="pac-wrap"><div class="pac-form">' + CAMPOS + '</div><div class="pac-out" id="pac-out"></div></div>';
 
-  root.querySelectorAll('input, select').forEach(el => el.addEventListener('input', compute));
+  root.querySelectorAll('.pac-form input, .pac-form select').forEach(el => el.addEventListener('input', compute));
+  // delegação de cliques nos botões de integração
+  document.getElementById('pac-out').addEventListener('click', e => {
+    const b = e.target.closest('.pac-go'); if (!b) return;
+    handleGo(b.dataset.go, b.dataset.arg || '');
+  });
   compute();
 })();
 
