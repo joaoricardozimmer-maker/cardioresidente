@@ -473,6 +473,25 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .tema-crit ul { margin: 8px 0; padding-left: 18px; }
 .tema-crit li { margin-bottom: 6px; line-height: 1.5; }
 
+/* ===== Paciente (gêmeo digital + evidência personalizada) ===== */
+.pac-wrap { display: grid; grid-template-columns: 340px 1fr; gap: 20px; }
+.pac-form { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px; align-self: start; }
+.pac-grid { margin: 12px 0; }
+.pac-checks { display: flex; flex-direction: column; gap: 7px; margin-top: 6px; }
+.pac-resumo { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 10px; padding: 11px 14px; font-size: 13.5px; margin-bottom: 14px; }
+.pac-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin-bottom: 12px; border-left: 4px solid var(--green); }
+.pac-card-h { font-weight: 700; font-size: 15.5px; margin-bottom: 10px; }
+.pac-nums { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.pac-num { display: flex; flex-direction: column; align-items: center; background: var(--bg-soft); border-radius: 8px; padding: 8px 14px; min-width: 96px; }
+.pac-n-v { font-size: 18px; font-weight: 800; color: var(--text); }
+.pac-n-l { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; margin-top: 2px; }
+.pac-nnt { background: var(--accent); }
+.pac-nnt .pac-n-v, .pac-nnt .pac-n-l { color: #fff; }
+.pac-arw { color: var(--muted); font-size: 20px; }
+.pac-txt { font-size: 13.5px; line-height: 1.55; }
+.pac-fonte { font-size: 11.5px; color: var(--muted); margin-top: 8px; }
+@media (max-width: 860px) { .pac-wrap { grid-template-columns: 1fr; } }
+
 /* ===== Plantão / protocolos ===== */
 .pr-steps { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
 .pr-step { display: flex; gap: 12px; align-items: flex-start; }
@@ -554,6 +573,15 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
   </header>
 
   <main id="app">
+    <!-- ============ PACIENTE ============ -->
+    <section class="view active" id="view-paciente">
+      <div class="hero">
+        <h2>Paciente — evidência personalizada</h2>
+        <p>O recurso que falta em todo lugar: monte um paciente e veja, <strong>para ele</strong>, o benefício absoluto e o NNT de cada conduta — a evidência da diretriz traduzida em número individual.</p>
+      </div>
+      <div id="paciente-root"></div>
+    </section>
+
     <!-- ============ TEMAS ============ -->
     <section class="view" id="view-temas">
       <div class="hero">
@@ -567,7 +595,7 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
     </section>
 
     <!-- ============ EVIDÊNCIAS ============ -->
-    <section class="view active" id="view-evidencia">
+    <section class="view" id="view-evidencia">
       <div class="hero">
         <h2>Recomendações por diretriz</h2>
         <p>Pergunte uma conduta e receba a <strong>Classe de recomendação</strong> e o <strong>Nível de evidência</strong> segundo a diretriz mais atual de cada sociedade (ESC, AHA/ACC e SBC). Apoio à decisão — confira sempre o documento original na aba Diretrizes.</p>
@@ -4523,9 +4551,148 @@ window.PROTOCOLOS = [
   ).join('');
 })();
 
+// Hub "Paciente": gêmeo digital + EVIDÊNCIA PERSONALIZADA (benefício absoluto/NNT individual).
+// Metodologia: risco basal estimado × redução relativa (RRR) do ensaio/diretriz → ARR e NNT.
+// Apoio à decisão compartilhada; assume RRR constante; não substitui o julgamento clínico.
+(function () {
+  const root = document.getElementById('paciente-root');
+  if (!root) return;
+  const P = window.PACIENTE = window.PACIENTE || {};
+  const n = v => { const x = parseFloat(String(v).replace(',', '.')); return isFinite(x) ? x : null; };
+  const r1 = x => Math.round(x * 10) / 10;
+
+  // taxa anual de AVC (%) por CHA2DS2-VASc (ajustada; Friberg/ESC) — usada como aproximação p/ CHA2DS2-VA
+  const AVC_ANO = { 0: 0.2, 1: 0.6, 2: 2.2, 3: 3.2, 4: 4.8, 5: 7.2, 6: 9.7, 7: 11.2, 8: 10.8, 9: 12.2 };
+  const RRR_ACO = 0.64;   // anticoagulação vs controle (meta-análise)
+  const RRR_CTT = 0.22;   // redução de eventos por 1 mmol/L (38,7 mg/dL) de LDL (CTT)
+
+  function ckdepi(cr, idade, fem) {
+    if (!cr || !idade) return null;
+    const k = fem ? 0.7 : 0.9, a = fem ? -0.241 : -0.302;
+    const mn = Math.min(cr / k, 1), mx = Math.max(cr / k, 1);
+    let e = 142 * Math.pow(mn, a) * Math.pow(mx, -1.2) * Math.pow(0.9938, idade);
+    if (fem) e *= 1.012;
+    return Math.round(e);
+  }
+  function chadsva() {
+    let s = 0; const id = n(P.idade) || 0;
+    if (id >= 75) s += 2; else if (id >= 65) s += 1;
+    if (P.ic) s += 1; if (P.has) s += 1; if (P.dm) s += 1;
+    if (P.avc) s += 2; if (P.vascular) s += 1;
+    return s;
+  }
+
+  const CAMPOS = `
+    <div class="sc-campos pac-grid">
+      <label class="sc-campo"><span>Idade <em>(anos)</em></span><input type="number" id="pac-idade"></label>
+      <label class="sc-campo"><span>Sexo</span><select id="pac-sexo"><option value="M">Masculino</option><option value="F">Feminino</option></select></label>
+      <label class="sc-campo"><span>Creatinina <em>(mg/dL)</em></span><input type="number" step="any" id="pac-cr"></label>
+      <label class="sc-campo"><span>FEVE <em>(%)</em></span><input type="number" id="pac-feve"></label>
+      <label class="sc-campo"><span>LDL atual <em>(mg/dL)</em></span><input type="number" id="pac-ldl"></label>
+      <label class="sc-campo"><span>Risco CV 10 anos <em>(%, SCORE2/PREVENT — opcional)</em></span><input type="number" step="any" id="pac-risco10"></label>
+    </div>
+    <div class="pac-checks">
+      ${[['has', 'Hipertensão'], ['dm', 'Diabetes'], ['dislip', 'Dislipidemia'], ['tabag', 'Tabagismo'], ['dcv', 'DCV aterosclerótica estabelecida'], ['fa', 'Fibrilação atrial'], ['ic', 'IC / disfunção de VE'], ['avc', 'AVC/AIT prévio'], ['vascular', 'Doença vascular (IAM/DAP/placa aórtica)']]
+      .map(c => `<label class="sc-check"><input type="checkbox" id="pac-${c[0]}"><span>${c[1]}</span></label>`).join('')}
+    </div>`;
+
+  function nntCard(titulo, base, com, arr, nnt, horizonte, txt, fonte) {
+    return `<div class="pac-card">
+      <div class="pac-card-h">${titulo}</div>
+      <div class="pac-nums">
+        <div class="pac-num"><span class="pac-n-v">${r1(base)}%</span><span class="pac-n-l">risco sem tratar</span></div>
+        <div class="pac-arw">→</div>
+        <div class="pac-num"><span class="pac-n-v">${r1(com)}%</span><span class="pac-n-l">com tratamento</span></div>
+        <div class="pac-num pac-nnt"><span class="pac-n-v">NNT ${nnt}</span><span class="pac-n-l">${horizonte}</span></div>
+      </div>
+      <div class="pac-txt">${txt} <b>Redução absoluta ≈ ${r1(arr)}%.</b></div>
+      <div class="pac-fonte">${fonte}</div>
+    </div>`;
+  }
+
+  function compute() {
+    P.idade = n(document.getElementById('pac-idade').value);
+    P.sexo = document.getElementById('pac-sexo').value;
+    P.cr = n(document.getElementById('pac-cr').value);
+    P.feve = n(document.getElementById('pac-feve').value);
+    P.ldl = n(document.getElementById('pac-ldl').value);
+    P.risco10 = n(document.getElementById('pac-risco10').value);
+    ['has', 'dm', 'dislip', 'tabag', 'dcv', 'fa', 'ic', 'avc', 'vascular'].forEach(k => { P[k] = document.getElementById('pac-' + k).checked; });
+
+    const out = document.getElementById('pac-out');
+    const fem = P.sexo === 'F';
+    const tfg = ckdepi(P.cr, P.idade, fem);
+    const cv = chadsva();
+
+    // resumo automático (gêmeo digital)
+    let resumo = '<div class="pac-resumo"><b>Resumo automático:</b> ';
+    const bits = [];
+    if (tfg) bits.push('TFG (CKD-EPI) ≈ <b>' + tfg + '</b> mL/min/1,73m²');
+    if (P.fa) bits.push('CHA₂DS₂-VA = <b>' + cv + '</b>');
+    if (P.feve != null) bits.push('FEVE <b>' + P.feve + '%</b> (' + (P.feve <= 40 ? 'ICFEr' : P.feve <= 49 ? 'levemente reduzida' : 'preservada') + ')');
+    resumo += (bits.length ? bits.join(' · ') : 'preencha o perfil ao lado') + '.</div>';
+
+    // ===== EVIDÊNCIA PERSONALIZADA =====
+    let cards = '';
+
+    // 1) Anticoagulação na FA (risco de AVC)
+    if (P.fa) {
+      const base = AVC_ANO[Math.min(cv, 9)];
+      const com = base * (1 - RRR_ACO);
+      const arr = base - com;
+      const nnt = Math.max(1, Math.round(100 / arr));
+      cards += nntCard('Anticoagulação na FA (prevenção de AVC)', base, com, arr, nnt, 'por ano',
+        'Risco anual de AVC estimado por CHA₂DS₂-VA = ' + cv + '. A anticoagulação reduz ~64% esse risco. Pondere contra o risco de sangramento (HAS-BLED).',
+        'Taxas de AVC ajustadas (Friberg/ESC) · RRR ~64% (meta-análise de anticoagulação na FA).');
+    }
+
+    // 2) Redução de LDL (estatina ± ezetimiba/PCSK9) — relação do CTT
+    if (P.ldl) {
+      const base10 = P.dcv ? 30 : P.risco10;     // DCV estabelecida ≈ 30% em 10 anos; senão usa o risco informado
+      const alvo = P.dcv ? 55 : 70;
+      if (base10) {
+        if (P.ldl <= alvo) {
+          cards += '<div class="pac-card"><div class="pac-card-h">LDL</div><div class="pac-txt">LDL já na meta (&lt; ' + alvo + ' mg/dL) — manter a terapia.</div></div>';
+        } else {
+          const dmmol = (P.ldl - alvo) / 38.7;
+          let rrr = Math.min(0.65, RRR_CTT * dmmol);
+          const base = base10, com = base * (1 - rrr), arr = base - com;
+          const nnt = Math.max(1, Math.round(100 / arr));
+          cards += nntCard('Reduzir o LDL para &lt; ' + alvo + ' mg/dL', base, com, arr, nnt, 'em 10 anos',
+            'Baixar o LDL de ' + P.ldl + ' para ' + alvo + ' mg/dL (Δ ≈ ' + r1(dmmol) + ' mmol/L). Pelo CTT (~22% de redução de eventos por mmol/L), a RRR é ~' + Math.round(rrr * 100) + '% sobre um risco basal de ' + base10 + '% em 10 anos.',
+            'Cholesterol Treatment Trialists (CTT), Lancet 2010 · risco basal ' + (P.dcv ? 'estimado (DCV estabelecida)' : 'informado') + '.');
+        }
+      } else {
+        cards += '<div class="pac-card"><div class="pac-card-h">Reduzir o LDL</div><div class="pac-txt">Marque <b>DCV estabelecida</b> ou informe o <b>risco CV em 10 anos</b> para personalizar o NNT.</div></div>';
+      }
+    }
+
+    // 3) iSGLT2 na ICFEr (benefício do trial)
+    if (P.feve != null && P.feve <= 40) {
+      const base = 21.2, com = 16.3, arr = 4.9, nnt = 21;
+      cards += nntCard('iSGLT2 na ICFEr (dapagliflozina)', base, com, arr, nnt, 'em ~18 meses',
+        'Na ICFEr (FEVE ≤ 40%), o iSGLT2 reduz morte CV/piora de IC. Benefício médio do ensaio (não individualizado pelo risco basal).',
+        'DAPA-HF (NEJM 2019): desfecho composto 16,3% vs 21,2%.');
+    }
+
+    if (!cards) cards = '<p class="muted small">Preencha o perfil para ver o benefício personalizado das condutas (ex.: marque Fibrilação atrial, informe o LDL, a FEVE...).</p>';
+
+    out.innerHTML = resumo + '<h3 class="sc-title" style="margin-top:6px">Evidência personalizada para este paciente</h3>' + cards;
+  }
+
+  root.innerHTML =
+    '<div class="rec-revbanner">Monte o paciente uma vez e veja o <b>benefício absoluto e o NNT individuais</b> de cada conduta — não a redução relativa genérica da diretriz. Estimativas de <b>apoio à decisão compartilhada</b> (assumem RRR constante e risco basal estimado); não substituem o julgamento clínico.</div>' +
+    '<div class="pac-wrap"><div class="pac-form"><h3 class="sc-title">Perfil do paciente</h3>' + CAMPOS + '</div>' +
+    '<div class="pac-out" id="pac-out"></div></div>';
+
+  root.querySelectorAll('input, select').forEach(el => el.addEventListener('input', compute));
+  compute();
+})();
+
 // Navegação em hubs (2 níveis) + busca global + utilidades compartilhadas
 (function () {
   const HUBS = [
+    { id: 'paciente', label: '🧬 Paciente', views: [['paciente', '🧬 Paciente']] },
     { id: 'temas', label: '🫀 Temas', views: [['temas', '🫀 Temas']] },
     { id: 'evidencias', label: '📚 Evidências', views: [['evidencia', '🔎 Recomendações'], ['guias', '📚 Diretrizes'], ['ensaios', '🧪 Ensaios pivotais']] },
     { id: 'ferramentas', label: '🧮 Ferramentas', views: [['scores', '🧮 Scores'], ['pretest', '🎯 Pré-teste'], ['mbe', '📐 MBE'], ['doses', '💊 Doses']] },
@@ -4566,8 +4733,8 @@ window.PROTOCOLOS = [
   }
   window.cardioGoView = showView;
 
-  const initial = (location.hash || '#evidencia').slice(1);
-  showView(viewHub[initial] ? initial : 'evidencia');
+  const initial = (location.hash || '#paciente').slice(1);
+  showView(viewHub[initial] ? initial : 'paciente');
 
   // ---------------- Busca global ----------------
   const gi = document.getElementById('gsearch');
