@@ -1056,6 +1056,41 @@ window.TEMAS = [
     ],
     recs: [['estatina prevenção primária', 'Estatina'], ['cessação tabagismo', 'Tabagismo'], ['atividade física', 'Atividade física'], ['AAS prevenção primária', 'AAS (não rotina)'], ['vacinação influenza', 'Vacina influenza']],
     scores: ['score2', 'prevent', 'imc'], guia: 'Dislipidemia', pretest: false
+  },
+  {
+    id: 'dor', nome: 'Dor torácica e diagnósticos diferenciais', area: 'Doença coronariana',
+    fisio:
+      '<p>A dor torácica é conduzida por aferentes <b>viscerais</b> (coração, aorta, esôfago, pleura) que convergem nos mesmos segmentos medulares dos dermátomos torácicos — por isso a localização é imprecisa e a irradiação ampla (braço, mandíbula, dorso). A isquemia miocárdica gera dor por acúmulo de metabólitos (adenosina) e estiramento.</p>' +
+      '<p>Prioridade é excluir as <b>causas fatais</b>: SCA, dissecção de aorta, TEP, pneumotórax hipertensivo e rotura esofágica.</p>',
+    resumo:
+      '<p><b>Abordagem:</b> ECG em ≤ 10 min + troponina (algoritmo 0/1 h); estratificar com o <b>HEART score</b>. Sinais que <u>reduzem</u> a chance de SCA: dor pleurítica, posicional ou reprodutível à palpação. Sinais de alarme para <b>dissecção</b>: dor lancinante/migratória, assimetria de pulsos/PA.</p>' +
+      '<p><b>Diferenciais:</b> cardíacos (SCA, pericardite, miocardite, dissecção), pulmonares (TEP, pneumotórax, pleurite/pneumonia), gastrointestinais (DRGE, espasmo esofágico, úlcera, pancreatite/colelitíase) e musculoesqueléticos (costocondrite, herpes-zóster).</p>',
+    trials: [
+      { n: 'HEART Pathway', t: 'Estratificação acelerada permite alta segura do baixo risco.' }
+    ],
+    recs: [], scores: ['heart', 'timi_nstemi', 'grace'], guia: 'coronariana aguda', pretest: true
+  },
+  {
+    id: 'febrereum', nome: 'Febre reumática e cardiopatia reumática', area: 'Valvopatia',
+    fisio:
+      '<p>Resposta autoimune por <b>mimetismo molecular</b> após faringite pelo <b>estreptococo β-hemolítico do grupo A</b>: anticorpos e células T contra a proteína M reagem de forma cruzada com antígenos cardíacos (a proteína M lembra a miosina), causando <b>pancardite</b>. A <b>valva mitral</b> é a mais acometida (insuficiência na fase aguda, estenose na crônica), seguida da aórtica.</p>',
+    resumo:
+      '<p>Diagnóstico pelos <b>critérios de Jones revisados</b> (evidência de infecção estreptocócica recente + 2 critérios maiores, ou 1 maior + 2 menores). <b>Fase aguda:</b> erradicar o estreptococo (penicilina) + anti-inflamatório (AAS/AINE; corticoide se cardite grave). <b>Profilaxia secundária:</b> penicilina benzatina IM a cada 21 dias por anos (duração conforme o acometimento cardíaco). Cardiopatia reumática crônica → manejo valvar (valvoplastia mitral percutânea quando favorável).</p>',
+    trials: [],
+    recs: [['valvoplastia mitral', 'Valvoplastia mitral'], ['estenose aórtica', 'Valvopatia']],
+    scores: [], guia: 'Valvopatia', pretest: false
+  },
+  {
+    id: 'dilatada', nome: 'Cardiomiopatia dilatada e etiologias da IC', area: 'Insuficiência cardíaca',
+    fisio:
+      '<p>Dilatação e disfunção sistólica do VE (ou biventricular) não explicadas por sobrecarga de pressão/volume ou DAC. Múltiplas agressões convergem para uma via final comum de remodelamento. <b>Causas:</b> <b>genética</b> (30–40%; destacam-se variantes em <b>TTN/titina</b> — a mais comum —, <b>LMNA</b>, MYH7, RBM20, <b>FLNC</b>, DSP, PLN), isquêmica, tóxica (álcool, antraciclinas, cocaína), infecciosa (<b>Chagas</b>, miocardite viral), <b>periparto</b>, taquicardiomiopatia, autoimune, endócrina (tireoide) e nutricional (tiamina).</p>',
+    resumo:
+      '<p><b>Investigar a etiologia:</b> anamnese (álcool, quimioterapia, gestação), ECG, eco, <b>RM cardíaca</b> (realce tardio = fibrose/prognóstico), sorologia para Chagas, triagem familiar e <b>genética</b> quando indicada. <b>Tratamento</b> da IC conforme a FEVE (quatro pilares na ICFEr). <b>Específicos:</b> abstinência (alcoólica), bromocriptina + anticoagulação (periparto), controle da arritmia (taquicardiomiopatia). <b>CDI</b> conforme FEVE/genótipo — <b>LMNA e FLNC</b> têm limiar mais baixo pelo alto risco arrítmico.</p>',
+    trials: [
+      { n: 'DANISH (2016)', t: 'CDI na CMD não isquêmica: sem redução de mortalidade total (benefício maior em jovens).' }
+    ],
+    recs: [['CDI prevenção primária', 'CDI'], ['sacubitril ICFEr', 'GDMT da ICFEr']],
+    scores: ['maggic'], guia: 'Insuficiência', pretest: false
   }
 ];
 
@@ -1082,7 +1117,10 @@ window.TEMAS_CRIT = {
   chagas: '<ul><li><b>Escore de Rassi</b> (mortalidade): NYHA III/IV, cardiomegalia ao RX, alteração segmentar/global ao eco, TVNS no Holter, baixa voltagem no ECG, sexo masculino.</li><li><b>ECG típico:</b> BRD + hemibloqueio anterior esquerdo; <b>aneurisma apical</b> ao eco.</li></ul>',
   congenita: '<ul><li><b>CIA com repercussão:</b> Qp/Qs &gt; 1,5 ou sobrecarga de VD.</li><li><b>Coarctação:</b> gradiente ≥ 20 mmHg (ou HAS/colaterais) → intervir.</li><li><b>Eisenmenger:</b> RVP elevada com inversão do shunt — contraindica fechamento.</li></ul>',
   onco: '<ul><li><b>Disfunção cardíaca relacionada ao câncer (CTRCD):</b> queda da FEVE ≥ 10 pontos para &lt; 50%.</li><li><b>Strain (GLS):</b> queda relativa &gt; 15% sugere toxicidade subclínica.</li><li>Troponina/natriuréticos seriados apoiam a detecção precoce.</li></ul>',
-  prevencao: '<ul><li><b>SCORE2 (&lt; 50 anos):</b> baixo-moderado &lt; 2,5% · alto 2,5–7,5% · muito alto ≥ 7,5% (10 anos).</li><li><b>50–69 anos:</b> &lt; 5 · 5–10 · ≥ 10%. <b>≥ 70 (SCORE2-OP):</b> &lt; 7,5 · 7,5–15 · ≥ 15%.</li><li>Meta de PA &lt; 130/80; metas de LDL conforme o risco.</li></ul>'
+  prevencao: '<ul><li><b>SCORE2 (&lt; 50 anos):</b> baixo-moderado &lt; 2,5% · alto 2,5–7,5% · muito alto ≥ 7,5% (10 anos).</li><li><b>50–69 anos:</b> &lt; 5 · 5–10 · ≥ 10%. <b>≥ 70 (SCORE2-OP):</b> &lt; 7,5 · 7,5–15 · ≥ 15%.</li><li>Meta de PA &lt; 130/80; metas de LDL conforme o risco.</li></ul>',
+  dor: '<ul><li><b>HEART score</b> (História, ECG, Idade, fatores de Risco, Troponina): 0–3 baixo risco (MACE ~1–2%) · 4–6 moderado · 7–10 alto.</li><li><b>Troponina hs 0/1 h:</b> descarta ou confirma rapidamente; valores muito baixos na admissão + ausência de dor recente afastam.</li><li><b>Reduzem SCA:</b> dor pleurítica, posicional, reprodutível à palpação.</li></ul>',
+  febrereum: '<ul><li><b>Critérios de Jones (maiores):</b> cardite, artrite (migratória de grandes articulações), coreia de Sydenham, eritema marginado, nódulos subcutâneos.</li><li><b>Menores:</b> febre, artralgia, VHS/PCR elevadas, intervalo PR prolongado.</li><li>Exigir <b>evidência de infecção estreptocócica</b> (ASLO, cultura/teste rápido). Diagnóstico: 2 maiores OU 1 maior + 2 menores.</li></ul>',
+  dilatada: '<ul><li><b>Genes de alto risco arrítmico:</b> LMNA, FLNC, DSP, PLN, RBM20 → considerar CDI com FEVE menos reduzida (≤ 45%) e/ou outros marcadores. TTN é o gene mais comum.</li><li><b>RM cardíaca:</b> realce tardio mesocárdico = fibrose, marcador de arritmia/prognóstico.</li><li>Investigar reversíveis: álcool, taquicardiomiopatia, tireoide, periparto, Chagas.</li></ul>'
 };
 
 // Changelog de diretrizes — "o que mudou" recentemente. Curado a partir das publicações oficiais.
@@ -3081,6 +3119,7 @@ window.PROTOCOLOS = [
       { t: 'dose', x: 'SIM → cardioversão elétrica SINCRONIZADA imediata (sedação se possível). Energia: QRS estreito regular 50–100 J · FA 120–200 J · TV monomórfica com pulso 100 J. TV polimórfica instável → desfibrilar.' },
       { t: 'decisao', x: 'ESTÁVEL → avaliar a largura do QRS.' },
       { t: 'sub', items: ['QRS ESTREITO (< 0,12 s): manobra vagal → adenosina 6 mg EV em bólus rápido → 12 mg (repetir 12 mg). Se não reverter/recorrer: betabloqueador ou BCC (diltiazem).', 'QRS LARGO (≥ 0,12 s): se TV provável → amiodarona 150 mg EV em 10 min (repetir) ou procainamida; considerar cardioversão eletiva. Adenosina apenas se regular e monomórfica.'] },
+      { t: 'alerta', x: 'FA pré-excitada (WPW — QRS largo, irregular, muito rápida): NÃO usar bloqueadores do nó AV (adenosina, BCC, betabloqueador, digoxina) — podem acelerar a condução pela via acessória e precipitar FV. Use cardioversão elétrica ou procainamida/ibutilida.' },
       { t: 'alerta', x: 'Torsades de pointes (TV polimórfica com QT longo): sulfato de magnésio 1–2 g EV; corrigir K⁺/Mg²⁺ e suspender fármacos que prolongam QT.' }
     ]
   },
@@ -3103,7 +3142,8 @@ window.PROTOCOLOS = [
       { t: 'passo', x: 'Monitorização, ECG, ecocardiograma à beira-leito, lactato; identificar a causa (IAM é a mais comum).' },
       { t: 'dose', x: 'Vasopressor de escolha: NORADRENALINA 0,05–0,5 mcg/kg/min (titular pela PAM ≥ 65).' },
       { t: 'dose', x: 'Inotrópico: DOBUTAMINA 2,5–20 mcg/kg/min se baixo débito com PA aceitável.' },
-      { t: 'passo', x: 'Se IAM: revascularização precoce da artéria culpada (ICP). Considerar suporte circulatório mecânico em casos refratários.' },
+      { t: 'passo', x: 'Se IAM: revascularização precoce da artéria culpada (ICP). Considerar suporte circulatório mecânico (Impella/ECMO) em casos refratários.' },
+      { t: 'nota', x: 'No choque por IAM multiarterial, revascularizar apenas a artéria culpada na fase aguda (CULPRIT-SHOCK). Balão intra-aórtico (BIA) NÃO de rotina (IABP-SHOCK II foi neutro).' },
       { t: 'alerta', x: 'Evite expansão volêmica agressiva se já congesto. Reavalie continuamente perfusão e congestão (perfis "quente/frio – úmido/seco").' }
     ]
   },
@@ -3146,6 +3186,55 @@ window.PROTOCOLOS = [
       { t: 'dose', x: 'Anticoagulação imediata com HNF (bólus 80 U/kg + infusão).' },
       { t: 'dose', x: 'TROMBÓLISE sistêmica (alteplase 100 mg EV em 2 h), salvo contraindicação. Alternativas: embolectomia cirúrgica ou por cateter.' },
       { t: 'nota', x: 'Risco intermediário-alto (VD disfuncional + troponina, sem choque): anticoagular e monitorar; trombólise de resgate se deteriorar.' }
+    ]
+  },
+  {
+    id: 'nstemi', nome: 'SCA sem supra (NSTE-ACS)', area: 'Síndrome coronariana',
+    passos: [
+      { t: 'passo', x: 'Dor torácica sem supra de ST persistente; ECG (infra de ST, inversão de T ou normal) + troponina hs com algoritmo 0/1–2 h.' },
+      { t: 'dose', x: 'AAS 150–300 mg + anticoagulação parenteral (fondaparinux, enoxaparina ou HNF). Inibidor de P2Y12 conforme estratégia/risco de sangramento.' },
+      { t: 'decisao', x: 'Estratificar o risco (GRACE, dinâmica de troponina, instabilidade) para definir o tempo da estratégia invasiva.' },
+      { t: 'sub', items: ['Muito alto risco (instabilidade, dor refratária, arritmia maligna, complicação mecânica) → invasiva IMEDIATA (< 2 h).', 'Alto risco (GRACE > 140, ΔST, troponina dinâmica) → invasiva PRECOCE (< 24 h).', 'Risco baixo → teste não invasivo de isquemia/estratégia seletiva.'] },
+      { t: 'dose', x: 'Estatina de alta intensidade precoce; betabloqueador e IECA/BRA se disfunção de VE/IC.' },
+      { t: 'alerta', x: 'O₂ só se SatO₂ < 90%; cuidado com nitrato se suspeita de infarto de VD ou hipotensão.' }
+    ]
+  },
+  {
+    id: 'faaguda', nome: 'Fibrilação atrial aguda', area: 'Arritmia',
+    passos: [
+      { t: 'passo', x: 'FA com resposta ventricular rápida. Monitor, acesso, ECG; avaliar instabilidade e tempo de início.' },
+      { t: 'decisao', x: 'INSTÁVEL (hipotensão, isquemia, IC, choque) → cardioversão elétrica SINCRONIZADA (120–200 J).' },
+      { t: 'dose', x: 'ESTÁVEL — controle de frequência: betabloqueador OU diltiazem/verapamil EV. Na ICFEr, preferir betabloqueador, amiodarona ou digoxina (evitar BCC não-diidro).' },
+      { t: 'passo', x: 'Anticoagulação conforme CHA₂DS₂-VA. Para cardioverter FA com > 48 h (ou duração incerta): ACO por ≥ 3 semanas antes OU ecocardiograma transesofágico para excluir trombo.' },
+      { t: 'alerta', x: 'FA pré-excitada (WPW): NÃO usar bloqueadores do nó AV (adenosina, BCC, betabloqueador, digoxina, amiodarona com cautela) → cardioversão elétrica ou procainamida/ibutilida.' }
+    ]
+  },
+  {
+    id: 'hiperk', nome: 'Hipercalemia', area: 'Emergência',
+    passos: [
+      { t: 'passo', x: 'K⁺ elevado. ECG: onda T apiculada → PR longo, alargamento do QRS, perda da onda P → padrão sinusoidal (pré-PCR). Confirmar (excluir hemólise) e monitorizar.' },
+      { t: 'dose', x: '1) ESTABILIZAR o miocárdio: gluconato de cálcio 10% 10–30 mL EV (ou cloreto de cálcio) se houver alterações no ECG — efeito em minutos, repetível.' },
+      { t: 'dose', x: '2) DESLOCAR o K⁺ para dentro da célula: insulina regular 10 U + glicose 25 g EV; β₂-agonista inalatório (salbutamol); bicarbonato de sódio se acidose metabólica.' },
+      { t: 'dose', x: '3) REMOVER o K⁺: diurético de alça (se diurese), quelantes intestinais e DIÁLISE na hipercalemia grave/refratária ou DRC dialítica.' },
+      { t: 'alerta', x: 'Suspender IECA/BRA, espironolactona e AINE. O cálcio NÃO reduz o potássio — apenas protege o coração enquanto as demais medidas agem.' }
+    ]
+  },
+  {
+    id: 'tamponamento', nome: 'Tamponamento cardíaco', area: 'Pericárdio',
+    passos: [
+      { t: 'passo', x: 'Tríade de Beck (hipotensão, turgência jugular, bulhas abafadas) + pulso paradoxal > 10 mmHg; ecocardiograma com derrame e colapso de câmaras direitas.' },
+      { t: 'passo', x: 'Estabilizar: volume EV cauteloso (otimiza o enchimento); evitar ventilação com pressão positiva e vasodilatadores (reduzem a pré-carga e pioram o quadro).' },
+      { t: 'dose', x: 'PERICARDIOCENTESE guiada por ecocardiograma, de urgência. Drenagem cirúrgica se etiologia traumática, dissecção ou derrame purulento/loculado.' },
+      { t: 'alerta', x: 'É diagnóstico clínico-ecocardiográfico: na instabilidade, não atrasar a drenagem aguardando exames.' }
+    ]
+  },
+  {
+    id: 'digital', nome: 'Intoxicação digitálica', area: 'Emergência',
+    passos: [
+      { t: 'passo', x: 'Náusea/vômito, distúrbios visuais (xantopsia), confusão; arritmias (bradicardia, BAV, TV bidirecional, extrassístoles). Dosar digoxina, K⁺, Mg²⁺ e função renal.' },
+      { t: 'dose', x: 'Anticorpo antidigoxina (fragmentos Fab) na intoxicação grave: arritmia ameaçadora, hipercalemia > 5 mEq/L ou instabilidade hemodinâmica.' },
+      { t: 'dose', x: 'Bradicardia/BAV → atropina e/ou marcapasso; corrigir hipomagnesemia; arritmias ventriculares → lidocaína ou fenitoína.' },
+      { t: 'alerta', x: 'NÃO administrar cálcio EV na hipercalemia por digital (risco de contratura miocárdica — "coração de pedra"). Cardioversão com cautela (pode deflagrar arritmias).' }
     ]
   }
 ];
@@ -4297,15 +4386,34 @@ window.PROTOCOLOS = [
     }));
   }
 
-  // menu
-  T.forEach(t => {
+  // menu agrupado por grandes áreas
+  const CATS = [
+    { c: 'Doença coronariana', ids: ['dor', 'scc', 'sca'] },
+    { c: 'Insuficiência cardíaca e miocardiopatias', ids: ['ic', 'dilatada', 'cmh', 'amiloidose', 'chagas'] },
+    { c: 'Arritmias, síncope e morte súbita', ids: ['fa', 'arritmias', 'sincope'] },
+    { c: 'Valvopatias e pericárdio', ids: ['valvopatia', 'febrereum', 'pericardite', 'miocardite', 'endocardite'] },
+    { c: 'Aorta, vascular e tromboembolismo', ids: ['aorta', 'dap', 'tep', 'hp'] },
+    { c: 'Prevenção e fatores de risco', ids: ['dislipidemia', 'has', 'prevencao'] },
+    { c: 'Situações especiais', ids: ['congenita', 'onco'] }
+  ];
+  const byId = {}; T.forEach(t => { byId[t.id] = t; });
+  let primeiro = null;
+  function addBtn(t) {
     const b = document.createElement('button');
     b.className = 'evol-item'; b.textContent = t.nome; b.dataset.id = t.id;
     b.addEventListener('click', () => { menu.querySelectorAll('.evol-item').forEach(x => x.classList.toggle('active', x === b)); render(t); });
     menu.appendChild(b);
+    if (!primeiro) primeiro = { b: b, t: t };
+  }
+  const usados = {};
+  CATS.forEach(cat => {
+    const temas = cat.ids.map(id => byId[id]).filter(Boolean);
+    if (!temas.length) return;
+    const gt = document.createElement('div'); gt.className = 'evol-group-title'; gt.textContent = cat.c; menu.appendChild(gt);
+    temas.forEach(t => { usados[t.id] = 1; addBtn(t); });
   });
-  const first = menu.querySelector('.evol-item');
-  if (first) { first.classList.add('active'); render(T[0]); }
+  T.filter(t => !usados[t.id]).forEach(addBtn);
+  if (primeiro) { primeiro.b.classList.add('active'); render(primeiro.t); }
 })();
 
 // Aba "Atualizações": changelog de diretrizes (o que mudou e quando).
