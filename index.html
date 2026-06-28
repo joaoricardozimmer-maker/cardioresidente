@@ -3980,11 +3980,11 @@ window.PROTOCOLOS = [
   // ---------- integração com o hub Paciente: pré-preenchimento ----------
   // mapeia window.PACIENTE -> valores dos campos de cada score
   const FILLMAP = {
-    chadsvasc: P => ({ idade: P.idade, icc: P.ic, has: P.has, dm: P.dm, avc: P.avc, vasc: P.vascular }),
+    chadsvasc: P => ({ idade: P.idade, icc: P.ic, has: P.has, dm: P.dm, avc: P.avc, vasc: !!(P.vascular || P.iam) }),
     hasbled:   P => ({ has: P.has, renal: (P.cr != null && P.cr > 2.26), avc: P.avc, idoso: (P.idade != null && P.idade > 65), drogas: !!(P.m_aas || P.m_p2y12) }),
     ckdepi:    P => ({ cr: P.cr, idade: P.idade, sexo: P.sexo === 'F' ? 'F' : 'M' }),
     cockcroft: P => ({ idade: P.idade, cr: P.cr, sexo: P.sexo === 'F' ? 'F' : 'M' }),
-    rcri:      P => ({ dac: P.dcv, icc: P.ic, avc: P.avc, dm: P.dm, cr: (P.cr != null && P.cr > 2.0) })
+    rcri:      P => ({ dac: !!(P.dcv || P.iam || P.sca_rec), icc: P.ic, avc: P.avc, dm: P.dm, cr: (P.cr != null && P.cr > 2.0) })
   };
   window.cardioScoreFill = function (scoreId) {
     const P = window.PACIENTE || {};
@@ -4787,13 +4787,56 @@ window.PROTOCOLOS = [
       beneficio: (p, c) => { const base = AVC_ANO[Math.min(c.cv, 9)]; const com = base * 0.36; return { base, com, arr: base - com, nnt: Math.max(1, Math.round(100 / (base - com))), horiz: 'por ano', txt: 'Risco de AVC por CHA₂DS₂-VA = ' + c.cv + '; anticoagulação reduz ~64%. <b>Preferir DOAC.</b> Pesar HAS-BLED.' }; },
       estudo: { nome: 'Hart et al. (Ann Intern Med 2007)', q: 'antithrombotic therapy prevent stroke atrial fibrillation Hart meta-analysis' }, score: 'chadsvasc', doses: 'apixabana' },
 
+    // ---------------- Coronariopatia / pós-IAM ----------------
+    { id: 'dapt', nome: 'Dupla antiagregação (AAS + inibidor de P2Y12)', grupo: 'Coronariopatia / pós-IAM',
+      aplica: (p) => p.sca_rec,
+      emUso: p => p.m_aas && p.m_p2y12,
+      contra: () => null,
+      beneficio: () => ({ txt: 'Pós-SCA/ICP: AAS + inibidor de P2Y12 por ~12 meses (<b>preferir ticagrelor ou prasugrel</b> ao clopidogrel na SCA). Ajustar a duração pelo equilíbrio isquêmico × hemorrágico (DAPT score / PRECISE-DAPT).' }),
+      estudo: { nome: 'PLATO (NEJM 2009) / PEGASUS-TIMI 54', q: 'PLATO ticagrelor acute coronary syndrome 2009' }, score: 'dapt' },
+
+    { id: 'bbpos', nome: 'Betabloqueador pós-IAM', grupo: 'Coronariopatia / pós-IAM',
+      aplica: (p, c) => (p.iam || p.sca_rec) && !c.icfer,
+      emUso: p => p.m_bb,
+      contra: (p, c) => (c.fc != null && c.fc < 50) ? 'FC < 50 bpm' : (p.asma ? 'asma/DPOC grave (cautela)' : null),
+      beneficio: () => ({ txt: 'Benefício de mortalidade <b>claro quando há disfunção de VE/IC</b>. Na <b>FEVE preservada</b>, dados recentes (REDUCE-AMI 2024) questionam o uso rotineiro de longo prazo — individualizar (ex.: manter por ~1 ano, angina ou arritmia).' }),
+      estudo: { nome: 'CAPRICORN (2001) / REDUCE-AMI (NEJM 2024)', q: 'REDUCE-AMI beta-blocker myocardial infarction preserved ejection fraction 2024' }, doses: 'metoprolol' },
+
+    { id: 'iecapos', nome: 'IECA/BRA pós-IAM', grupo: 'Coronariopatia / pós-IAM',
+      aplica: (p, c) => (p.iam || p.sca_rec) && !c.icfer,
+      emUso: p => p.m_ieca || p.m_arni,
+      contra: (p, c) => p.gravidez ? 'contraindicado na gravidez' : (c.k != null && c.k > 5.5 ? 'K⁺ > 5,5 mEq/L' : null),
+      beneficio: () => ({ txt: 'Maior benefício no IAM <b>anterior</b>, com disfunção de VE, IC, diabetes ou hipertensão. Em IAM não complicado de baixo risco, o benefício é menor.' }),
+      estudo: { nome: 'SAVE (NEJM 1992) / HOPE', q: 'SAVE captopril myocardial infarction left ventricular dysfunction 1992' }, doses: 'enalapril' },
+
+    { id: 'colchicina', nome: 'Colchicina 0,5 mg/dia', grupo: 'Coronariopatia / pós-IAM',
+      aplica: (p, c) => c.ascvd,
+      emUso: p => p.m_colchicina,
+      contra: (p, c) => (c.tfg != null && c.tfg < 30) ? 'TFG < 30 (cautela/evitar)' : null,
+      beneficio: () => ({ base: 9.6, com: 6.8, arr: 2.8, nnt: 36, horiz: '~2,4 anos', txt: 'Anti-inflamatório na DAC crônica ou pós-IAM — reduz eventos CV. Atenção a interações (claritromicina, estatinas em dose alta) e intolerância gastrointestinal.' }),
+      estudo: { nome: 'LoDoCo2 (NEJM 2020) / COLCOT', q: 'LoDoCo2 colchicine chronic coronary disease 2020' } },
+
+    { id: 'angina', nome: 'Antianginosos (controle de sintomas)', grupo: 'Coronariopatia / pós-IAM',
+      aplica: (p) => p.angina,
+      emUso: p => p.m_nitrato || p.m_bcc,
+      contra: () => null,
+      beneficio: () => ({ txt: '1ª linha <b>betabloqueador e/ou bloqueador de canal de cálcio</b>; nitrato de ação prolongada, ranolazina ou trimetazidina como adicionais. Objetivo é <b>sintoma/qualidade de vida</b> (não reduzem mortalidade).' }),
+      estudo: { nome: 'ESC 2024 — Síndromes coronarianas crônicas', q: 'ESC 2024 chronic coronary syndromes antianginal therapy' }, doses: 'nitrato' },
+
+    { id: 'reab', nome: 'Reabilitação cardíaca', grupo: 'Coronariopatia / pós-IAM',
+      aplica: (p, c) => p.iam || p.sca_rec || c.icfer,
+      emUso: p => p.m_reab,
+      contra: () => null,
+      beneficio: () => ({ txt: 'Programa estruturado baseado em exercício pós-IAM/ICP e na IC: reduz mortalidade CV e re-hospitalização e melhora a capacidade funcional. Indicação Classe I — encaminhar.' }),
+      estudo: { nome: 'Cochrane — reabilitação cardíaca baseada em exercício', q: 'exercise-based cardiac rehabilitation coronary heart disease Cochrane' } },
+
     // ---------------- Lípides / aterosclerose ----------------
     { id: 'estatina', nome: 'Estatina de alta intensidade', grupo: 'Lípides / aterosclerose',
-      aplica: (p) => p.dcv || (p.risco10 != null && p.risco10 >= 7.5),
+      aplica: (p, c) => c.ascvd || (p.risco10 != null && p.risco10 >= 7.5),
       emUso: p => p.m_estatina,
       contra: p => p.gravidez ? 'contraindicada na gravidez' : null,
-      beneficio: (p) => {
-        const base10 = p.dcv ? 30 : p.risco10; const alvo = p.dcv ? 55 : 70;
+      beneficio: (p, c) => {
+        const base10 = c.ascvd ? 30 : p.risco10; const alvo = c.ascvd ? 55 : 70;
         if (!base10 || p.ldl == null) return { txt: 'Reduz eventos ~22% por mmol/L de LDL (CTT). Informe LDL e risco para o NNT.' };
         const dmmol = Math.max(0, (p.ldl - alvo) / 38.7); const rrr = Math.min(0.6, 0.22 * dmmol);
         const com = base10 * (1 - rrr); return { base: base10, com, arr: base10 - com, nnt: Math.max(1, Math.round(100 / (base10 - com))), horiz: 'em 10 anos', txt: 'Meta LDL &lt; ' + alvo + '. RRR ~' + Math.round(rrr * 100) + '% sobre risco basal de ' + base10 + '% (10 anos).' };
@@ -4801,21 +4844,21 @@ window.PROTOCOLOS = [
       estudo: { nome: 'CTT Collaboration (Lancet 2010)', q: 'Cholesterol Treatment Trialists more intensive lowering LDL 2010' }, evid: 'estatina', doses: 'atorvastatina' },
 
     { id: 'ezet', nome: 'Ezetimiba (associar à estatina)', grupo: 'Lípides / aterosclerose',
-      aplica: (p) => (p.dcv) && p.m_estatina && p.ldl != null && p.ldl > 55,
+      aplica: (p, c) => c.ascvd && p.m_estatina && p.ldl != null && p.ldl > 55,
       emUso: p => p.m_ezet,
       contra: () => null,
       beneficio: () => ({ base: 34.7, com: 32.7, arr: 2.0, nnt: 50, horiz: '~7 anos', txt: 'Quando a meta de LDL não é atingida com estatina na dose máxima tolerada.' }),
       estudo: { nome: 'IMPROVE-IT (NEJM 2015)', q: 'IMPROVE-IT ezetimibe simvastatin acute coronary syndrome 2015' }, evid: 'ezetimiba', doses: 'ezetimiba' },
 
     { id: 'pcsk9', nome: 'Inibidor de PCSK9', grupo: 'Lípides / aterosclerose',
-      aplica: (p) => p.dcv && p.m_estatina && p.m_ezet && p.ldl != null && p.ldl > 55,
+      aplica: (p, c) => c.ascvd && p.m_estatina && p.m_ezet && p.ldl != null && p.ldl > 55,
       emUso: p => p.m_pcsk9,
       contra: () => null,
       beneficio: () => ({ base: 11.3, com: 9.8, arr: 1.5, nnt: 67, horiz: '~2,2 anos', txt: 'Muito alto risco fora da meta de LDL apesar de estatina + ezetimiba.' }),
       estudo: { nome: 'FOURIER (NEJM 2017)', q: 'FOURIER evolocumab cardiovascular outcomes 2017' }, evid: 'PCSK9' },
 
     { id: 'aas', nome: 'Antiagregante (AAS)', grupo: 'Prevenção secundária',
-      aplica: (p) => p.dcv,
+      aplica: (p, c) => c.ascvd && !p.sca_rec,
       emUso: p => p.m_aas || p.m_p2y12,
       contra: () => null,
       beneficio: () => ({ txt: 'Prevenção secundária: reduz ~19–22% os eventos vasculares graves. AAS 75–100 mg/dia indefinidamente.' }),
@@ -4823,14 +4866,14 @@ window.PROTOCOLOS = [
 
     // ---------------- Diabetes e doença renal ----------------
     { id: 'sglt2dm', nome: 'iSGLT2 (proteção CV/renal)', grupo: 'Diabetes e doença renal',
-      aplica: (p, c) => p.dm && !c.icfer && !c.icfep && (p.dcv || c.drc),
+      aplica: (p, c) => p.dm && !c.icfer && !c.icfep && (c.ascvd || c.drc),
       emUso: p => p.m_isglt2,
       contra: (p, c) => (c.tfg != null && c.tfg < 20) ? 'TFG < 20 (não iniciar)' : (p.gravidez ? 'gravidez' : null),
       beneficio: () => ({ base: 14.5, com: 9.2, arr: 5.3, nnt: 19, horiz: '~2,4 anos', txt: 'DM2 com DCV ou DRC: reduz progressão renal e desfechos CV (desfecho renal composto).' }),
       estudo: { nome: 'DAPA-CKD (NEJM 2020)', q: 'DAPA-CKD dapagliflozin chronic kidney disease 2020' }, doses: 'dapagliflozina' },
 
     { id: 'glp1', nome: 'Agonista de GLP-1', grupo: 'Diabetes e doença renal',
-      aplica: (p, c) => p.dm && p.dcv && !c.icfer,
+      aplica: (p, c) => p.dm && c.ascvd && !c.icfer,
       emUso: p => p.m_glp1,
       contra: () => null,
       beneficio: () => ({ base: 14.9, com: 13.0, arr: 1.9, nnt: 53, horiz: '~3,8 anos', txt: 'DM2 com DCV estabelecida: reduz eventos cardiovasculares (benefício CV comprovado).' }),
@@ -4859,17 +4902,17 @@ window.PROTOCOLOS = [
     </div>
     <div class="pac-sec">Comorbidades</div>
     <div class="pac-checks">
-      ${[['has', 'Hipertensão'], ['dm', 'Diabetes'], ['dislip', 'Dislipidemia'], ['tabag', 'Tabagismo'], ['dcv', 'DCV aterosclerótica estabelecida'], ['fa', 'Fibrilação atrial'], ['ic', 'Insuficiência cardíaca'], ['avc', 'AVC/AIT prévio'], ['vascular', 'Doença vascular (IAM/DAP)'], ['asma', 'Asma/DPOC grave'], ['gravidez', 'Gestante']]
+      ${[['has', 'Hipertensão'], ['dm', 'Diabetes'], ['dislip', 'Dislipidemia'], ['tabag', 'Tabagismo'], ['dcv', 'DCV aterosclerótica estabelecida'], ['iam', 'IAM prévio'], ['sca_rec', 'SCA/ICP recente (≤12 meses)'], ['angina', 'Angina estável'], ['fa', 'Fibrilação atrial'], ['ic', 'Insuficiência cardíaca'], ['avc', 'AVC/AIT prévio'], ['vascular', 'Doença vascular periférica/carótida'], ['asma', 'Asma/DPOC grave'], ['gravidez', 'Gestante']]
       .map(c => `<label class="sc-check"><input type="checkbox" id="pac-${c[0]}"><span>${c[1]}</span></label>`).join('')}
     </div>
     <div class="pac-sec">Medicações / terapias em uso</div>
     <div class="pac-checks">
-      ${[['m_ieca', 'IECA/BRA'], ['m_arni', 'ARNI (sacubitril/valsartana)'], ['m_bb', 'Betabloqueador'], ['m_mra', 'Espironolactona/eplerenona'], ['m_isglt2', 'iSGLT2'], ['m_diur', 'Diurético de alça'], ['m_ivab', 'Ivabradina'], ['m_vericiguat', 'Vericiguate'], ['m_hidnit', 'Hidralazina + nitrato'], ['m_ferro', 'Ferro EV'], ['m_cdi', 'CDI'], ['m_trc', 'TRC (ressincronizador)'], ['m_estatina', 'Estatina'], ['m_ezet', 'Ezetimiba'], ['m_pcsk9', 'Inibidor de PCSK9'], ['m_aas', 'AAS'], ['m_p2y12', 'Clopidogrel/ticagrelor/prasugrel'], ['m_aco', 'Anticoagulante'], ['m_glp1', 'Agonista de GLP-1']]
+      ${[['m_ieca', 'IECA/BRA'], ['m_arni', 'ARNI (sacubitril/valsartana)'], ['m_bb', 'Betabloqueador'], ['m_mra', 'Espironolactona/eplerenona'], ['m_isglt2', 'iSGLT2'], ['m_diur', 'Diurético de alça'], ['m_ivab', 'Ivabradina'], ['m_vericiguat', 'Vericiguate'], ['m_hidnit', 'Hidralazina + nitrato'], ['m_ferro', 'Ferro EV'], ['m_cdi', 'CDI'], ['m_trc', 'TRC (ressincronizador)'], ['m_estatina', 'Estatina'], ['m_ezet', 'Ezetimiba'], ['m_pcsk9', 'Inibidor de PCSK9'], ['m_aas', 'AAS'], ['m_p2y12', 'Clopidogrel/ticagrelor/prasugrel'], ['m_colchicina', 'Colchicina'], ['m_nitrato', 'Nitrato'], ['m_bcc', 'Bloq. canal de cálcio'], ['m_reab', 'Em reabilitação cardíaca'], ['m_aco', 'Anticoagulante'], ['m_glp1', 'Agonista de GLP-1']]
       .map(c => `<label class="sc-check"><input type="checkbox" id="pac-${c[0]}"><span>${c[1]}</span></label>`).join('')}
     </div>`;
 
-  const MED_KEYS = ['m_ieca', 'm_arni', 'm_bb', 'm_mra', 'm_isglt2', 'm_diur', 'm_ivab', 'm_vericiguat', 'm_hidnit', 'm_ferro', 'm_cdi', 'm_trc', 'm_estatina', 'm_ezet', 'm_pcsk9', 'm_aas', 'm_p2y12', 'm_aco', 'm_glp1'];
-  const COMORB_KEYS = ['has', 'dm', 'dislip', 'tabag', 'dcv', 'fa', 'ic', 'avc', 'vascular', 'asma', 'gravidez'];
+  const MED_KEYS = ['m_ieca', 'm_arni', 'm_bb', 'm_mra', 'm_isglt2', 'm_diur', 'm_ivab', 'm_vericiguat', 'm_hidnit', 'm_ferro', 'm_cdi', 'm_trc', 'm_estatina', 'm_ezet', 'm_pcsk9', 'm_aas', 'm_p2y12', 'm_colchicina', 'm_nitrato', 'm_bcc', 'm_reab', 'm_aco', 'm_glp1'];
+  const COMORB_KEYS = ['has', 'dm', 'dislip', 'tabag', 'dcv', 'iam', 'sca_rec', 'angina', 'fa', 'ic', 'avc', 'vascular', 'asma', 'gravidez'];
 
   function read() {
     P.idade = n(document.getElementById('pac-idade').value);
@@ -4888,11 +4931,12 @@ window.PROTOCOLOS = [
     const tfg = ckdepi(P.cr, P.idade, fem);
     let cv = 0; const id = P.idade || 0;
     if (id >= 75) cv += 2; else if (id >= 65) cv += 1;
-    if (P.ic) cv += 1; if (P.has) cv += 1; if (P.dm) cv += 1; if (P.avc) cv += 2; if (P.vascular) cv += 1;
+    if (P.ic) cv += 1; if (P.has) cv += 1; if (P.dm) cv += 1; if (P.avc) cv += 2; if (P.vascular || P.iam) cv += 1;
     const icfer = P.ic && P.feve != null && P.feve <= 40;
     const icfep = P.ic && P.feve != null && P.feve > 40;
     const drc = tfg != null && tfg < 60;
-    return { tfg, k: P.k, fc: P.fc, cv, icfer, icfep, drc };
+    const ascvd = !!(P.dcv || P.iam || P.vascular || P.sca_rec);
+    return { tfg, k: P.k, fc: P.fc, cv, icfer, icfep, drc, ascvd };
   }
 
   function nums(b) {
