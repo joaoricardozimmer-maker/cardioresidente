@@ -456,6 +456,9 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .tema-link:hover { border-color: var(--accent); color: var(--accent); }
 .tl-score:hover { border-color: var(--blue); color: var(--blue); }
 .tema-fisio { background: var(--bg-soft); border-left: 3px solid var(--blue); padding: 10px 14px; border-radius: 0 8px 8px 0; }
+.tema-crit { background: var(--bg-soft); border-left: 3px solid var(--green); padding: 4px 14px; border-radius: 0 8px 8px 0; font-size: 13.5px; }
+.tema-crit ul { margin: 8px 0; padding-left: 18px; }
+.tema-crit li { margin-bottom: 6px; line-height: 1.5; }
 
 /* ===== Polimento mobile ===== */
 @media (max-width: 860px) {
@@ -1008,6 +1011,32 @@ window.TEMAS = [
   }
 ];
 
+// Critérios diagnósticos e cortes numéricos por tema (alto rendimento para prova e prática)
+window.TEMAS_CRIT = {
+  fa: '<ul><li><b>CHA₂DS₂-VA:</b> IC/disfunção VE 1 · HTA 1 · idade ≥75 <b>2</b> · DM 1 · AVC/AIT/tromboembolismo <b>2</b> · doença vascular 1 · idade 65–74 1. ACO se ≥2.</li><li><b>HAS-BLED ≥3:</b> alto risco de sangramento (corrigir fatores, não contraindica).</li><li><b>Controle de FC:</b> alvo inicial &lt; 110 bpm.</li><li><b>FA "valvar"</b> (DOAC contraindicado): prótese mecânica ou estenose mitral reumática moderada/grave.</li></ul>',
+  ic: '<ul><li><b>FEVE:</b> ICFEr ≤ 40% · levemente reduzida 41–49% · preservada ≥ 50%.</li><li><b>Natriuréticos (afastam IC):</b> ambulatorial NT-proBNP &lt; 125 / BNP &lt; 35; agudo NT-proBNP &lt; 300 / BNP &lt; 100 pg/mL.</li><li><b>CDI:</b> FEVE ≤ 35%, NYHA II–III, terapia otimizada. <b>TRC:</b> BRE, QRS ≥ 150 ms.</li><li><b>HFA-PEFF/H₂FPEF</b> para ICFEp.</li></ul>',
+  sca: '<ul><li><b>STEMI:</b> supra de ST ≥ 1 mm em 2 derivações contíguas (≥ 2 mm em V2–V3 ♂, ≥ 1,5 mm ♀) ou BRE novo.</li><li><b>Tempos:</b> ICP primária ≤ 120 min do diagnóstico; se indisponível, fibrinólise ≤ 10 min.</li><li><b>GRACE &gt; 140</b> → invasiva &lt; 24 h. Troponina hs com algoritmo 0/1 h.</li></ul>',
+  scc: '<ul><li><b>Likelihood (RF-CL):</b> ≤5% muito baixa · 5–15 baixa · 15–50 moderada · 50–85 alta · &gt;85 muito alta.</li><li><b>Significância funcional:</b> FFR ≤ 0,80 · iFR ≤ 0,89 · QFR ≤ 0,80.</li><li><b>SYNTAX:</b> ≤ 22 favorece ICP · ≥ 33 favorece CRM.</li></ul>',
+  dislipidemia: '<ul><li><b>Metas de LDL (ESC):</b> muito alto &lt; 55 (e ↓ ≥ 50%) · alto &lt; 70 · moderado &lt; 100 · baixo &lt; 116 mg/dL. SBC muito alto &lt; 50.</li><li><b>Não-HDL</b> = colesterol total − HDL (meta = LDL + 30).</li><li><b>Lp(a):</b> risco a partir de ~50 mg/dL (≈ 125 nmol/L).</li></ul>',
+  has: '<ul><li><b>ESC:</b> ótima &lt; 120/80 · normal-alta 130–139/85–89 · HAS ≥ 140/90 mmHg.</li><li><b>AHA/ACC 2025:</b> elevada 120–129/&lt;80 · estágio 1 130–139/80–89 · estágio 2 ≥ 140/90.</li><li><b>MAPA:</b> 24 h ≥ 130/80 · vigília ≥ 135/85 · sono ≥ 120/70. <b>Meta &lt; 130/80.</b></li></ul>',
+  valvopatia: '<ul><li><b>EAo grave:</b> Vmáx ≥ 4 m/s · gradiente médio ≥ 40 mmHg · AVA &lt; 1,0 cm² (&lt; 0,6 cm²/m²).</li><li><b>IM primária grave:</b> ERO ≥ 0,40 cm² · volume regurgitante ≥ 60 mL.</li><li><b>EM grave:</b> AVM ≤ 1,5 cm² (muito grave ≤ 1,0).</li></ul>',
+  tep: '<ul><li><b>Wells &gt; 4</b> → TEP provável (angio-TC). D-dímero com corte ajustado pela idade (idade × 10 ng/mL se &gt; 50 anos).</li><li><b>Alto risco:</b> PAS &lt; 90 mmHg ou queda ≥ 40 por &gt; 15 min.</li><li><b>Intermediário-alto:</b> disfunção de VD (eco/TC) + troponina elevada. <b>sPESI ≥ 1</b> = não baixo.</li></ul>',
+  cmh: '<ul><li><b>Hipertrofia:</b> parede ≥ 15 mm (ou ≥ 13 mm com história familiar).</li><li><b>Obstrução de VSVE:</b> gradiente ≥ 30 mmHg (≥ 50 mmHg = alvo terapêutico), em repouso ou provocado.</li><li><b>Risco de MS:</b> HCM Risk-SCD ≥ 6% em 5 anos → considerar CDI; parede ≥ 30 mm é critério maior.</li></ul>',
+  amiloidose: '<ul><li><b>Cintilografia óssea (PYP/DPD/HMDP):</b> captação Perugini grau 2–3 + ausência de componente monoclonal = ATTR sem biópsia.</li><li><b>Pistas:</b> baixa voltagem no ECG com HVE ao eco, "apical sparing" no strain, túnel do carpo bilateral.</li><li>Sempre excluir <b>AL</b>: eletroforese + imunofixação sérica/urinária + cadeias leves livres.</li></ul>',
+  pericardite: '<ul><li><b>Diagnóstico (≥ 2):</b> dor pleurítica típica · atrito · supra de ST difuso com infra de PR · derrame novo/piora.</li><li>PCR/VHS elevadas apoiam; RM com realce pericárdico.</li><li><b>Tamponamento:</b> pulso paradoxal &gt; 10 mmHg, colapso de câmaras direitas ao eco.</li></ul>',
+  miocardite: '<ul><li><b>RM — critérios de Lake Louise (2018):</b> 1 critério T2 (edema) + 1 critério T1 (realce tardio/T1 mapping) = alta probabilidade.</li><li>Troponina elevada, coronárias normais; biópsia endomiocárdica nos casos graves/refratários.</li></ul>',
+  endocardite: '<ul><li><b>Critérios de Duke modificados/2023:</b> 2 maiores · ou 1 maior + 3 menores · ou 5 menores.</li><li><b>Maiores:</b> hemoculturas típicas persistentes + evidência de envolvimento endocárdico (eco/PET/TC).</li><li>Vegetação &gt; 10 mm → maior risco embólico.</li></ul>',
+  arritmias: '<ul><li><b>QTc prolongado:</b> &gt; 450 ms (♂) / &gt; 460 ms (♀); &gt; 500 ms = risco de Torsades.</li><li><b>TV:</b> ≥ 3 batimentos, ≥ 100 bpm (sustentada &gt; 30 s ou com instabilidade).</li><li><b>Bradi/bloqueio:</b> BAV 2º grau Mobitz II, BAV avançado/total ou pausas sintomáticas → marcapasso.</li></ul>',
+  sincope: '<ul><li><b>Sinais de alarme:</b> síncope ao esforço ou supino, palpitação prévia, cardiopatia estrutural, ECG anormal, história familiar de morte súbita.</li><li><b>Hipotensão ortostática:</b> queda ≥ 20 mmHg sistólica ou ≥ 10 diastólica em 3 min de ortostase.</li></ul>',
+  hp: '<ul><li><b>Diagnóstico (cateterismo direito):</b> PAP média &gt; 20 mmHg.</li><li><b>Pré-capilar:</b> PAOP ≤ 15 mmHg + RVP &gt; 2 unidades Wood.</li><li>Estratificação de risco da HAP em estratos (NYHA, TC6min, BNP/NT-proBNP, hemodinâmica).</li></ul>',
+  aorta: '<ul><li><b>Cirurgia (aorta ascendente):</b> ≥ 55 mm; ≥ 50 mm em Marfan/valva bicúspide com fatores de risco; ≥ 45 mm em Marfan de muito alto risco.</li><li><b>Dissecção tipo A</b> (ascendente) → cirurgia de emergência; <b>tipo B</b> não complicada → clínico.</li></ul>',
+  dap: '<ul><li><b>ITB:</b> &lt; 0,90 = DAP · ≤ 0,40 = isquemia crítica · &gt; 1,40 = incompressível (calcificação).</li><li><b>Carótida:</b> estenose 70–99% sintomática → revascularizar; assintomática individualizar.</li></ul>',
+  chagas: '<ul><li><b>Escore de Rassi</b> (mortalidade): NYHA III/IV, cardiomegalia ao RX, alteração segmentar/global ao eco, TVNS no Holter, baixa voltagem no ECG, sexo masculino.</li><li><b>ECG típico:</b> BRD + hemibloqueio anterior esquerdo; <b>aneurisma apical</b> ao eco.</li></ul>',
+  congenita: '<ul><li><b>CIA com repercussão:</b> Qp/Qs &gt; 1,5 ou sobrecarga de VD.</li><li><b>Coarctação:</b> gradiente ≥ 20 mmHg (ou HAS/colaterais) → intervir.</li><li><b>Eisenmenger:</b> RVP elevada com inversão do shunt — contraindica fechamento.</li></ul>',
+  onco: '<ul><li><b>Disfunção cardíaca relacionada ao câncer (CTRCD):</b> queda da FEVE ≥ 10 pontos para &lt; 50%.</li><li><b>Strain (GLS):</b> queda relativa &gt; 15% sugere toxicidade subclínica.</li><li>Troponina/natriuréticos seriados apoiam a detecção precoce.</li></ul>',
+  prevencao: '<ul><li><b>SCORE2 (&lt; 50 anos):</b> baixo-moderado &lt; 2,5% · alto 2,5–7,5% · muito alto ≥ 7,5% (10 anos).</li><li><b>50–69 anos:</b> &lt; 5 · 5–10 · ≥ 10%. <b>≥ 70 (SCORE2-OP):</b> &lt; 7,5 · 7,5–15 · ≥ 15%.</li><li>Meta de PA &lt; 130/80; metas de LDL conforme o risco.</li></ul>'
+};
+
 // Base de recomendações por sociedade (ESC, AHA/ACC, SBC).
 // Cada conduta traz Classe (I | IIa | IIb | III) e Nível (A | B | C | '' = —) da diretriz
 // mais recente de cada sociedade, com link para o PDF/portal da diretriz (campo doc).
@@ -1019,7 +1048,7 @@ window.REC_LINKS = {
   sca:   { 'ESC': 'https://academic.oup.com/eurheartj/article-pdf/44/38/3720/56728087/ehad191.pdf', 'AHA/ACC': 'https://www.ahajournals.org/doi/pdf/10.1161/CIR.0000000000001309', 'SBC': 'https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-122-09-e20250620/0066-782X-abc-122-09-e20250620.x74770.pdf' },
   scc:   { 'ESC': 'https://academic.oup.com/eurheartj/article-pdf/45/36/3415/59561235/ehae177.pdf', 'AHA/ACC': 'https://www.ahajournals.org/doi/pdf/10.1161/CIR.0000000000001168', 'SBC': 'https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-122-09-e20250619/0066-782X-abc-122-09-e20250619.x74770.pdf' },
   fa:    { 'ESC': 'https://academic.oup.com/eurheartj/article-pdf/45/36/3314/59561045/ehae176.pdf', 'AHA/ACC': 'https://www.ahajournals.org/doi/pdf/10.1161/CIR.0000000000001193', 'SBC': 'https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-122-09-e20250618/0066-782X-abc-122-09-e20250618.x74770.pdf' },
-  valva: { 'ESC': 'https://academic.oup.com/eurheartj/article-pdf/43/7/561/44362577/ehab395.pdf', 'AHA/ACC': 'https://www.ahajournals.org/doi/pdf/10.1161/CIR.0000000000000923', 'SBC': 'https://www.portal.cardiol.br/diretrizes' },
+  valva: { 'ESC': 'https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/valvular-heart-disease-management-of/', 'AHA/ACC': 'https://www.ahajournals.org/doi/pdf/10.1161/CIR.0000000000000923', 'SBC': 'https://www.portal.cardiol.br/diretrizes' },
   lipid: { 'ESC': 'https://academic.oup.com/eurheartj/article-pdf/41/1/111/66477601/eurheartj_41_1_111.pdf', 'AHA/ACC': 'https://www.ahajournals.org/doi/pdf/10.1161/CIR.0000000000000625', 'SBC': 'https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-122-09-e20250640/0066-782X-abc-122-09-e20250640.x74770.pdf' },
   has:   { 'ESC': 'https://academic.oup.com/eurheartj/article-pdf/45/38/3912/59633218/ehae178.pdf', 'AHA/ACC': 'https://www.acc.org/guidelines', 'SBC': 'https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-122-09-e20250624/0066-782X-abc-122-09-e20250624.x74770.pdf' },
   tep:   { 'ESC': 'https://academic.oup.com/eurheartj/article-pdf/41/4/543/34306708/ehz405.pdf', 'AHA/ACC': 'https://www.acc.org/guidelines', 'SBC': 'https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-118-04-0797/0066-782X-abc-118-04-0797.x27815.pdf' },
@@ -1180,27 +1209,27 @@ window.RECOMENDACOES = [
   { area: 'Valvopatia', doc: 'valva', titulo: 'Intervenção na estenose aórtica grave sintomática',
     kw: ['estenose aortica', 'eao', 'troca valvar aortica', 'tavi', 'savr', 'valvopatia aortica'],
     resumo: 'Estenose aórtica grave sintomática tem indicação de intervenção (TAVI ou cirurgia), definida pelo Heart Team.',
-    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EACTS Valva 2021' }, { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC Valva 2020' }] },
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EACTS Valva 2025' }, { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC Valva 2020' }] },
   { area: 'Valvopatia', doc: 'valva', titulo: 'TAVI na estenose aórtica grave (≥75 anos ou alto risco cirúrgico)',
     kw: ['tavi', 'tavr', 'implante transcateter', 'estenose aortica', 'idoso', 'alto risco cirurgico'],
     resumo: 'TAVI recomendada em ≥75 anos, ou alto risco/inoperáveis; SAVR preferida em <75 anos e baixo risco. Heart Team.',
-    recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC/EACTS Valva 2021' }, { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC Valva 2020' }] },
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC/EACTS Valva 2025' }, { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC Valva 2020' }] },
   { area: 'Valvopatia', doc: 'valva', titulo: 'Cirurgia na insuficiência mitral primária grave sintomática',
     kw: ['insuficiencia mitral', 'im primaria', 'regurgitacao mitral', 'plastia mitral', 'cirurgia mitral'],
     resumo: 'IM primária (degenerativa) grave sintomática: cirurgia (preferir plastia); também em assintomáticos com disfunção de VE.',
-    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EACTS Valva 2021' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC Valva 2020' }] },
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EACTS Valva 2025' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC Valva 2020' }] },
   { area: 'Valvopatia', doc: 'valva', titulo: 'Cirurgia na insuficiência aórtica grave sintomática',
     kw: ['insuficiencia aortica', 'iao', 'regurgitacao aortica', 'troca valvar aortica', 'cirurgia aortica'],
     resumo: 'IAo crônica grave sintomática, ou assintomática com FEVE ≤50% ou VE muito dilatado: cirurgia.',
-    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EACTS Valva 2021' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC Valva 2020' }] },
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EACTS Valva 2025' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC Valva 2020' }] },
   { area: 'Valvopatia', doc: 'valva', titulo: 'TEER mitral (insuficiência mitral secundária)',
     kw: ['teer', 'mitraclip', 'reparo borda a borda', 'insuficiencia mitral secundaria', 'im funcional'],
     resumo: 'IM secundária grave sintomática apesar de terapia otimizada, anatomia favorável e não candidato à cirurgia.',
-    recs: [{ soc: 'ESC', cls: 'IIa', niv: 'B', fonte: 'ESC/EACTS Valva 2021' }, { soc: 'AHA/ACC', cls: 'IIa', niv: 'B', fonte: 'AHA/ACC Valva 2020' }] },
+    recs: [{ soc: 'ESC', cls: 'IIa', niv: 'B', fonte: 'ESC/EACTS Valva 2025' }, { soc: 'AHA/ACC', cls: 'IIa', niv: 'B', fonte: 'AHA/ACC Valva 2020' }] },
   { area: 'Valvopatia', doc: 'valva', titulo: 'Anticoagulação com varfarina em prótese valvar mecânica',
     kw: ['protese mecanica', 'valva mecanica', 'varfarina', 'anticoagulacao protese', 'inr'],
     resumo: 'Prótese mecânica exige varfarina (alvo de INR conforme posição/fatores de risco). Os DOACs são contraindicados.',
-    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EACTS Valva 2021' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC Valva 2020' }] },
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EACTS Valva 2025' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC Valva 2020' }] },
   { area: 'Valvopatia', doc: 'valva', titulo: 'DOAC em prótese mecânica ou estenose mitral reumática (NÃO usar)',
     kw: ['doac em protese', 'doac contraindicado', 'protese mecanica', 'estenose mitral reumatica', 'anticoagulante'],
     resumo: 'Os DOACs são contraindicados em prótese valvar mecânica e na estenose mitral reumática moderada/grave — usar varfarina.',
@@ -1240,11 +1269,11 @@ window.RECOMENDACOES = [
   { area: 'Gravidez e cardiopatia', doc: 'grav', titulo: 'IECA, BRA, ARNI e espironolactona são contraindicados na gravidez',
     kw: ['gravidez', 'gestante', 'contraindicado', 'ieca', 'bra', 'arni', 'espironolactona', 'teratogenico'],
     resumo: 'IECA, BRA, ARNI, antagonistas mineralocorticoides (e estatinas) são contraindicados na gestação — suspender/substituir.',
-    recs: [{ soc: 'ESC', cls: 'III', niv: 'C', fonte: 'ESC Gravidez 2018/2025' }] },
+    recs: [{ soc: 'ESC', cls: 'III', niv: 'C', fonte: 'ESC Gravidez 2025' }] },
   { area: 'Gravidez e cardiopatia', doc: 'grav', titulo: 'Hipertensão na gravidez: metildopa, labetalol ou nifedipino',
     kw: ['hipertensao na gravidez', 'gestante', 'metildopa', 'labetalol', 'nifedipino', 'pre-eclampsia'],
     resumo: 'Tratar hipertensão na gestação com metildopa, labetalol ou nifedipino de liberação prolongada (anti-hipertensivos seguros).',
-    recs: [{ soc: 'ESC', cls: 'I', niv: 'C', fonte: 'ESC Gravidez 2018/2025' }] },
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'C', fonte: 'ESC Gravidez 2025' }] },
   // ===================== DISPOSITIVOS / BRADIARRITMIA =====================
   { area: 'Arritmias e dispositivos', doc: 'disp', titulo: 'Marcapasso no BAV avançado/total sintomático',
     kw: ['marcapasso', 'mp', 'bav', 'bloqueio atrioventricular', 'bavt', 'bradicardia', 'pausa'],
@@ -1254,28 +1283,28 @@ window.RECOMENDACOES = [
   { area: 'Dislipidemia', doc: 'lipid', titulo: 'Estatina de alta intensidade na prevenção secundária',
     kw: ['estatina', 'alta intensidade', 'prevencao secundaria', 'dac', 'dcv estabelecida', 'aterosclerose'],
     resumo: 'Doença cardiovascular aterosclerótica estabelecida: estatina de alta intensidade na maior dose tolerada.',
-    recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC/EAS Dislipidemia 2019' }, { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC Colesterol 2018' }, { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC Dislipidemia' }] },
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC/EAS Dislipidemia 2025' }, { soc: 'AHA/ACC', cls: 'I', niv: 'A', fonte: 'AHA/ACC Colesterol 2018' }, { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC Dislipidemia' }] },
   { area: 'Dislipidemia', doc: 'lipid', titulo: 'Meta de LDL-C <55 mg/dL (muito alto risco)',
     kw: ['ldl', 'meta de ldl', 'colesterol', 'muito alto risco', 'alvo lipidico', 'ldl 55', 'ldl 50'],
     resumo: 'Muito alto risco: LDL-C <55 mg/dL e redução ≥50% (ESC). SBC adota <50 mg/dL. AHA usa redução ≥50% e limiar de LDL ≥70 para intensificar.',
-    recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC/EAS Dislipidemia 2019' }, { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC Dislipidemia (alvo <50)' }] },
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC/EAS Dislipidemia 2025' }, { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC Dislipidemia (alvo <50)' }] },
   { area: 'Dislipidemia', doc: 'lipid', titulo: 'Ezetimiba se não atingir a meta com estatina',
     kw: ['ezetimiba', 'ezetimibe', 'meta de ldl', 'combinacao', 'colesterol'],
     resumo: 'Adicionar ezetimiba quando a meta de LDL não é alcançada com a dose máxima tolerada de estatina.',
-    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EAS Dislipidemia 2019' }, { soc: 'AHA/ACC', cls: 'IIa', niv: 'B', fonte: 'AHA/ACC Colesterol 2018' }, { soc: 'SBC', cls: 'I', niv: 'B', fonte: 'SBC Dislipidemia' }] },
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EAS Dislipidemia 2025' }, { soc: 'AHA/ACC', cls: 'IIa', niv: 'B', fonte: 'AHA/ACC Colesterol 2018' }, { soc: 'SBC', cls: 'I', niv: 'B', fonte: 'SBC Dislipidemia' }] },
   { area: 'Dislipidemia', doc: 'lipid', titulo: 'Inibidor de PCSK9 se meta não atingida com estatina + ezetimiba',
     kw: ['pcsk9', 'evolocumabe', 'alirocumabe', 'inclisirana', 'muito alto risco', 'ldl refratario'],
     resumo: 'Muito alto risco que não atinge a meta com estatina máxima + ezetimiba: associar inibidor de PCSK9.',
-    recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC/EAS Dislipidemia 2019' }, { soc: 'AHA/ACC', cls: 'IIa', niv: 'A', fonte: 'AHA/ACC Colesterol 2018' }] },
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC/EAS Dislipidemia 2025' }, { soc: 'AHA/ACC', cls: 'IIa', niv: 'A', fonte: 'AHA/ACC Colesterol 2018' }] },
   { area: 'Dislipidemia', doc: 'lipid', titulo: 'Icosapenta de etila (ômega-3) em triglicérides altos + alto risco',
     kw: ['icosapenta', 'icosapent', 'omega 3', 'triglicerides', 'reduce-it', 'alto risco'],
     resumo: 'Alto risco com TG 135–499 mg/dL apesar de estatina: icosapenta de etila reduz eventos CV (REDUCE-IT).',
-    recs: [{ soc: 'ESC', cls: 'IIa', niv: 'B', fonte: 'ESC/EAS Dislipidemia 2019' }, { soc: 'AHA/ACC', cls: 'IIa', niv: 'B', fonte: 'ACC ECDP 2021' }] },
+    recs: [{ soc: 'ESC', cls: 'IIa', niv: 'B', fonte: 'ESC/EAS Dislipidemia 2025' }, { soc: 'AHA/ACC', cls: 'IIa', niv: 'B', fonte: 'ACC ECDP 2021' }] },
   // ===================== HIPERTENSÃO =====================
   { area: 'Hipertensão arterial', doc: 'has', titulo: 'Meta de pressão arterial <130/80 mmHg',
     kw: ['meta pressorica', 'pressao arterial', 'has', 'hipertensao', 'alvo de pa', '130/80', 'controle pressorico'],
     resumo: 'Alvo <130/80 mmHg na maioria, se tolerado (ESC 2024 mira PAS 120–129 mmHg). Individualizar em idosos frágeis.',
-    recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC HAS 2024' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC HAS 2017' }, { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC HAS 2020' }] },
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC HAS 2024' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC HAS 2025' }, { soc: 'SBC', cls: 'I', niv: 'A', fonte: 'SBC HAS 2020' }] },
   { area: 'Hipertensão arterial', doc: 'has', titulo: 'Início do tratamento com combinação dupla',
     kw: ['combinacao dupla', 'terapia combinada', 'has', 'ieca bcc', 'bra diuretico', 'inicio tratamento'],
     resumo: 'Iniciar com combinação (IECA ou BRA + BCC ou diurético tiazídico), de preferência em comprimido único.',
@@ -1283,7 +1312,7 @@ window.RECOMENDACOES = [
   { area: 'Hipertensão arterial', doc: 'has', titulo: 'Espironolactona na hipertensão resistente',
     kw: ['hipertensao resistente', 'espironolactona', 'quarto farmaco', 'has resistente'],
     resumo: 'Hipertensão resistente apesar de 3 fármacos (incluindo diurético): adicionar espironolactona como 4ª droga.',
-    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC HAS 2024' }, { soc: 'AHA/ACC', cls: 'IIa', niv: 'B', fonte: 'AHA/ACC HAS 2017' }] },
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC HAS 2024' }, { soc: 'AHA/ACC', cls: 'IIa', niv: 'B', fonte: 'AHA/ACC HAS 2025' }] },
   // ===================== PREVENÇÃO =====================
   { area: 'Prevenção', doc: 'prev', titulo: 'Estatina na prevenção primária de alto/muito alto risco',
     kw: ['estatina', 'prevencao primaria', 'alto risco', 'score2', 'risco cardiovascular'],
@@ -1301,7 +1330,7 @@ window.RECOMENDACOES = [
   { area: 'Pericardite', doc: 'peri', titulo: 'Colchicina na pericardite aguda',
     kw: ['colchicina', 'pericardite', 'pericardite aguda', 'recorrencia'],
     resumo: 'Adjuvante ao AINE/AAS na pericardite aguda — reduz sintomas e recorrência. Manter por ~3 meses.',
-    recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC Pericárdio 2015' }] },
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'A', fonte: 'ESC Miocardite/Pericardite 2025' }] },
   // ===================== TROMBOEMBOLISMO =====================
   { area: 'Tromboembolismo', doc: 'tep', titulo: 'Anticoagulação com DOAC no TEP (sem instabilidade)',
     kw: ['tep', 'tromboembolismo pulmonar', 'embolia pulmonar', 'doac', 'aco', 'anticoagulacao tep', 'apixabana', 'rivaroxabana'],
@@ -1360,15 +1389,15 @@ window.RECOMENDACOES = [
   { area: 'Valvopatia', doc: 'valva', titulo: 'Valvoplastia mitral percutânea na estenose mitral reumática',
     kw: ['estenose mitral', 'valvoplastia mitral', 'comissurotomia percutanea', 'reumatica', 'balao'],
     resumo: 'Estenose mitral reumática grave sintomática com anatomia favorável e sem trombo/IM significativa: valvoplastia mitral percutânea por balão.',
-    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EACTS Valva 2021' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC Valva 2020' }] },
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EACTS Valva 2025' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC Valva 2020' }] },
   { area: 'Valvopatia', doc: 'valva', titulo: 'Cirurgia na estenose aórtica grave assintomática com FEVE < 50%',
     kw: ['estenose aortica assintomatica', 'fevе reduzida', 'disfuncao de ve', 'cirurgia aortica', 'troca valvar'],
     resumo: 'Estenose aórtica grave assintomática com disfunção de VE (FEVE <50%) sem outra causa: intervenção indicada.',
-    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EACTS Valva 2021' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC Valva 2020' }] },
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC/EACTS Valva 2025' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC Valva 2020' }] },
   { area: 'Valvopatia', doc: 'valva', titulo: 'Intervenção na regurgitação tricúspide grave',
     kw: ['regurgitacao tricuspide', 'insuficiencia tricuspide', 'cirurgia tricuspide', 'teer tricuspide'],
     resumo: 'IT primária grave sintomática, ou IT grave em paciente submetido a cirurgia de valva esquerda: intervenção (cirúrgica; transcateter em selecionados).',
-    recs: [{ soc: 'ESC', cls: 'I', niv: 'C', fonte: 'ESC/EACTS Valva 2021' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC Valva 2020' }] },
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'C', fonte: 'ESC/EACTS Valva 2025' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC Valva 2020' }] },
 
   // ===================== HIPERTENSÃO PULMONAR =====================
   { area: 'Hipertensão pulmonar', doc: 'hp', titulo: 'Cateterismo cardíaco direito para diagnóstico de HP',
@@ -1430,7 +1459,7 @@ window.RECOMENDACOES = [
   { area: 'Dislipidemia', doc: 'lipid', titulo: 'Dosar lipoproteína(a) ao menos uma vez na vida',
     kw: ['lipoproteina a', 'lp(a)', 'lpa', 'risco residual', 'historia familiar'],
     resumo: 'Medir Lp(a) ao menos uma vez na vida adulta para refinar o risco — valores muito altos conferem risco CV aumentado.',
-    recs: [{ soc: 'ESC', cls: 'IIa', niv: 'C', fonte: 'ESC/EAS Dislipidemia 2019' }] },
+    recs: [{ soc: 'ESC', cls: 'IIa', niv: 'C', fonte: 'ESC/EAS Dislipidemia 2025' }] },
 
   // ===================== CARDIO-ONCOLOGIA =====================
   { area: 'Cardio-oncologia', doc: 'onco', titulo: 'Monitorização da FEVE durante quimioterapia cardiotóxica',
@@ -1464,7 +1493,25 @@ window.RECOMENDACOES = [
   { area: 'Doença coronariana crônica', doc: 'scc', titulo: 'Antianginoso de primeira linha (betabloqueador ou BCC) na angina estável',
     kw: ['angina estavel', 'antianginoso', 'betabloqueador', 'bcc', 'nitrato', 'dac estavel'],
     resumo: 'Angina estável: betabloqueador e/ou BCC como primeira linha para controle de sintomas; nitrato de ação curta para alívio.',
-    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC SCC 2024' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC CCD 2023' }] }
+    recs: [{ soc: 'ESC', cls: 'I', niv: 'B', fonte: 'ESC SCC 2024' }, { soc: 'AHA/ACC', cls: 'I', niv: 'B', fonte: 'AHA/ACC CCD 2023' }] },
+
+  // ===== Evidências recentes (2024–2025) =====
+  { area: 'Dislipidemia', doc: 'lipid', titulo: 'Ácido bempedoico (intolerância a estatina ou fora da meta)',
+    kw: ['acido bempedoico', 'bempedoico', 'clear outcomes', 'intolerancia a estatina', 'ldl'],
+    resumo: 'Reduz LDL e eventos CV (CLEAR Outcomes), especialmente em intolerantes a estatina ou que não atingem a meta com estatina + ezetimiba.',
+    recs: [{ soc: 'ESC', cls: 'IIa', niv: 'B', fonte: 'ESC/EAS Dislipidemia 2025' }, { soc: 'AHA/ACC', cls: 'IIa', niv: 'B', fonte: 'ACC ECDP' }] },
+  { area: 'Dislipidemia', doc: 'lipid', titulo: 'Inclisirana (siRNA anti-PCSK9) como adjuvante',
+    kw: ['inclisirana', 'sirna', 'pcsk9', 'ldl refratario', 'muito alto risco'],
+    resumo: 'Pequeno RNA de interferência que reduz a PCSK9; opção (2 doses/ano) quando a meta de LDL não é atingida com estatina + ezetimiba.',
+    recs: [{ soc: 'ESC', cls: 'IIb', niv: 'B', fonte: 'ESC/EAS Dislipidemia 2025' }] },
+  { area: 'Doença coronariana crônica', doc: 'scc', titulo: 'Colchicina 0,5 mg/dia na doença coronariana crônica',
+    kw: ['colchicina', 'anti-inflamatorio', 'dac cronica', 'lodoco2', 'aterosclerose', 'inflamacao'],
+    resumo: 'Colchicina em baixa dose reduz eventos cardiovasculares na DAC estável/aterosclerose estabelecida (LoDoCo2, COLCOT), em adição à terapia padrão.',
+    recs: [{ soc: 'ESC', cls: 'IIb', niv: 'A', fonte: 'ESC SCC 2024' }, { soc: 'AHA/ACC', cls: 'IIb', niv: 'B', fonte: 'AHA/ACC CCD 2023' }] },
+  { area: 'Cardiometabólico', doc: 'prev', titulo: 'Semaglutida em sobrepeso/obesidade com DCV (sem diabetes)',
+    kw: ['semaglutida', 'glp1', 'obesidade', 'sobrepeso', 'select', 'emagrecedor', 'prevencao'],
+    resumo: 'Em sobrepeso/obesidade com DCV estabelecida e sem diabetes, a semaglutida reduz eventos cardiovasculares (SELECT) além da perda de peso.',
+    recs: [{ soc: 'ESC', cls: 'IIa', niv: 'B', fonte: 'ESC SCC 2024' }] }
 ];
 
 // Base curada de condutas cardiológicas consolidadas.
@@ -2311,13 +2358,13 @@ window.GUIAS = [
   },
   {
     t: "Valvopatias",
-    esc: { t: "ESC/EACTS 2021 — Valvopatias (PDF)", u: "https://academic.oup.com/eurheartj/article-pdf/43/7/561/44362577/ehab395.pdf" },
+    esc: { t: "ESC/EACTS 2025 — Valvopatias", u: "https://www.escardio.org/guidelines/clinical-practice-guidelines/all-esc-practice-guidelines/valvular-heart-disease-management-of/" },
     aha: { t: "ACC/AHA 2020 — VHD (PDF)", u: "https://www.ahajournals.org/doi/pdf/10.1161/CIR.0000000000000923" },
     sbc: { t: "SBC — Valvopatias (portal)", u: "https://www.portal.cardiol.br/diretrizes" }
   },
   {
     t: "Dislipidemia e prevenção",
-    esc: { t: "ESC/EAS 2019 — Dislipidemias (PDF)", u: "https://academic.oup.com/eurheartj/article-pdf/41/1/111/66477601/eurheartj_41_1_111.pdf" },
+    esc: { t: "ESC/EAS 2019 — Dislipidemias (PDF) · atual. 2025", u: "https://academic.oup.com/eurheartj/article-pdf/41/1/111/66477601/eurheartj_41_1_111.pdf" },
     aha: { t: "ACC/AHA 2018 — Colesterol (PDF)", u: "https://www.ahajournals.org/doi/pdf/10.1161/CIR.0000000000000625" },
     sbc: { t: "SBC 2025 — Dislipidemias e Prevenção da Aterosclerose", u: "https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-122-09-e20250640/0066-782X-abc-122-09-e20250640.x74770.pdf" }
   },
@@ -3963,6 +4010,8 @@ window.DOSES = [
     let h = '<h3 class="sc-title">' + esc(t.nome) + '</h3><span class="rec-area">' + esc(t.area) + '</span>';
     if (t.fisio) h += '<h4 class="tema-h">Fisiopatologia</h4><div class="tema-resumo tema-fisio">' + t.fisio + '</div>';
     h += '<h4 class="tema-h">Resumo clínico</h4><div class="tema-resumo">' + t.resumo + '</div>';
+    const crit = (window.TEMAS_CRIT || {})[t.id];
+    if (crit) h += '<h4 class="tema-h">Critérios e cortes</h4><div class="tema-crit">' + crit + '</div>';
     if (t.trials && t.trials.length) {
       h += '<h4 class="tema-h">Ensaios-chave</h4><ul class="tema-trials">' +
         t.trials.map(tr => '<li><b>' + esc(tr.n) + '</b> — ' + esc(tr.t) + '</li>').join('') + '</ul>';
