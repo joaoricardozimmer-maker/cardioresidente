@@ -4787,6 +4787,29 @@ window.PROTOCOLOS = [
       beneficio: (p, c) => { const base = AVC_ANO[Math.min(c.cv, 9)]; const com = base * 0.36; return { base, com, arr: base - com, nnt: Math.max(1, Math.round(100 / (base - com))), horiz: 'por ano', txt: 'Risco de AVC por CHA₂DS₂-VA = ' + c.cv + '; anticoagulação reduz ~64%. <b>Preferir DOAC.</b> Pesar HAS-BLED.' }; },
       estudo: { nome: 'Hart et al. (Ann Intern Med 2007)', q: 'antithrombotic therapy prevent stroke atrial fibrillation Hart meta-analysis' }, score: 'chadsvasc', doses: 'apixabana' },
 
+    { id: 'fa_freq', nome: 'Controle de frequência', grupo: 'Fibrilação atrial',
+      aplica: (p) => p.fa,
+      emUso: p => p.m_bb || p.m_bcc || p.m_digoxina,
+      contra: () => null,
+      beneficio: (p, c) => ({ txt: 'Alvo inicial de FC de repouso <b>&lt; 110 bpm</b> (controle leniente — RACE II). 1ª linha betabloqueador.' + (c.icfer ? ' <b>Na ICFEr, evitar verapamil/diltiazem</b> (inotrópicos negativos) — usar betabloqueador ± digoxina.' : ' Verapamil/diltiazem são alternativas se FEVE preservada.') }),
+      estudo: { nome: 'RACE II (NEJM 2010)', q: 'RACE II lenient versus strict rate control atrial fibrillation 2010' }, doses: 'metoprolol' },
+
+    { id: 'fa_ritmo', nome: 'Controle de ritmo precoce', grupo: 'Fibrilação atrial',
+      aplica: (p) => p.fa,
+      emUso: p => p.m_antiarr,
+      contra: () => null,
+      beneficio: () => ({ txt: 'Controle de ritmo <b>precoce</b> (≤ 1 ano do diagnóstico) reduz desfechos CV (EAST-AFNET 4). Escolha do antiarrítmico pela cardiopatia: <b>propafenona/flecainida só sem doença estrutural</b>; sotalol/dronedarona conforme contexto; <b>amiodarona</b> preferida na IC/cardiopatia estrutural.' }),
+      estudo: { nome: 'EAST-AFNET 4 (NEJM 2020)', q: 'EAST-AFNET 4 early rhythm control atrial fibrillation 2020' }, doses: 'amiodarona' },
+
+    { id: 'fa_ablacao', nome: 'Ablação por cateter (isolamento de veias pulmonares)', grupo: 'Fibrilação atrial',
+      aplica: (p) => p.fa,
+      emUso: p => p.m_ablacao,
+      contra: () => null,
+      beneficio: (p, c) => c.icfer
+        ? { base: 25, com: 13.4, arr: 11.6, nnt: 9, horiz: '~3 anos', txt: 'Na <b>FA + ICFEr</b>, a ablação reduz mortalidade e hospitalização por IC (CASTLE-AF) — superior ao tratamento clínico.' }
+        : { txt: 'Opção de <b>1ª linha</b> para controle de ritmo (sobretudo FA paroxística): mais eficaz que antiarrítmicos para manter o ritmo sinusal e melhora sintomas/qualidade de vida.' },
+      estudo: { nome: 'CASTLE-AF (NEJM 2018) / CABANA', q: 'CASTLE-AF catheter ablation atrial fibrillation heart failure 2018' } },
+
     // ---------------- Coronariopatia / pós-IAM ----------------
     { id: 'dapt', nome: 'Dupla antiagregação (AAS + inibidor de P2Y12)', grupo: 'Coronariopatia / pós-IAM',
       aplica: (p) => p.sca_rec,
@@ -4907,11 +4930,11 @@ window.PROTOCOLOS = [
     </div>
     <div class="pac-sec">Medicações / terapias em uso</div>
     <div class="pac-checks">
-      ${[['m_ieca', 'IECA/BRA'], ['m_arni', 'ARNI (sacubitril/valsartana)'], ['m_bb', 'Betabloqueador'], ['m_mra', 'Espironolactona/eplerenona'], ['m_isglt2', 'iSGLT2'], ['m_diur', 'Diurético de alça'], ['m_ivab', 'Ivabradina'], ['m_vericiguat', 'Vericiguate'], ['m_hidnit', 'Hidralazina + nitrato'], ['m_ferro', 'Ferro EV'], ['m_cdi', 'CDI'], ['m_trc', 'TRC (ressincronizador)'], ['m_estatina', 'Estatina'], ['m_ezet', 'Ezetimiba'], ['m_pcsk9', 'Inibidor de PCSK9'], ['m_aas', 'AAS'], ['m_p2y12', 'Clopidogrel/ticagrelor/prasugrel'], ['m_colchicina', 'Colchicina'], ['m_nitrato', 'Nitrato'], ['m_bcc', 'Bloq. canal de cálcio'], ['m_reab', 'Em reabilitação cardíaca'], ['m_aco', 'Anticoagulante'], ['m_glp1', 'Agonista de GLP-1']]
+      ${[['m_ieca', 'IECA/BRA'], ['m_arni', 'ARNI (sacubitril/valsartana)'], ['m_bb', 'Betabloqueador'], ['m_mra', 'Espironolactona/eplerenona'], ['m_isglt2', 'iSGLT2'], ['m_diur', 'Diurético de alça'], ['m_ivab', 'Ivabradina'], ['m_vericiguat', 'Vericiguate'], ['m_hidnit', 'Hidralazina + nitrato'], ['m_ferro', 'Ferro EV'], ['m_cdi', 'CDI'], ['m_trc', 'TRC (ressincronizador)'], ['m_estatina', 'Estatina'], ['m_ezet', 'Ezetimiba'], ['m_pcsk9', 'Inibidor de PCSK9'], ['m_aas', 'AAS'], ['m_p2y12', 'Clopidogrel/ticagrelor/prasugrel'], ['m_colchicina', 'Colchicina'], ['m_nitrato', 'Nitrato'], ['m_bcc', 'Bloq. canal de cálcio'], ['m_reab', 'Em reabilitação cardíaca'], ['m_aco', 'Anticoagulante'], ['m_digoxina', 'Digoxina'], ['m_antiarr', 'Antiarrítmico (amiodarona/propafenona/sotalol)'], ['m_ablacao', 'Ablação de FA prévia'], ['m_glp1', 'Agonista de GLP-1']]
       .map(c => `<label class="sc-check"><input type="checkbox" id="pac-${c[0]}"><span>${c[1]}</span></label>`).join('')}
     </div>`;
 
-  const MED_KEYS = ['m_ieca', 'm_arni', 'm_bb', 'm_mra', 'm_isglt2', 'm_diur', 'm_ivab', 'm_vericiguat', 'm_hidnit', 'm_ferro', 'm_cdi', 'm_trc', 'm_estatina', 'm_ezet', 'm_pcsk9', 'm_aas', 'm_p2y12', 'm_colchicina', 'm_nitrato', 'm_bcc', 'm_reab', 'm_aco', 'm_glp1'];
+  const MED_KEYS = ['m_ieca', 'm_arni', 'm_bb', 'm_mra', 'm_isglt2', 'm_diur', 'm_ivab', 'm_vericiguat', 'm_hidnit', 'm_ferro', 'm_cdi', 'm_trc', 'm_estatina', 'm_ezet', 'm_pcsk9', 'm_aas', 'm_p2y12', 'm_colchicina', 'm_nitrato', 'm_bcc', 'm_reab', 'm_aco', 'm_digoxina', 'm_antiarr', 'm_ablacao', 'm_glp1'];
   const COMORB_KEYS = ['has', 'dm', 'dislip', 'tabag', 'dcv', 'iam', 'sca_rec', 'angina', 'fa', 'ic', 'avc', 'vascular', 'asma', 'gravidez'];
 
   function read() {
