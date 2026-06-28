@@ -423,7 +423,7 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .gs-item:hover { background: var(--bg-soft); }
 .gs-item:last-child { border-bottom: none; }
 .gs-type { flex: 0 0 auto; font-size: 10px; font-weight: 700; color: #fff; border-radius: 20px; padding: 2px 8px; text-transform: uppercase; letter-spacing: .03em; }
-.gs-cond { background: #c10e21; } .gs-score { background: #14679e; } .gs-dose { background: #1f9d57; } .gs-guia { background: #b07414; } .gs-ens { background: #6b3fa0; }
+.gs-cond { background: #c10e21; } .gs-score { background: #14679e; } .gs-dose { background: #1f9d57; } .gs-guia { background: #b07414; } .gs-ens { background: #6b3fa0; } .gs-prot { background: #b3261e; }
 .gs-label { flex: 1 1 auto; font-weight: 600; color: var(--text); }
 .gs-sub { flex: 0 0 auto; color: var(--muted); font-size: 11px; max-width: 38%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gs-empty { padding: 14px; color: var(--muted); font-size: 13px; }
@@ -472,6 +472,20 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .tema-crit { background: var(--bg-soft); border-left: 3px solid var(--green); padding: 4px 14px; border-radius: 0 8px 8px 0; font-size: 13.5px; }
 .tema-crit ul { margin: 8px 0; padding-left: 18px; }
 .tema-crit li { margin-bottom: 6px; line-height: 1.5; }
+
+/* ===== Plantão / protocolos ===== */
+.pr-steps { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+.pr-step { display: flex; gap: 12px; align-items: flex-start; }
+.pr-num { flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+.pr-txt { font-size: 14px; line-height: 1.5; }
+.pr-dose, .pr-decisao, .pr-alerta { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 8px; font-size: 13.5px; line-height: 1.5; }
+.pr-dose { background: #eef6f0; border-left: 3px solid var(--green); }
+.pr-decisao { background: #eef3f9; border-left: 3px solid var(--blue); font-weight: 500; }
+.pr-alerta { background: #fdecee; border-left: 3px solid var(--accent); }
+.pr-ic { flex: 0 0 auto; }
+.pr-nota { font-size: 12.5px; color: var(--muted); padding-left: 4px; }
+.pr-sub { margin: 0 0 0 38px; padding-left: 16px; }
+.pr-sub li { margin-bottom: 6px; font-size: 13.5px; line-height: 1.5; }
 
 /* ===== Polimento mobile ===== */
 @media (max-width: 860px) {
@@ -666,6 +680,18 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
         <p>A probabilidade de doença <em>antes</em> do exame, no modelo mais atual (likelihood clínica ponderada por fatores de risco, RF-CL, da ESC 2024): idade, sexo, tipo de sintoma e fatores de risco. Combine com a aba MBE para a probabilidade pós-teste.</p>
       </div>
       <div id="pretest-root"></div>
+    </section>
+
+    <!-- ============ PLANTÃO ============ -->
+    <section class="view" id="view-protocolos">
+      <div class="hero">
+        <h2>Protocolos de plantão</h2>
+        <p>Fluxogramas de emergência prontos para o plantão (ACLS e diretrizes ESC): parada, bradi/taquiarritmias, edema agudo, choque, dissecção, crise hipertensiva, STEMI e TEP. Apoio à decisão — siga o protocolo da sua instituição.</p>
+      </div>
+      <div class="evol-grid">
+        <aside class="evol-menu" id="protocolos-menu"></aside>
+        <div class="sc-panel" id="protocolos-panel"></div>
+      </div>
     </section>
 
     <!-- ============ DOSES ============ -->
@@ -3015,6 +3041,115 @@ window.DOSES = [
   { g: 'Vasoativos e inotrópicos', nome: 'Nitroprussiato de sódio', dose: '0,3–10 mcg/kg/min', renal: 'Risco de toxicidade por tiocianato na DRC', obs: 'Emergência hipertensiva; fotossensível; monitorar PA invasiva.' }
 ];
 
+// Protocolos de plantão — algoritmos de emergência (ACLS/AHA 2020 e diretrizes ESC).
+// Apoio à decisão: siga o protocolo da sua instituição e o ACLS vigente.
+// passos[].t: passo | dose | decisao | alerta | nota | sub(items[])
+window.PROTOCOLOS = [
+  {
+    id: 'pcr', nome: 'Parada cardiorrespiratória (ACLS)', area: 'Emergência',
+    passos: [
+      { t: 'passo', x: 'Cheque responsividade, respiração e pulso (≤ 10 s). Sem pulso → iniciar RCP.' },
+      { t: 'passo', x: 'RCP de alta qualidade: 100–120 compressões/min, 5–6 cm de profundidade, permitir retorno do tórax, minimizar interrupções (< 10 s). Ventilação 30:2 (ou 1 a cada 6 s se via aérea avançada).' },
+      { t: 'passo', x: 'Monitor/desfibrilador assim que possível → identificar o ritmo.' },
+      { t: 'decisao', x: 'RITMO CHOCÁVEL (FV / TV sem pulso): desfibrilar imediatamente.' },
+      { t: 'dose', x: 'Choque: 120–200 J bifásico (360 J monofásico). Retomar RCP por 2 min logo após.' },
+      { t: 'dose', x: 'Adrenalina 1 mg EV/IO a cada 3–5 min (após o 2º choque).' },
+      { t: 'dose', x: 'Amiodarona 300 mg EV/IO (1ª dose) e 150 mg (2ª) na FV/TV refratária — alternativa: lidocaína 1–1,5 mg/kg.' },
+      { t: 'decisao', x: 'RITMO NÃO CHOCÁVEL (AESP / assistolia): NÃO chocar.' },
+      { t: 'dose', x: 'Adrenalina 1 mg EV/IO o mais precoce possível e a cada 3–5 min. RCP contínua, checar ritmo a cada 2 min.' },
+      { t: 'alerta', x: 'Trate as causas reversíveis — 5 H: hipovolemia, hipóxia, H⁺ (acidose), hipo/hipercalemia, hipotermia. 5 T: pneumoTórax hipertensivo, Tamponamento, Toxinas, Trombose coronária, TEP.' },
+      { t: 'nota', x: 'Capnografia (ETCO₂): qualidade da RCP e possível RCE (subida abrupta). Pós-RCE: oxigenação/PA-alvo, ECG (ICP se STEMI), controle de temperatura.' }
+    ]
+  },
+  {
+    id: 'bradi', nome: 'Bradicardia com pulso (ACLS)', area: 'Emergência',
+    passos: [
+      { t: 'passo', x: 'FC < 50 bpm com sintomas. Avalie via aérea, O₂ se hipoxêmico, monitor, acesso, ECG de 12 derivações.' },
+      { t: 'decisao', x: 'Há instabilidade? (hipotensão, alteração de consciência, dor torácica isquêmica, IC aguda, choque).' },
+      { t: 'sub', items: ['SIM → tratar agora.', 'NÃO → observar/monitorar e investigar a causa.'] },
+      { t: 'dose', x: 'Atropina 1 mg EV em bólus, repetir a cada 3–5 min (máx. 3 mg).' },
+      { t: 'passo', x: 'Se atropina ineficaz: marcapasso transcutâneo E/OU infusão de cronotrópico.' },
+      { t: 'dose', x: 'Dopamina 5–20 mcg/kg/min OU adrenalina 2–10 mcg/min, titulando pela resposta.' },
+      { t: 'alerta', x: 'BAV de 2º grau Mobitz II ou BAV total: atropina costuma falhar — priorize marcapasso (transcutâneo → transvenoso).' }
+    ]
+  },
+  {
+    id: 'taqui', nome: 'Taquicardia com pulso (ACLS)', area: 'Emergência',
+    passos: [
+      { t: 'passo', x: 'FC ≥ 150 bpm geralmente sintomática. O₂ se necessário, monitor, acesso, ECG de 12 derivações.' },
+      { t: 'decisao', x: 'INSTÁVEL? (hipotensão, rebaixamento, dor torácica isquêmica, IC aguda).' },
+      { t: 'dose', x: 'SIM → cardioversão elétrica SINCRONIZADA imediata (sedação se possível). Energia: QRS estreito regular 50–100 J · FA 120–200 J · TV monomórfica com pulso 100 J. TV polimórfica instável → desfibrilar.' },
+      { t: 'decisao', x: 'ESTÁVEL → avaliar a largura do QRS.' },
+      { t: 'sub', items: ['QRS ESTREITO (< 0,12 s): manobra vagal → adenosina 6 mg EV em bólus rápido → 12 mg (repetir 12 mg). Se não reverter/recorrer: betabloqueador ou BCC (diltiazem).', 'QRS LARGO (≥ 0,12 s): se TV provável → amiodarona 150 mg EV em 10 min (repetir) ou procainamida; considerar cardioversão eletiva. Adenosina apenas se regular e monomórfica.'] },
+      { t: 'alerta', x: 'Torsades de pointes (TV polimórfica com QT longo): sulfato de magnésio 1–2 g EV; corrigir K⁺/Mg²⁺ e suspender fármacos que prolongam QT.' }
+    ]
+  },
+  {
+    id: 'eap', nome: 'Edema agudo de pulmão', area: 'Insuficiência cardíaca',
+    passos: [
+      { t: 'passo', x: 'Dispneia grave, estertores, hipoxemia, congestão. Sente o paciente, monitorize, acesso, ECG (buscar isquemia/arritmia).' },
+      { t: 'dose', x: 'Oxigênio para SatO₂ ≥ 90%; VNI (CPAP/BiPAP) se desconforto respiratório e sem contraindicação.' },
+      { t: 'decisao', x: 'Avalie a PA antes de vasodilatar.' },
+      { t: 'dose', x: 'Se PAS > 110 mmHg: nitroglicerina EV 10–20 mcg/min, titular (reduz pré e pós-carga). Útil também na crise hipertensiva associada.' },
+      { t: 'dose', x: 'Diurético: furosemida 20–40 mg EV (ou ~2× a dose oral habitual se já em uso); reavaliar diurese e congestão.' },
+      { t: 'alerta', x: 'Se PAS < 90 ou sinais de hipoperfusão → é CHOQUE CARDIOGÊNICO: não usar vasodilatador/diurético agressivo; iniciar inotrópico/vasopressor (ver protocolo).' },
+      { t: 'nota', x: 'Tratar o gatilho: SCA, emergência hipertensiva, taqui/bradiarritmia, má adesão, disfunção valvar aguda. Morfina apenas em casos selecionados (cautela).' }
+    ]
+  },
+  {
+    id: 'choque', nome: 'Choque cardiogênico', area: 'Emergência',
+    passos: [
+      { t: 'passo', x: 'PAS < 90 mmHg por > 30 min (ou necessidade de vasopressor) + sinais de hipoperfusão (oligúria, confusão, extremidades frias, lactato elevado) por disfunção cardíaca.' },
+      { t: 'passo', x: 'Monitorização, ECG, ecocardiograma à beira-leito, lactato; identificar a causa (IAM é a mais comum).' },
+      { t: 'dose', x: 'Vasopressor de escolha: NORADRENALINA 0,05–0,5 mcg/kg/min (titular pela PAM ≥ 65).' },
+      { t: 'dose', x: 'Inotrópico: DOBUTAMINA 2,5–20 mcg/kg/min se baixo débito com PA aceitável.' },
+      { t: 'passo', x: 'Se IAM: revascularização precoce da artéria culpada (ICP). Considerar suporte circulatório mecânico em casos refratários.' },
+      { t: 'alerta', x: 'Evite expansão volêmica agressiva se já congesto. Reavalie continuamente perfusão e congestão (perfis "quente/frio – úmido/seco").' }
+    ]
+  },
+  {
+    id: 'dissecao', nome: 'Dissecção aórtica aguda', area: 'Aorta',
+    passos: [
+      { t: 'passo', x: 'Suspeite: dor torácica/dorsal súbita, intensa, migratória; assimetria de pulsos/PA; sopro de IAo; síncope. Risco em HAS, Marfan, valva bicúspide.' },
+      { t: 'passo', x: 'Confirmação: angio-TC de aorta (ou ecocardiograma transesofágico se instável). Dois acessos calibrosos, analgesia (morfina).' },
+      { t: 'dose', x: '1º — CONTROLE DA FC: betabloqueador EV (esmolol, metoprolol ou labetalol) com alvo FC < 60 bpm, ANTES de vasodilatador (evita taquicardia reflexa e ↑ do estresse de parede).' },
+      { t: 'dose', x: '2º — CONTROLE DA PA: alvo PAS 100–120 mmHg; associar nitroprussiato se necessário, sempre após o betabloqueador.' },
+      { t: 'decisao', x: 'Tipo A (acomete aorta ascendente) → CIRURGIA de emergência. Tipo B não complicada → tratamento clínico; TEVAR se complicada (má-perfusão, dor/HAS refratária, expansão).' }
+    ]
+  },
+  {
+    id: 'crisehas', nome: 'Emergência hipertensiva', area: 'Hipertensão',
+    passos: [
+      { t: 'passo', x: 'PA muito elevada (geralmente > 180/120) COM lesão aguda de órgão-alvo: encefalopatia/AVC, EAP, SCA, dissecção, LRA, eclâmpsia, retinopatia grave.' },
+      { t: 'decisao', x: 'Sem lesão aguda de órgão-alvo = URGÊNCIA hipertensiva → reduzir a PA em horas/dias com fármacos VO, ambulatorial. NÃO usar EV agressivo.' },
+      { t: 'passo', x: 'Emergência: internar (preferir UTI) e reduzir a PA de forma CONTROLADA com anti-hipertensivo EV titulável.' },
+      { t: 'dose', x: 'Alvo geral: reduzir a PAM em ~25% na 1ª hora; depois ~160/100 nas 2–6 h. Opções: nitroprussiato 0,3–10 mcg/kg/min · nitroglicerina (se EAP/isquemia) · labetalol · esmolol.' },
+      { t: 'alerta', x: 'Exceções ao alvo: DISSECÇÃO → PAS 100–120 e FC < 60 rapidamente. AVC isquêmico → só tratar se PA muito alta/trombólise (alvos específicos). Eclâmpsia → sulfato de magnésio + anti-hipertensivo.' }
+    ]
+  },
+  {
+    id: 'stemi', nome: 'IAM com supra (STEMI) — reperfusão', area: 'Síndrome coronariana',
+    passos: [
+      { t: 'passo', x: 'Dor torácica + supra de ST ≥ 1 mm em 2 derivações contíguas (≥ 2 mm V2–V3 ♂/≥ 1,5 mm ♀) ou BRE/BRD novo. ECG em ≤ 10 min da chegada.' },
+      { t: 'dose', x: 'Antiagregação: AAS 150–300 mg (mastigado) + inibidor de P2Y12 (ticagrelor 180 mg ou prasugrel 60 mg; clopidogrel 600 mg se fibrinólise/sem opção).' },
+      { t: 'dose', x: 'Anticoagulação parenteral (HNF/enoxaparina conforme a estratégia).' },
+      { t: 'decisao', x: 'REPERFUSÃO: ICP primária se exequível em ≤ 120 min do diagnóstico (porta-balão ≤ 90 min).' },
+      { t: 'dose', x: 'Se ICP indisponível no prazo e início < 12 h: FIBRINÓLISE em ≤ 10 min (tenecteplase ajustada ao peso), seguida de transferência para ICP.' },
+      { t: 'alerta', x: 'Não atrasar a reperfusão. Evitar nitrato/morfina de rotina se instabilidade; O₂ só se SatO₂ < 90%.' }
+    ]
+  },
+  {
+    id: 'tep', nome: 'TEP de alto risco (instável)', area: 'Tromboembolismo',
+    passos: [
+      { t: 'passo', x: 'Instabilidade hemodinâmica (PAS < 90 ou queda ≥ 40 mmHg por > 15 min) com suspeita de TEP → emergência.' },
+      { t: 'passo', x: 'Suporte: O₂, cautela na volemia (VD sobrecarregado), noradrenalina se choque; angio-TC se possível ou eco à beira-leito (disfunção/sobrecarga de VD).' },
+      { t: 'dose', x: 'Anticoagulação imediata com HNF (bólus 80 U/kg + infusão).' },
+      { t: 'dose', x: 'TROMBÓLISE sistêmica (alteplase 100 mg EV em 2 h), salvo contraindicação. Alternativas: embolectomia cirúrgica ou por cateter.' },
+      { t: 'nota', x: 'Risco intermediário-alto (VD disfuncional + troponina, sem choque): anticoagular e monitorar; trombólise de resgate se deteriorar.' }
+    ]
+  }
+];
+
 // Aba "Scores" — calculadoras cardiológicas com interpretação e conduta.
 // Cada score: { id, grupo, nome, desc, campos[], calc(v) -> {valor, nivel, conduta(HTML)} }
 // nivel: 'ok' (verde) | 'warn' (amarelo) | 'bad' (vermelho) | 'info' (azul)
@@ -3634,6 +3769,39 @@ window.DOSES = [
   document.getElementById('dz-grupo').addEventListener('change', e => render(document.getElementById('dz-busca').value, e.target.value));
 })();
 
+// Aba "Plantão": fluxogramas/algoritmos de emergência.
+(function () {
+  const menu = document.getElementById('protocolos-menu');
+  const panel = document.getElementById('protocolos-panel');
+  if (!menu || !panel) return;
+  const P = window.PROTOCOLOS || [];
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  function render(p) {
+    let n = 0;
+    let h = '<h3 class="sc-title">' + esc(p.nome) + '</h3><span class="rec-area">' + esc(p.area) + '</span><div class="pr-steps">';
+    p.passos.forEach(s => {
+      if (s.t === 'passo') { n++; h += '<div class="pr-step"><span class="pr-num">' + n + '</span><div class="pr-txt">' + esc(s.x) + '</div></div>'; }
+      else if (s.t === 'dose') h += '<div class="pr-dose"><span class="pr-ic">💊</span><div>' + esc(s.x) + '</div></div>';
+      else if (s.t === 'decisao') h += '<div class="pr-decisao"><span class="pr-ic">↳</span><div>' + esc(s.x) + '</div></div>';
+      else if (s.t === 'alerta') h += '<div class="pr-alerta"><span class="pr-ic">⚠️</span><div>' + esc(s.x) + '</div></div>';
+      else if (s.t === 'nota') h += '<div class="pr-nota">' + esc(s.x) + '</div>';
+      else if (s.t === 'sub') h += '<ul class="pr-sub">' + s.items.map(i => '<li>' + esc(i) + '</li>').join('') + '</ul>';
+    });
+    h += '</div><p class="muted small" style="margin-top:14px">Apoio à decisão — siga o protocolo da sua instituição e o ACLS/diretriz vigente. Doses para adultos; individualize.</p>';
+    panel.innerHTML = h;
+  }
+
+  P.forEach(p => {
+    const b = document.createElement('button');
+    b.className = 'evol-item'; b.textContent = p.nome; b.dataset.id = p.id;
+    b.addEventListener('click', () => { menu.querySelectorAll('.evol-item').forEach(x => x.classList.toggle('active', x === b)); render(p); });
+    menu.appendChild(b);
+  });
+  const first = menu.querySelector('.evol-item');
+  if (first) { first.classList.add('active'); render(P[0]); }
+})();
+
 // Aba "Medicina baseada em evidências" (MBE)
 // Ferramentas: probabilidade pós-teste (Bayes/Fagan), medidas de efeito (NNT/NNH/RRA/RRR/OR)
 // e biblioteca robusta de razões de verossimilhança (LR) cardiológicas, com referências.
@@ -4159,6 +4327,7 @@ window.DOSES = [
     { id: 'temas', label: '🫀 Temas', views: [['temas', '🫀 Temas']] },
     { id: 'evidencias', label: '📚 Evidências', views: [['evidencia', '🔎 Recomendações'], ['guias', '📚 Diretrizes'], ['ensaios', '🧪 Ensaios pivotais']] },
     { id: 'ferramentas', label: '🧮 Ferramentas', views: [['scores', '🧮 Scores'], ['pretest', '🎯 Pré-teste'], ['mbe', '📐 MBE'], ['doses', '💊 Doses']] },
+    { id: 'plantao', label: '🚨 Plantão', views: [['protocolos', '🚨 Protocolos']] },
     { id: 'prontuario', label: '📝 Prontuário', views: [['transcricao', '📝 Transcrever laudo'], ['evolucoes', '🗂️ Evoluções']] },
     { id: 'sobre', label: 'ℹ️ Sobre', views: [['novidades', '🆕 Atualizações'], ['sobre', 'ℹ️ Sobre']] }
   ];
@@ -4221,6 +4390,10 @@ window.DOSES = [
       label: g.t, sub: 'Diretriz por tema', type: 'Diretriz', kw: '',
       run: () => { showView('guias'); const i = document.getElementById('guias-busca'); if (i) { i.value = g.t; i.dispatchEvent(new Event('input')); } }
     }));
+    (window.PROTOCOLOS || []).forEach(p => IDX.push({
+      label: p.nome, sub: 'Protocolo de plantão', type: 'Protocolo', kw: (p.area || ''),
+      run: () => { showView('protocolos'); const b = document.querySelector('#protocolos-menu .evol-item[data-id="' + p.id + '"]'); if (b) b.click(); }
+    }));
     // ensaios pivotais: estrutura { sec, t:[{n,a,...}] }
     (window.ENSAIOS || []).forEach(sec => {
       (sec.t || []).forEach(tr => { if (tr && tr.n) IDX.push({
@@ -4230,7 +4403,7 @@ window.DOSES = [
     });
     built = true;
   }
-  function badgeClass(t) { return 'gs-' + ({ 'Conduta': 'cond', 'Score': 'score', 'Dose': 'dose', 'Diretriz': 'guia', 'Ensaio': 'ens' }[t] || 'cond'); }
+  function badgeClass(t) { return 'gs-' + ({ 'Conduta': 'cond', 'Score': 'score', 'Dose': 'dose', 'Diretriz': 'guia', 'Ensaio': 'ens', 'Protocolo': 'prot' }[t] || 'cond'); }
 
   if (gi && gr) {
     const run = () => {
