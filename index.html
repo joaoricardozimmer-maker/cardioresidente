@@ -1091,6 +1091,86 @@ window.TEMAS = [
     ],
     recs: [['CDI prevenção primária', 'CDI'], ['sacubitril ICFEr', 'GDMT da ICFEr']],
     scores: ['maggic'], guia: 'Insuficiência', pretest: false
+  },
+
+  // ===================== MÉTODOS DIAGNÓSTICOS =====================
+  {
+    id: 'ecg', nome: 'Eletrocardiograma e isquemia', area: 'Métodos diagnósticos',
+    fisio: '<p>Registra a despolarização/repolarização do coração. A isquemia altera a repolarização (ST/T); a oclusão transmural eleva o ST na parede afetada, com imagem em espelho (infra) na parede oposta.</p>',
+    resumo: '<p>Leitura sistemática: ritmo, FC, eixo, intervalos (PR, QRS, QTc) e morfologia. <b>Localização do IAM:</b> inferior (II, III, aVF — CD/Cx), anterosseptal/anterior (V1–V4 — DA), lateral (V5–V6, DI, aVL — Cx/diagonal), posterior (infra V1–V3 + R alto). <b>Procure equivalentes de oclusão</b> (ver Plantão → OCA): De Winter, Wellens, supra de aVR, T hiperaguda. <b>BRE/BRD novos não são supra</b> — use Sgarbossa modificado.</p>',
+    trials: [], recs: [], scores: ['qtc'], guia: '', pretest: false
+  },
+  {
+    id: 'rx', nome: 'Radiografia de tórax', area: 'Métodos diagnósticos',
+    fisio: '<p>Avalia a silhueta cardíaca, a circulação pulmonar e o parênquima/pleura por densidades radiográficas.</p>',
+    resumo: '<p><b>Índice cardiotorácico &gt; 0,5</b> (PA, em inspiração) = cardiomegalia. <b>Congestão/EAP</b> (sequência): redistribuição vascular para ápices → edema intersticial (linhas B de Kerley) → edema alveolar peri-hilar ("asa de borboleta") → derrame pleural. Alargamento do mediastino pode sugerir dissecção de aorta.</p>',
+    trials: [], recs: [], scores: [], guia: '', pretest: false
+  },
+  {
+    id: 'ergometria', nome: 'Teste ergométrico', area: 'Métodos diagnósticos',
+    fisio: '<p>O esforço aumenta a demanda miocárdica; em estenose coronária significativa surge isquemia (infra de ST) e/ou angina, e avalia-se a resposta funcional.</p>',
+    resumo: '<p>Útil na avaliação de DAC de probabilidade intermediária (ECG basal interpretável, paciente capaz de se exercitar) e na estratificação funcional. <b>Positivo:</b> infra de ST horizontal/descendente ≥ 1 mm. Avaliar capacidade funcional (METs), resposta cronotrópica/pressórica e o <b>escore de Duke</b>. Sensibilidade ~68%, especificidade ~77% (menor em mulheres). Contraindicado em SCA instável, EAo grave sintomática, arritmia não controlada.</p>',
+    trials: [], recs: [], scores: ['duke'], guia: 'crônica', pretest: true
+  },
+  {
+    id: 'eco', nome: 'Ecocardiograma', area: 'Métodos diagnósticos',
+    fisio: '<p>Ultrassonografia em tempo real do coração: anatomia, função sistólica/diastólica e hemodinâmica (Doppler).</p>',
+    resumo: '<p>Avalia FEVE, contratilidade segmentar, dimensões de câmaras, valvas, pericárdio e pressões de enchimento. <b>Transesofágico (ETE):</b> trombo de apêndice atrial, endocardite, prótese, fonte embólica. <b>Eco de estresse</b> (esforço/dobutamina): isquemia e viabilidade. <b>Strain (GLS):</b> disfunção subclínica (cardio-oncologia, infiltrativas).</p>',
+    trials: [], recs: [], scores: [], guia: '', pretest: false
+  },
+  {
+    id: 'nuclear', nome: 'Cardiologia nuclear (SPECT/PET)', area: 'Métodos diagnósticos',
+    fisio: '<p>Radiotraçadores de perfusão (SPECT com ⁹⁹ᵐTc-sestamibi; PET com ¹³N-amônia/rubídio) são captados proporcionalmente ao fluxo coronário; a comparação estresse × repouso identifica isquemia e fibrose.</p>',
+    resumo: '<p><b>Cintilografia de perfusão</b> para diagnóstico/estratificação de DAC e viabilidade: defeito <b>reversível</b> (presente no estresse, ausente no repouso) = isquemia; defeito <b>fixo</b> = infarto/fibrose. <b>PET</b> quantifica fluxo absoluto e reserva (microvascular, multiarterial). <b>Cintilografia óssea (PYP/DPD)</b> diagnostica amiloidose ATTR.</p>',
+    trials: [], recs: [], scores: [], guia: '', pretest: false
+  },
+  {
+    id: 'rmc', nome: 'Ressonância magnética cardíaca', area: 'Métodos diagnósticos',
+    fisio: '<p>Padrão-ouro para volumes/FEVE e para <b>caracterização tecidual</b>: edema (T2), fibrose/infiltração (realce tardio de gadolínio) e mapas paramétricos (T1/T2/ECV).</p>',
+    resumo: '<p><b>Indicações:</b> miocardiopatias, miocardite (critérios de Lake Louise), viabilidade (realce transmural &gt; 50% = baixa recuperação), infiltrativas (amiloidose: realce subendocárdico difuso + T1 alto/ECV alto; Fabry: T1 baixo; sarcoidose: realce focal mesoepicárdico), CMH e cardiomiopatia arritmogênica. Realce mesocárdico na CMD = marcador de risco arrítmico.</p>',
+    trials: [{ n: 'CE-MARC', t: 'RMC com boa acurácia para DAC, superior ao SPECT em sensibilidade.' }],
+    recs: [], scores: [], guia: '', pretest: false
+  },
+  {
+    id: 'tc', nome: 'TC e angio-TC de coronárias', area: 'Métodos diagnósticos',
+    fisio: '<p>A TC com contraste reconstrói a luz coronária; o escore de cálcio (sem contraste) quantifica a carga de placa calcificada (Agatston).</p>',
+    resumo: '<p><b>Angio-TC de coronárias:</b> alto valor preditivo NEGATIVO — ideal para EXCLUIR DAC obstrutiva na probabilidade baixa/intermediária (1ª linha na SCC, ESC 2024). <b>Escore de cálcio (Agatston):</b> 0 = muito baixo risco; 1–99 leve; 100–399 moderado; ≥ 400 alto. A TC também avalia aorta (dissecção/aneurisma) e artérias pulmonares (TEP).</p>',
+    trials: [{ n: 'SCOT-HEART / PROMISE', t: 'Angio-TC melhora o diagnóstico e reduz IAM no manejo da dor torácica estável.' }],
+    recs: [['revascularização DAC estável', 'DAC estável']], scores: ['prevent'], guia: 'crônica', pretest: true
+  },
+  {
+    id: 'cate', nome: 'Cateterismo e angiografia coronária', area: 'Métodos diagnósticos',
+    fisio: '<p>Injeção de contraste nas coronárias sob fluoroscopia define a anatomia; medidas fisiológicas (FFR/iFR) avaliam a significância funcional das estenoses.</p>',
+    resumo: '<p>Padrão-ouro anatômico, com possibilidade de <b>intervenção (ICP)</b> no mesmo tempo. Indicado na alta probabilidade/SCA e em sintomas refratários. <b>Estenose ≥ 70%</b> (≥ 50% no TCE) é significativa; intermediárias (40–70%) → avaliar <b>FFR ≤ 0,80 / iFR ≤ 0,89</b>. Acesso radial preferido (menos sangramento). O escore SYNTAX orienta ICP × cirurgia.</p>',
+    trials: [{ n: 'FAME / FAME 2', t: 'Revascularização guiada por FFR melhora desfechos vs angiografia isolada.' }],
+    recs: [], scores: ['syntax'], guia: 'crônica', pretest: false
+  },
+
+  // ===================== INFILTRATIVAS E SISTÊMICAS =====================
+  {
+    id: 'sarcoidose', nome: 'Sarcoidose cardíaca', area: 'Cardiomiopatia',
+    fisio: '<p>Doença granulomatosa sistêmica (granulomas não caseosos) que infiltra o miocárdio, com predileção pelo <b>septo basal</b> e pelo sistema de condução → BAV, taquicardia ventricular e disfunção/IC. Pode ser isolada ou parte de sarcoidose sistêmica.</p>',
+    resumo: '<p>Suspeite em adulto jovem/meia-idade com <b>BAV inexplicado</b> ou <b>TV</b>. Diagnóstico: RMC (realce tardio focal) e/ou <b>PET-FDG</b> (inflamação ativa); biópsia endomiocárdica tem baixo rendimento. Tratamento: <b>imunossupressão</b> (corticoide) na atividade inflamatória + manejo de IC/arritmia; <b>CDI</b> pelo alto risco arrítmico; marcapasso no BAV.</p>',
+    trials: [], recs: [['CDI prevenção secundária morte súbita', 'CDI'], ['marcapasso BAV', 'Marcapasso']], scores: [], guia: 'Cardiomiopatia', pretest: false
+  },
+  {
+    id: 'fabry', nome: 'Doença de Fabry', area: 'Cardiomiopatia',
+    fisio: '<p>Doença de depósito lisossômico ligada ao X (deficiência de <b>α-galactosidase A</b>) → acúmulo de globotriaosilceramida em múltiplos órgãos, incluindo o coração → <b>hipertrofia concêntrica de VE</b>, fibrose e arritmias.</p>',
+    resumo: '<p>Suspeite em <b>HVE "inexplicada"</b>, sobretudo com manifestações extracardíacas: acroparestesias, angioqueratomas, córnea verticilata, proteinúria/DRC, hipoidrose. <b>Pista na RMC: T1 nativo BAIXO.</b> Diagnóstico: dosagem enzimática (homens) e teste genético (mulheres). Tratamento: <b>terapia de reposição enzimática</b> ou chaperona (migalastate) + manejo cardíaco.</p>',
+    trials: [], recs: [], scores: [], guia: 'Cardiomiopatia', pretest: false
+  },
+  {
+    id: 'sistemicas', nome: 'Doenças sistêmicas com acometimento cardíaco', area: 'Situações especiais',
+    fisio: '<p>Doenças sistêmicas afetam o coração por inflamação, infiltração, sobrecarga metabólica ou toxicidade direta.</p>',
+    resumo: '<p><b>Tireoide:</b> hipertireoidismo (FA, IC de alto débito), hipotireoidismo (derrame pericárdico, bradicardia). <b>Hemocromatose:</b> miocardiopatia restritiva/dilatada por ferro (quelação/flebotomia). <b>Lúpus:</b> pericardite, endocardite de Libman-Sacks, miocardite. <b>Artrite reumatoide/inflamatórias:</b> aterosclerose acelerada, pericardite. <b>Esclerodermia:</b> fibrose miocárdica e hipertensão pulmonar. <b>HIV:</b> miocardiopatia e aterosclerose precoce. <b>Acromegalia, feocromocitoma, Cushing</b> também afetam o coração. Tratar a doença de base + manejo cardíaco.</p>',
+    trials: [], recs: [], scores: [], guia: '', pretest: false
+  },
+  {
+    id: 'noca', nome: 'Angina/isquemia sem obstrução (ANOCA/INOCA)', area: 'Doença coronariana',
+    fisio: '<p>Isquemia/angina sem estenose epicárdica obstrutiva, por <b>disfunção microvascular</b> (reserva de fluxo reduzida) e/ou <b>vasoespasmo</b> coronário (angina de Prinzmetal). Predomina em mulheres.</p>',
+    resumo: '<p>Considere quando há angina/isquemia com coronárias "limpas" ou lesões não obstrutivas. Diagnóstico: <b>teste funcional invasivo</b> — reserva de fluxo coronário (CFR), índice de resistência microvascular (IMR) e <b>provocação com acetilcolina</b> (espasmo). Tratamento por endótipo: <b>microvascular</b> → betabloqueador/BCC, IECA, estatina; <b>vasoespástico</b> → BCC + nitrato, cessar tabagismo, evitar betabloqueador não seletivo.</p>',
+    trials: [{ n: 'CorMicA (2018)', t: 'Estratégia guiada pelo endótipo (teste funcional) melhora angina e qualidade de vida.' }],
+    recs: [['antianginoso angina estável', 'Antianginosos']], scores: [], guia: 'crônica', pretest: false
   }
 ];
 
@@ -1120,7 +1200,16 @@ window.TEMAS_CRIT = {
   prevencao: '<ul><li><b>SCORE2 (&lt; 50 anos):</b> baixo-moderado &lt; 2,5% · alto 2,5–7,5% · muito alto ≥ 7,5% (10 anos).</li><li><b>50–69 anos:</b> &lt; 5 · 5–10 · ≥ 10%. <b>≥ 70 (SCORE2-OP):</b> &lt; 7,5 · 7,5–15 · ≥ 15%.</li><li>Meta de PA &lt; 130/80; metas de LDL conforme o risco.</li></ul>',
   dor: '<ul><li><b>HEART score</b> (História, ECG, Idade, fatores de Risco, Troponina): 0–3 baixo risco (MACE ~1–2%) · 4–6 moderado · 7–10 alto.</li><li><b>Troponina hs 0/1 h:</b> descarta ou confirma rapidamente; valores muito baixos na admissão + ausência de dor recente afastam.</li><li><b>Reduzem SCA:</b> dor pleurítica, posicional, reprodutível à palpação.</li></ul>',
   febrereum: '<ul><li><b>Critérios de Jones (maiores):</b> cardite, artrite (migratória de grandes articulações), coreia de Sydenham, eritema marginado, nódulos subcutâneos.</li><li><b>Menores:</b> febre, artralgia, VHS/PCR elevadas, intervalo PR prolongado.</li><li>Exigir <b>evidência de infecção estreptocócica</b> (ASLO, cultura/teste rápido). Diagnóstico: 2 maiores OU 1 maior + 2 menores.</li></ul>',
-  dilatada: '<ul><li><b>Genes de alto risco arrítmico:</b> LMNA, FLNC, DSP, PLN, RBM20 → considerar CDI com FEVE menos reduzida (≤ 45%) e/ou outros marcadores. TTN é o gene mais comum.</li><li><b>RM cardíaca:</b> realce tardio mesocárdico = fibrose, marcador de arritmia/prognóstico.</li><li>Investigar reversíveis: álcool, taquicardiomiopatia, tireoide, periparto, Chagas.</li></ul>'
+  dilatada: '<ul><li><b>Genes de alto risco arrítmico:</b> LMNA, FLNC, DSP, PLN, RBM20 → considerar CDI com FEVE menos reduzida (≤ 45%) e/ou outros marcadores. TTN é o gene mais comum.</li><li><b>RM cardíaca:</b> realce tardio mesocárdico = fibrose, marcador de arritmia/prognóstico.</li><li>Investigar reversíveis: álcool, taquicardiomiopatia, tireoide, periparto, Chagas.</li></ul>',
+  ecg: '<ul><li><b>Intervalos:</b> PR 120–200 ms · QRS &lt; 120 ms · QTc &gt; 450 (♂)/&gt; 460 (♀) ms, &gt; 500 = risco de Torsades.</li><li><b>Sgarbossa modificado (BRE/MP):</b> supra concordante ≥ 1 mm · infra concordante ≥ 1 mm V1–V3 · supra discordante com ST/S ≤ −0,25.</li><li><b>Equivalentes de OCA:</b> De Winter, Wellens, supra de aVR + infra difuso, IAM posterior (V7–V9).</li></ul>',
+  ergometria: '<ul><li><b>Positivo:</b> infra de ST horizontal ou descendente ≥ 1 mm a 80 ms do ponto J.</li><li><b>Escore de Duke</b> = tempo (min) − 5 × ΔST (mm) − 4 × angina (0/1/2): ≥ +5 baixo risco · −10 a +4 intermediário · &lt; −10 alto risco.</li><li>Avaliar METs e resposta cronotrópica/pressórica.</li></ul>',
+  nuclear: '<ul><li><b>Defeito reversível</b> (estresse, normaliza no repouso) = isquemia. <b>Defeito fixo</b> = infarto/fibrose.</li><li>Isquemia extensa (&gt; 10% do miocárdio) → maior risco.</li><li><b>PYP/DPD (Perugini 2–3)</b> + sem componente monoclonal = amiloidose ATTR.</li></ul>',
+  rmc: '<ul><li><b>Miocardite (Lake Louise 2018):</b> 1 critério T2 (edema) + 1 critério T1 (realce/ T1 mapping).</li><li><b>Viabilidade:</b> realce tardio transmural &gt; 50% = baixa chance de recuperação funcional.</li><li><b>Padrões:</b> amiloide (subendocárdico difuso, T1/ECV altos) · Fabry (T1 baixo) · sarcoidose (focal mesoepicárdico) · CMD (mesocárdico).</li></ul>',
+  tc: '<ul><li><b>Escore de cálcio (Agatston):</b> 0 muito baixo · 1–99 leve · 100–399 moderado · ≥ 400 alto risco.</li><li><b>Angio-TC:</b> alto valor preditivo negativo — ideal para excluir DAC obstrutiva.</li></ul>',
+  cate: '<ul><li><b>Estenose significativa:</b> ≥ 70% (≥ 50% no tronco da coronária esquerda).</li><li><b>Fisiologia (intermediárias):</b> FFR ≤ 0,80 · iFR ≤ 0,89 · QFR ≤ 0,80.</li><li><b>SYNTAX:</b> ≤ 22 favorece ICP · ≥ 33 favorece cirurgia.</li></ul>',
+  sarcoidose: '<ul><li>Predileção pelo <b>septo basal</b> e sistema de condução (BAV, TV).</li><li><b>PET-FDG</b> positivo = inflamação ativa (alvo de imunossupressão); RMC com realce focal.</li><li>BAV inexplicado em &lt; 60 anos → investigar sarcoidose/doença infiltrativa.</li></ul>',
+  fabry: '<ul><li><b>RMC: T1 nativo BAIXO</b> (diferencia de outras causas de HVE, que têm T1 alto).</li><li>Diagnóstico: <b>α-galactosidase A</b> reduzida (♂) · teste genético (♀).</li><li>HVE + acroparestesias/angioqueratomas/proteinúria → suspeitar.</li></ul>',
+  noca: '<ul><li><b>Disfunção microvascular:</b> reserva de fluxo coronário (CFR) &lt; 2,0 e/ou índice de resistência microvascular (IMR) ≥ 25.</li><li><b>Vasoespasmo:</b> espasmo reprodutível ao teste com acetilcolina.</li></ul>'
 };
 
 // Changelog de diretrizes — "o que mudou" recentemente. Curado a partir das publicações oficiais.
@@ -3168,14 +3257,18 @@ window.PROTOCOLOS = [
     ]
   },
   {
-    id: 'stemi', nome: 'IAM com supra (STEMI) — reperfusão', area: 'Síndrome coronariana',
+    id: 'stemi', nome: 'IAM com oclusão coronária aguda (OCA/OMI) — reperfusão', area: 'Síndrome coronariana',
     passos: [
-      { t: 'passo', x: 'Dor torácica + supra de ST ≥ 1 mm em 2 derivações contíguas (≥ 2 mm V2–V3 ♂/≥ 1,5 mm ♀) ou BRE/BRD novo. ECG em ≤ 10 min da chegada.' },
+      { t: 'passo', x: 'ECG de 12 derivações em ≤ 10 min. Objetivo: identificar OCLUSÃO CORONÁRIA AGUDA (OMI) → reperfusão imediata, não apenas o "supra clássico".' },
+      { t: 'passo', x: 'Supra de ST novo no ponto J em ≥ 2 derivações contíguas: ≥ 1 mm (geral); V2–V3 ≥ 2 mm (♂ ≥ 40 a), ≥ 2,5 mm (♂ < 40 a), ≥ 1,5 mm (♀); inferior/posterior (V7–V9) ≥ 0,5 mm; VD (V3R–V4R) ≥ 1 mm (≥ 0,5 se ♀/♂ < 30 a).' },
+      { t: 'alerta', x: 'BRE ou BRD NOVO, por si só, NÃO é critério de supra. No BRE/ritmo de marcapasso, aplique os critérios de SGARBOSSA MODIFICADOS (Smith): supra concordante ≥ 1 mm · infra concordante ≥ 1 mm em V1–V3 · supra discordante excessivo (razão ST/S ≤ −0,25).' },
+      { t: 'decisao', x: 'Reconheça EQUIVALENTES de oclusão (OCA) — reperfusão urgente mesmo SEM supra clássico:' },
+      { t: 'sub', items: ['De Winter: infra de ST ascendente + T apiculada/simétrica em precordiais → oclusão proximal da DA.', 'Supra em aVR ≥ 1 mm com infra de ST difuso → TCE/DA proximal ou doença triarterial.', 'IAM posterior: infra de ST V1–V3 com R alto/T positiva → confirmar com V7–V9.', 'Ondas T hiperagudas (largas, simétricas) — fase precoce da oclusão.', 'Wellens (T bifásica ou profunda em V2–V3, sem dor): suboclusão crítica da DA — angiografar, NÃO trombolisar.'] },
       { t: 'dose', x: 'Antiagregação: AAS 150–300 mg (mastigado) + inibidor de P2Y12 (ticagrelor 180 mg ou prasugrel 60 mg; clopidogrel 600 mg se fibrinólise/sem opção).' },
-      { t: 'dose', x: 'Anticoagulação parenteral (HNF/enoxaparina conforme a estratégia).' },
+      { t: 'dose', x: 'Anticoagulação parenteral (HNF ou enoxaparina conforme a estratégia).' },
       { t: 'decisao', x: 'REPERFUSÃO: ICP primária se exequível em ≤ 120 min do diagnóstico (porta-balão ≤ 90 min).' },
-      { t: 'dose', x: 'Se ICP indisponível no prazo e início < 12 h: FIBRINÓLISE em ≤ 10 min (tenecteplase ajustada ao peso), seguida de transferência para ICP.' },
-      { t: 'alerta', x: 'Não atrasar a reperfusão. Evitar nitrato/morfina de rotina se instabilidade; O₂ só se SatO₂ < 90%.' }
+      { t: 'dose', x: 'Se ICP indisponível no prazo e início < 12 h: FIBRINÓLISE em ≤ 10 min (tenecteplase ajustada ao peso) + transferência para ICP. (Não trombolisar padrão de Wellens/suboclusão sem oclusão ativa.)' },
+      { t: 'alerta', x: 'Não atrasar a reperfusão; ECG seriado se dúvida e dor persistente. O₂ só se SatO₂ < 90%; cuidado com nitrato no IAM de VD/hipotensão.' }
     ]
   },
   {
@@ -4388,13 +4481,14 @@ window.PROTOCOLOS = [
 
   // menu agrupado por grandes áreas
   const CATS = [
-    { c: 'Doença coronariana', ids: ['dor', 'scc', 'sca'] },
-    { c: 'Insuficiência cardíaca e miocardiopatias', ids: ['ic', 'dilatada', 'cmh', 'amiloidose', 'chagas'] },
+    { c: 'Doença coronariana', ids: ['dor', 'scc', 'sca', 'noca'] },
+    { c: 'Insuficiência cardíaca e miocardiopatias', ids: ['ic', 'dilatada', 'cmh', 'amiloidose', 'sarcoidose', 'fabry', 'chagas'] },
     { c: 'Arritmias, síncope e morte súbita', ids: ['fa', 'arritmias', 'sincope'] },
     { c: 'Valvopatias e pericárdio', ids: ['valvopatia', 'febrereum', 'pericardite', 'miocardite', 'endocardite'] },
     { c: 'Aorta, vascular e tromboembolismo', ids: ['aorta', 'dap', 'tep', 'hp'] },
+    { c: 'Métodos diagnósticos', ids: ['ecg', 'rx', 'ergometria', 'eco', 'nuclear', 'rmc', 'tc', 'cate'] },
     { c: 'Prevenção e fatores de risco', ids: ['dislipidemia', 'has', 'prevencao'] },
-    { c: 'Situações especiais', ids: ['congenita', 'onco'] }
+    { c: 'Situações especiais', ids: ['congenita', 'onco', 'sistemicas'] }
   ];
   const byId = {}; T.forEach(t => { byId[t.id] = t; });
   let primeiro = null;
