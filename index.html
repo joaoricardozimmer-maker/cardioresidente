@@ -489,7 +489,10 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .pac-nnt .pac-n-v, .pac-nnt .pac-n-l { color: #fff; }
 .pac-arw { color: var(--muted); font-size: 20px; }
 .pac-txt { font-size: 13.5px; line-height: 1.55; }
-.pac-fonte { font-size: 11.5px; color: var(--muted); margin-top: 8px; }
+.pac-estudo { font-size: 12.5px; margin-top: 10px; padding: 7px 10px; background: #eef3f9; border-left: 3px solid var(--blue); border-radius: 0 6px 6px 0; }
+.pac-estudo a { color: var(--blue); font-weight: 700; text-decoration: none; }
+.pac-estudo a:hover { text-decoration: underline; }
+.pac-fonte { font-size: 11.5px; color: var(--muted); margin-top: 6px; }
 @media (max-width: 860px) { .pac-wrap { grid-template-columns: 1fr; } }
 
 /* ===== Plantão / protocolos ===== */
@@ -4596,7 +4599,8 @@ window.PROTOCOLOS = [
       .map(c => `<label class="sc-check"><input type="checkbox" id="pac-${c[0]}"><span>${c[1]}</span></label>`).join('')}
     </div>`;
 
-  function nntCard(titulo, base, com, arr, nnt, horizonte, txt, fonte) {
+  function nntCard(titulo, base, com, arr, nnt, horizonte, txt, estudo, metodo) {
+    const link = '<a class="tema-trial-link" href="https://pubmed.ncbi.nlm.nih.gov/?term=' + encodeURIComponent(estudo.q) + '&sort=relevance" target="_blank" rel="noopener" title="Abrir no PubMed">' + estudo.nome + '</a>';
     return `<div class="pac-card">
       <div class="pac-card-h">${titulo}</div>
       <div class="pac-nums">
@@ -4606,7 +4610,8 @@ window.PROTOCOLOS = [
         <div class="pac-num pac-nnt"><span class="pac-n-v">NNT ${nnt}</span><span class="pac-n-l">${horizonte}</span></div>
       </div>
       <div class="pac-txt">${txt} <b>Redução absoluta ≈ ${r1(arr)}%.</b></div>
-      <div class="pac-fonte">${fonte}</div>
+      <div class="pac-estudo">📚 <b>Estudo-base:</b> ${link}</div>
+      <div class="pac-fonte">${metodo}</div>
     </div>`;
   }
 
@@ -4643,7 +4648,8 @@ window.PROTOCOLOS = [
       const nnt = Math.max(1, Math.round(100 / arr));
       cards += nntCard('Anticoagulação na FA (prevenção de AVC)', base, com, arr, nnt, 'por ano',
         'Risco anual de AVC estimado por CHA₂DS₂-VA = ' + cv + '. A anticoagulação reduz ~64% esse risco. Pondere contra o risco de sangramento (HAS-BLED).',
-        'Taxas de AVC ajustadas (Friberg/ESC) · RRR ~64% (meta-análise de anticoagulação na FA).');
+        { nome: 'Hart et al., Ann Intern Med 2007 (meta-análise)', q: 'antithrombotic therapy to prevent stroke atrial fibrillation Hart meta-analysis' },
+        'Risco basal de AVC por CHA₂DS₂-VA (Friberg 2012); RRR ~64% vs controle. DOACs com eficácia ≥ varfarina (RE-LY, ROCKET-AF, ARISTOTLE, ENGAGE).');
     }
 
     // 2) Redução de LDL (estatina ± ezetimiba/PCSK9) — relação do CTT
@@ -4660,7 +4666,8 @@ window.PROTOCOLOS = [
           const nnt = Math.max(1, Math.round(100 / arr));
           cards += nntCard('Reduzir o LDL para &lt; ' + alvo + ' mg/dL', base, com, arr, nnt, 'em 10 anos',
             'Baixar o LDL de ' + P.ldl + ' para ' + alvo + ' mg/dL (Δ ≈ ' + r1(dmmol) + ' mmol/L). Pelo CTT (~22% de redução de eventos por mmol/L), a RRR é ~' + Math.round(rrr * 100) + '% sobre um risco basal de ' + base10 + '% em 10 anos.',
-            'Cholesterol Treatment Trialists (CTT), Lancet 2010 · risco basal ' + (P.dcv ? 'estimado (DCV estabelecida)' : 'informado') + '.');
+            { nome: 'Cholesterol Treatment Trialists (CTT), Lancet 2010', q: 'Cholesterol Treatment Trialists efficacy safety more intensive lowering LDL 2010 meta-analysis' },
+            'RRR ~22% por mmol/L de LDL reduzido; risco basal ' + (P.dcv ? 'estimado (DCV estabelecida ~30%/10 anos)' : 'informado pelo usuário') + '.');
         }
       } else {
         cards += '<div class="pac-card"><div class="pac-card-h">Reduzir o LDL</div><div class="pac-txt">Marque <b>DCV estabelecida</b> ou informe o <b>risco CV em 10 anos</b> para personalizar o NNT.</div></div>';
@@ -4672,7 +4679,8 @@ window.PROTOCOLOS = [
       const base = 21.2, com = 16.3, arr = 4.9, nnt = 21;
       cards += nntCard('iSGLT2 na ICFEr (dapagliflozina)', base, com, arr, nnt, 'em ~18 meses',
         'Na ICFEr (FEVE ≤ 40%), o iSGLT2 reduz morte CV/piora de IC. Benefício médio do ensaio (não individualizado pelo risco basal).',
-        'DAPA-HF (NEJM 2019): desfecho composto 16,3% vs 21,2%.');
+        { nome: 'DAPA-HF (McMurray, NEJM 2019)', q: 'DAPA-HF dapagliflozin heart failure reduced ejection fraction McMurray 2019' },
+        'Desfecho composto (morte CV/piora de IC) 16,3% vs 21,2%; mediana ~18 meses.');
     }
 
     if (!cards) cards = '<p class="muted small">Preencha o perfil para ver o benefício personalizado das condutas (ex.: marque Fibrilação atrial, informe o LDL, a FEVE...).</p>';
