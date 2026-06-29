@@ -4907,7 +4907,50 @@ window.PROTOCOLOS = [
       emUso: () => false,
       contra: (p, c) => (c.k != null && c.k > 5.0) ? 'K⁺ > 5,0 mEq/L' : null,
       beneficio: () => ({ base: 21.1, com: 17.8, arr: 3.3, nnt: 30, horiz: '~2,6 anos', txt: 'DRC com DM2 e albuminúria, em adição a IECA/BRA e iSGLT2. Vigiar K⁺.' }),
-      estudo: { nome: 'FIDELIO-DKD (NEJM 2020)', q: 'FIDELIO-DKD finerenone chronic kidney disease type 2 diabetes 2020' } }
+      estudo: { nome: 'FIDELIO-DKD (NEJM 2020)', q: 'FIDELIO-DKD finerenone chronic kidney disease type 2 diabetes 2020' } },
+
+    // ---------------- Prevenção / estilo de vida ----------------
+    { id: 'tabag', nome: 'Cessação do tabagismo', grupo: 'Prevenção / estilo de vida',
+      aplica: (p) => p.tabag,
+      emUso: () => false,
+      contra: () => null,
+      beneficio: () => ({ txt: '<b>A intervenção isolada de maior impacto</b> na prevenção CV. Aconselhamento estruturado + farmacoterapia: vareniclina (mais eficaz), bupropiona ou terapia de reposição de nicotina. O risco CV cai progressivamente após a parada.' }),
+      estudo: { nome: 'Cochrane — farmacoterapia para cessação do tabagismo', q: 'pharmacological interventions smoking cessation Cochrane review' } },
+
+    { id: 'pa_meta', nome: 'Controle pressórico (meta de PA)', grupo: 'Prevenção / estilo de vida',
+      aplica: (p) => p.has,
+      emUso: () => false,
+      contra: () => null,
+      beneficio: () => ({ txt: 'Meta geralmente <b>&lt; 130/80 mmHg</b> se tolerada (AHA/ACC 2025; ESC 2024) — reduz AVC, IC e eventos CV (SPRINT). Combinar estilo de vida (sal &lt; 2 g Na/dia, peso, exercício, álcool) + anti-hipertensivos; preferir terapia combinada precoce.' }),
+      estudo: { nome: 'SPRINT (NEJM 2015)', q: 'SPRINT intensive blood pressure control 2015' } },
+
+    { id: 'atividade', nome: 'Atividade física e dieta cardioprotetora', grupo: 'Prevenção / estilo de vida',
+      aplica: (p, c) => c.ascvd || p.ic || p.has || p.dm || p.obesidade || (p.risco10 != null && p.risco10 >= 7.5),
+      emUso: () => false,
+      contra: () => null,
+      beneficio: () => ({ txt: '<b>≥ 150 min/semana</b> de atividade aeróbica moderada (ou 75 min vigorosa) + treino de força 2×/semana. Dieta tipo mediterrânea reduz eventos CV (PREDIMED). Base da prevenção primária e secundária.' }),
+      estudo: { nome: 'PREDIMED (NEJM 2018) / diretrizes de atividade física', q: 'PREDIMED mediterranean diet cardiovascular prevention' } },
+
+    { id: 'glicemia', nome: 'Controle glicêmico (metas individualizadas)', grupo: 'Prevenção / estilo de vida',
+      aplica: (p) => p.dm,
+      emUso: () => false,
+      contra: () => null,
+      beneficio: () => ({ txt: 'Meta de HbA1c <b>individualizada</b> (~7%, mais flexível em idosos/comorbidades). <b>Priorizar agentes com benefício CV/renal</b> (iSGLT2, GLP-1) em vez do controle glicêmico isolado; evitar hipoglicemia.' }),
+      estudo: { nome: 'ADA/EASD — manejo da hiperglicemia (consenso)', q: 'ADA EASD consensus management hyperglycemia type 2 diabetes' } },
+
+    { id: 'obes_glp1', nome: 'Semaglutida (obesidade + DCV, sem diabetes)', grupo: 'Prevenção / estilo de vida',
+      aplica: (p, c) => p.obesidade && c.ascvd && !p.dm,
+      emUso: p => p.m_glp1,
+      contra: p => p.gravidez ? 'gravidez' : null,
+      beneficio: () => ({ base: 8.0, com: 6.5, arr: 1.5, nnt: 67, horiz: '~3,3 anos', txt: 'Sobrepeso/obesidade com DCV estabelecida e <b>sem diabetes</b>: semaglutida 2,4 mg reduz eventos cardiovasculares maiores (SELECT), além da perda de peso.' }),
+      estudo: { nome: 'SELECT (NEJM 2023)', q: 'SELECT semaglutide cardiovascular outcomes obesity without diabetes 2023' } },
+
+    { id: 'vacina', nome: 'Vacinação (influenza anual)', grupo: 'Prevenção / estilo de vida',
+      aplica: (p, c) => c.ascvd || p.ic,
+      emUso: () => false,
+      contra: () => null,
+      beneficio: () => ({ txt: 'Vacina <b>influenza anual</b> reduz eventos CV em pacientes com doença cardiovascular (IAMI) — recomendação Classe I. Considerar também pneumocócica e COVID-19 conforme calendário.' }),
+      estudo: { nome: 'IAMI trial (Circulation 2021)', q: 'IAMI influenza vaccination acute myocardial infarction 2021' } }
   ];
 
   // ---------- formulário ----------
@@ -4925,7 +4968,7 @@ window.PROTOCOLOS = [
     </div>
     <div class="pac-sec">Comorbidades</div>
     <div class="pac-checks">
-      ${[['has', 'Hipertensão'], ['dm', 'Diabetes'], ['dislip', 'Dislipidemia'], ['tabag', 'Tabagismo'], ['dcv', 'DCV aterosclerótica estabelecida'], ['iam', 'IAM prévio'], ['sca_rec', 'SCA/ICP recente (≤12 meses)'], ['angina', 'Angina estável'], ['fa', 'Fibrilação atrial'], ['ic', 'Insuficiência cardíaca'], ['avc', 'AVC/AIT prévio'], ['vascular', 'Doença vascular periférica/carótida'], ['asma', 'Asma/DPOC grave'], ['gravidez', 'Gestante']]
+      ${[['has', 'Hipertensão'], ['dm', 'Diabetes'], ['dislip', 'Dislipidemia'], ['tabag', 'Tabagismo'], ['dcv', 'DCV aterosclerótica estabelecida'], ['iam', 'IAM prévio'], ['sca_rec', 'SCA/ICP recente (≤12 meses)'], ['angina', 'Angina estável'], ['fa', 'Fibrilação atrial'], ['ic', 'Insuficiência cardíaca'], ['avc', 'AVC/AIT prévio'], ['vascular', 'Doença vascular periférica/carótida'], ['obesidade', 'Obesidade / sobrepeso'], ['asma', 'Asma/DPOC grave'], ['gravidez', 'Gestante']]
       .map(c => `<label class="sc-check"><input type="checkbox" id="pac-${c[0]}"><span>${c[1]}</span></label>`).join('')}
     </div>
     <div class="pac-sec">Medicações / terapias em uso</div>
@@ -4935,7 +4978,7 @@ window.PROTOCOLOS = [
     </div>`;
 
   const MED_KEYS = ['m_ieca', 'm_arni', 'm_bb', 'm_mra', 'm_isglt2', 'm_diur', 'm_ivab', 'm_vericiguat', 'm_hidnit', 'm_ferro', 'm_cdi', 'm_trc', 'm_estatina', 'm_ezet', 'm_pcsk9', 'm_aas', 'm_p2y12', 'm_colchicina', 'm_nitrato', 'm_bcc', 'm_reab', 'm_aco', 'm_digoxina', 'm_antiarr', 'm_ablacao', 'm_glp1'];
-  const COMORB_KEYS = ['has', 'dm', 'dislip', 'tabag', 'dcv', 'iam', 'sca_rec', 'angina', 'fa', 'ic', 'avc', 'vascular', 'asma', 'gravidez'];
+  const COMORB_KEYS = ['has', 'dm', 'dislip', 'tabag', 'dcv', 'iam', 'sca_rec', 'angina', 'fa', 'ic', 'avc', 'vascular', 'obesidade', 'asma', 'gravidez'];
 
   function read() {
     P.idade = n(document.getElementById('pac-idade').value);
