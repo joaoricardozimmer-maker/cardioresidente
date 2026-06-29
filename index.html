@@ -495,6 +495,7 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .pac-fonte { font-size: 11.5px; color: var(--muted); margin-top: 6px; }
 .pac-sec { font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 16px 0 4px; }
 .pac-score { font-size: 13px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; }
+.pac-risco { font-size: 13px; background: #eef3f9; border: 1px solid var(--line); border-left: 4px solid var(--blue); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; line-height: 1.5; }
 .pac-tag { font-size: 10.5px; font-weight: 700; background: var(--bg-soft); color: var(--muted); border-radius: 6px; padding: 2px 7px; margin-left: 6px; vertical-align: middle; }
 .pac-h-gap { color: #b07414; }
 .pac-h-uso { color: var(--green); }
@@ -3597,6 +3598,38 @@ window.PROTOCOLOS = [
       }
     },
     {
+      id:'archbr', grupo:'Antiagregação', nome:'ARC-HBR (alto risco de sangramento)',
+      desc:'Define alto risco hemorrágico (HBR) para guiar a duração/escolha da DAPT. HBR = ≥ 1 critério MAIOR ou ≥ 2 MENORES (consenso ARC-HBR 2019).',
+      campos:[
+        {id:'aco', tipo:'chk', maj:true, label:'MAIOR — uso prolongado de anticoagulante oral'},
+        {id:'drcg', tipo:'chk', maj:true, label:'MAIOR — DRC grave/terminal (TFG < 30 mL/min)'},
+        {id:'hb11', tipo:'chk', maj:true, label:'MAIOR — hemoglobina < 11 g/dL'},
+        {id:'sangr6', tipo:'chk', maj:true, label:'MAIOR — sangramento espontâneo com internação/transfusão nos últimos 6 meses (ou recorrente)'},
+        {id:'plaq', tipo:'chk', maj:true, label:'MAIOR — plaquetopenia moderada/grave (< 100.000/µL)'},
+        {id:'diatese', tipo:'chk', maj:true, label:'MAIOR — diátese hemorrágica crônica'},
+        {id:'cirrose', tipo:'chk', maj:true, label:'MAIOR — cirrose com hipertensão portal'},
+        {id:'neo', tipo:'chk', maj:true, label:'MAIOR — neoplasia ativa (últimos 12 meses)'},
+        {id:'hic', tipo:'chk', maj:true, label:'MAIOR — HIC espontânea prévia; HIC traumática < 12m; MAV cerebral; ou AVC isquêmico moderado/grave < 6m'},
+        {id:'cirurgia', tipo:'chk', maj:true, label:'MAIOR — cirurgia maior não adiável sob DAPT; ou cirurgia maior/trauma < 30 dias antes da ICP'},
+        {id:'idade', tipo:'chk', label:'menor — idade ≥ 75 anos'},
+        {id:'drcm', tipo:'chk', label:'menor — DRC moderada (TFG 30–59 mL/min)'},
+        {id:'hbm', tipo:'chk', label:'menor — hemoglobina 11–12,9 (♂) / 11–11,9 (♀) g/dL'},
+        {id:'sangr12', tipo:'chk', label:'menor — sangramento espontâneo com internação/transfusão nos últimos 12 meses (sem critério maior)'},
+        {id:'aine', tipo:'chk', label:'menor — uso prolongado de AINE ou corticoide oral'},
+        {id:'avc', tipo:'chk', label:'menor — qualquer AVC isquêmico prévio (sem critério maior)'}
+      ],
+      calc(v){
+        let maj=0, men=0;
+        this.campos.forEach(c=>{ if(v[c.id]){ if(c.maj) maj++; else men++; } });
+        const hbr = maj>=1 || men>=2;
+        const nivel = hbr ? 'bad' : 'ok';
+        const cond = hbr
+          ? '<b>Alto risco de sangramento (HBR).</b> Favorece <b>DAPT mais curta</b> (ex.: 1–3 meses e depois monoterapia — de preferência com inibidor de P2Y12) e/ou agente menos potente; acesso radial, IBP e correção de fatores modificáveis (anemia, AINE, PA). Pesar contra o risco isquêmico (DAPT score / PRECISE-DAPT).'
+          : 'Não preenche critérios de HBR. DAPT de duração padrão conforme o risco isquêmico.';
+        return { valor: (hbr?'HBR positivo':'HBR negativo')+' · '+maj+' maior / '+men+' menor', nivel, conduta: cond };
+      }
+    },
+    {
       id:'h2fpef', grupo:'Insuficiência cardíaca', nome:'H₂FPEF',
       desc:'Probabilidade de IC com fração de ejeção preservada (ICFEp).',
       campos:[
@@ -5026,14 +5059,14 @@ window.PROTOCOLOS = [
       aplica: (p) => p.sca_rec,
       emUso: p => p.m_aas && p.m_p2y12,
       contra: () => null,
-      beneficio: () => ({ txt: 'Pós-SCA/ICP: AAS + inibidor de P2Y12 por ~12 meses. Ajustar a duração pelo equilíbrio isquêmico × hemorrágico (DAPT score / PRECISE-DAPT).' }),
+      beneficio: () => ({ txt: 'Pós-SCA/ICP: AAS + inibidor de P2Y12 por ~12 meses. Ajustar a duração pelo equilíbrio isquêmico × hemorrágico (DAPT score / PRECISE-DAPT / <b>ARC-HBR</b> para risco de sangramento).' }),
       agentes: [
         { n: 'Ticagrelor', t: 'PLATO', o: 'preferido na SCA; reversível; pode causar dispneia; não exige conhecer a anatomia coronária' },
         { n: 'Prasugrel', t: 'TRITON-TIMI 38 · ISAR-REACT 5', o: 'na SCA tratada com ICP; <b>ISAR-REACT 5</b> sugeriu superioridade sobre o ticagrelor. <b>Contraindicado se AVC/AIT prévio</b>; cautela se &gt; 75 anos ou &lt; 60 kg' },
         { n: 'Clopidogrel', t: 'CURE', o: 'quando ticagrelor/prasugrel são contraindicados, alto risco de sangramento, ou em associação a anticoagulante (terapia tripla curta)' }
       ],
       agentesNota: 'Na SCA, prefira ticagrelor ou prasugrel ao clopidogrel (PLATO; TRITON). O prasugrel não foi melhor no pré-tratamento sem anatomia conhecida (ACCOAST).',
-      estudo: { nome: 'PLATO (NEJM 2009) / PEGASUS-TIMI 54', q: 'PLATO ticagrelor acute coronary syndrome 2009' }, score: 'dapt' },
+      estudo: { nome: 'PLATO (NEJM 2009) / PEGASUS-TIMI 54', q: 'PLATO ticagrelor acute coronary syndrome 2009' }, score: 'dapt', score2: 'archbr' },
 
     { id: 'bbpos', nome: 'Betabloqueador pós-IAM', grupo: 'Coronariopatia / pós-IAM',
       aplica: (p, c) => (p.iam || p.sca_rec) && !c.icfer,
@@ -5411,6 +5444,7 @@ window.PROTOCOLOS = [
     bts.push('<button class="pac-go pac-go-why" data-go="tutor" data-arg="' + esc(iv.id) + '">🎓 Por quê?</button>');
     if (iv.doses) bts.push('<button class="pac-go" data-go="doses" data-arg="' + esc(iv.doses) + '">💊 Dose / ajuste renal</button>');
     if (iv.score) bts.push('<button class="pac-go" data-go="score" data-arg="' + esc(iv.score) + '">🧮 Calcular score</button>');
+    if (iv.score2) bts.push('<button class="pac-go" data-go="score" data-arg="' + esc(iv.score2) + '">🩸 ARC-HBR (sangramento)</button>');
     if (iv.evid) bts.push('<button class="pac-go" data-go="evid" data-arg="' + esc(iv.evid) + '">📚 Ver recomendação</button>');
     return '<div class="pac-golinks">' + bts.join('') + '</div>';
   }
@@ -5441,6 +5475,31 @@ window.PROTOCOLOS = [
       badges(g.iv, g.b) + nums(g.b) +
       '<div class="pac-txt">' + g.b.txt + (g.b.arr != null ? ' <b>Redução absoluta ≈ ' + r1(g.b.arr) + '%.</b>' : '') + '</div>' +
       agentesBlock(g.iv) + estudoLink(g.iv.estudo) + cardLinks(g.iv) + '</div>';
+  }
+
+  function riscoBlock(c) {
+    let txt, showPrevent = true;
+    if (c.ascvd || c.icfer || c.icfep) {
+      txt = '<b>Muito alto risco</b> (prevenção secundária / doença CV estabelecida) — meta de LDL <b>&lt; 55 mg/dL</b> e redução ≥ 50%, PA &lt; 130/80. Não é necessário calcular escore.';
+      showPrevent = false;
+    } else if (c.drc) {
+      txt = '<b>DRC</b> — risco alto a muito alto conforme TFG/albuminúria; meta de LDL &lt; 70 (ou &lt; 55 se muito alto). Calculadora de escore tem valor limitado na DRC avançada.';
+      showPrevent = false;
+    } else if (P.dm) {
+      txt = '<b>Diabetes</b> — risco alto a muito alto conforme tempo de doença, lesão de órgão-alvo e fatores de risco. Use a versão para diabetes (PREVENT/SCORE2-Diabetes).';
+    } else if (P.risco10 != null) {
+      const r = P.risco10; const cat = r < 5 ? 'baixo' : r < 7.5 ? 'limítrofe' : r < 20 ? 'intermediário' : 'alto';
+      txt = 'Risco informado: <b>' + r + '%</b> em 10 anos — categoria <b>' + cat + '</b>.' + (r >= 7.5 ? ' Favorece estatina + estilo de vida.' : ' Foco em estilo de vida; reavaliar periodicamente.');
+    } else {
+      txt = 'Sem evento aterosclerótico estabelecido — <b>calcule o risco em 10 anos</b> (PREVENT/AHA) e preencha o campo "Risco CV 10a" para personalizar as metas.';
+    }
+    let links = '<div class="pac-golinks">';
+    if (showPrevent) {
+      links += '<button class="pac-go" data-go="score" data-arg="prevent">🧮 Abrir PREVENT no site</button>';
+      links += '<a class="pac-go" style="text-decoration:none;display:inline-block" href="https://professional.heart.org/en/guidelines-and-statements/prevent-calculator" target="_blank" rel="noopener">↗ Calculadora PREVENT (AHA)</a>';
+    }
+    links += '</div>';
+    return '<div class="pac-risco"><b>🎯 Risco cardiovascular:</b> ' + txt + links + '</div>';
   }
 
   let lastPlan = '';
@@ -5475,7 +5534,7 @@ window.PROTOCOLOS = [
       '<button class="pac-go pac-go-main" data-go="copy" data-arg="">📋 Copiar plano p/ prontuário</button>' +
       '</div>';
 
-    let html = resumo + actions;
+    let html = resumo + actions + riscoBlock(c);
     const totalInd = gaps.length + uso.length + contra.length;
     if (totalInd) html += '<div class="pac-score">Terapias indicadas: <b>' + totalInd + '</b> · em uso <b>' + uso.length + '</b> · <b style="color:#b07414">oportunidades ' + gaps.length + '</b> · contraindicadas ' + contra.length + '</div>';
 
