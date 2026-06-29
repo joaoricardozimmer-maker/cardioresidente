@@ -4888,14 +4888,13 @@ window.PROTOCOLOS = [
       aplica: (p, c) => c.icfer,
       emUso: p => p.m_bb,
       contra: (p, c) => (c.fc != null && c.fc < 50) ? 'FC < 50 bpm' : (p.asma ? 'asma/DPOC grave (preferir beta-1 seletivo, cautela)' : null),
-      beneficio: () => ({ base: 17.3, com: 11.8, arr: 5.5, nnt: 18, horiz: '~1,3 ano', txt: 'Pilar — reduz mortalidade. Iniciar com o paciente compensado e titular a cada 2 semanas. <b>Use apenas os 4 com evidência de mortalidade na ICFEr.</b>' }),
+      beneficio: () => ({ base: 17.3, com: 11.8, arr: 5.5, nnt: 18, horiz: '~1,3 ano', txt: 'Pilar — reduz mortalidade. Iniciar com o paciente compensado e titular a cada 2 semanas. <b>Use os 3 com evidência de mortalidade na ICFEr.</b>' }),
       agentes: [
         { n: 'Carvedilol', t: 'COPERNICUS / US Carvedilol', o: 'β1+β2+α; benefício mesmo na IC grave' },
         { n: 'Succinato de metoprolol (CR/XL)', t: 'MERIT-HF', o: 'β1 seletivo de liberação prolongada' },
-        { n: 'Bisoprolol', t: 'CIBIS-II', o: 'β1 seletivo' },
-        { n: 'Nebivolol', t: 'SENIORS', o: 'β1 + vasodilatador; evidência em idosos' }
+        { n: 'Bisoprolol', t: 'CIBIS-II', o: 'β1 seletivo' }
       ],
-      agentesNota: '<b>Atenolol</b> e <b>metoprolol tartarato</b> NÃO têm evidência de mortalidade na ICFEr — não substituem os acima.',
+      agentesNota: '<b>Nebivolol (SENIORS)</b> reduziu o desfecho composto de morte/hospitalização CV, mas <b>NÃO</b> a mortalidade isolada — opção sobretudo no idoso, não preferencial. <b>Atenolol</b> e <b>metoprolol tartarato</b> não têm evidência na ICFEr.',
       estudo: { nome: 'CIBIS-II (Lancet 1999)', q: 'CIBIS-II bisoprolol heart failure mortality 1999' }, doses: 'carvedilol' },
 
     { id: 'mra', nome: 'Antagonista mineralocorticoide (espironolactona)', grupo: 'ICFEr — pilares',
