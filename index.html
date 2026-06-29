@@ -511,6 +511,8 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .pac-go-main { background: var(--bg-soft); }
 .pac-golinks { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
 .pac-golinks .pac-go { font-size: 12px; padding: 5px 9px; }
+.pac-go-why { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.pac-go-why:hover { background: var(--accent); color: #fff; }
 @media (max-width: 860px) { .pac-wrap { grid-template-columns: 1fr; } }
 /* ---- Tutor socrático ---- */
 .tutor-wrap { max-width: 820px; }
@@ -4708,7 +4710,8 @@ window.PROTOCOLOS = [
   const MODOS = [
     { id: 'livre', t: '💬 Tutoria livre', d: 'Traga uma dúvida ou tema; o tutor explora seu raciocínio.' },
     { id: 'caso', t: '🩺 Caso clínico', d: 'O tutor cria um caso e conduz você do diagnóstico à conduta.' },
-    { id: 'quiz', t: '❓ Quiz dirigido', d: 'Perguntas conceituais progressivas sobre um tema.' }
+    { id: 'quiz', t: '❓ Quiz dirigido', d: 'Perguntas conceituais progressivas sobre um tema.' },
+    { id: 'paciente', t: '🧬 Meu paciente', d: 'Discuta o caso montado no gêmeo digital (aba Paciente) e o porquê de cada conduta.' }
   ];
   const TEMAS = ['Insuficiência cardíaca', 'Síndrome coronariana aguda (OCA/OMI)', 'Fibrilação atrial', 'Valvopatias', 'Dislipidemia e prevenção', 'Hipertensão', 'Arritmias e síncope', 'Emergências (plantão)'];
 
@@ -4753,9 +4756,9 @@ window.PROTOCOLOS = [
     return div;
   }
 
-  async function send(text, isStart) {
+  async function send(text, isStart, displayText) {
     if (busy) return;
-    if (!isStart) { messages.push({ role: 'user', text }); addBubble('user', fmt(text)); }
+    if (!isStart) { messages.push({ role: 'user', text }); addBubble('user', fmt(displayText || text)); }
     busy = true;
     const loading = addBubble('tutor', '<span class="tutor-dots"><i></i><i></i><i></i></span>');
     try {
@@ -4784,6 +4787,7 @@ window.PROTOCOLOS = [
   txtEl.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSend(); } });
   document.getElementById('tutor-iniciar').addEventListener('click', () => {
     if (busy) return;
+    if (modo === 'paciente') { startPaciente(); return; }
     chatEl.innerHTML = ''; messages = [];
     const kick = modo === 'caso'
       ? 'Crie um caso clínico cardiológico e faça a primeira pergunta.'
@@ -4791,6 +4795,25 @@ window.PROTOCOLOS = [
     messages.push({ role: 'user', text: kick });
     send(null, true);
   });
+
+  function startPaciente() {
+    const txt = window.cardioPaciente ? window.cardioPaciente.texto() : '';
+    if (!txt || !/OPORTUNIDADES/.test(txt)) {
+      chatEl.innerHTML = '';
+      addBubble('sys', 'Monte um paciente na aba 🧬 Paciente primeiro (preencha comorbidades e medicações). Depois volte aqui e clique em Iniciar — ou use o botão "🎓 Por quê?" em cada conduta.');
+      return;
+    }
+    chatEl.innerHTML = ''; messages = [];
+    send('Discuta comigo o paciente abaixo: explique o PORQUÊ de cada conduta (mecanismo + evidência/diretriz + benefício), a ordem de otimização e as contraindicações. Depois faça uma pergunta para fixar.\n\n' + txt,
+      false, 'Vamos discutir o paciente que montei no gêmeo digital — explique o porquê de cada conduta.');
+  }
+
+  // chamado pela aba Paciente (botão "🎓 Por quê?")
+  window.cardioTutorExplica = function (apiText, displayText) {
+    modo = 'paciente'; renderModos();
+    chatEl.innerHTML = ''; messages = [];
+    send(apiText, false, displayText);
+  };
 
   renderModos();
   resetChat();
@@ -5268,10 +5291,11 @@ window.PROTOCOLOS = [
   }
   function cardLinks(iv) {
     const bts = [];
+    bts.push('<button class="pac-go pac-go-why" data-go="tutor" data-arg="' + esc(iv.id) + '">🎓 Por quê?</button>');
     if (iv.doses) bts.push('<button class="pac-go" data-go="doses" data-arg="' + esc(iv.doses) + '">💊 Dose / ajuste renal</button>');
     if (iv.score) bts.push('<button class="pac-go" data-go="score" data-arg="' + esc(iv.score) + '">🧮 Calcular score</button>');
     if (iv.evid) bts.push('<button class="pac-go" data-go="evid" data-arg="' + esc(iv.evid) + '">📚 Ver recomendação</button>');
-    return bts.length ? '<div class="pac-golinks">' + bts.join('') + '</div>' : '';
+    return '<div class="pac-golinks">' + bts.join('') + '</div>';
   }
 
   let lastPlan = '';
@@ -5370,11 +5394,22 @@ window.PROTOCOLOS = [
     else if (act === 'pretest') go('pretest', () => { if (window.cardioPretestFill) window.cardioPretestFill(); });
     else if (act === 'evid') go('evidencia', () => { const i = document.getElementById('busca-input'); if (i) { i.value = arg; const f = document.getElementById('busca-form'); if (f) f.dispatchEvent(new Event('submit', { cancelable: true })); } });
     else if (act === 'copy') { if (window.copyText) window.copyText(lastPlan); else navigator.clipboard.writeText(lastPlan); }
+    else if (act === 'tutor') {
+      const iv = INTERV.find(x => x.id === arg); if (!iv) return;
+      const nome = iv.nome.replace(/<[^>]+>/g, '');
+      const prompt = 'Explique, como tutor, o PORQUÊ desta conduta para ESTE paciente específico: "' + nome + '" (grupo ' + iv.grupo + ').'
+        + ' Aborde o mecanismo, a evidência/diretriz' + (iv.estudo ? ' (ex.: ' + iv.estudo.nome + ')' : '') + ' e o benefício esperado; aponte cuidados e contraindicações relevantes.'
+        + ' Seja didático e, ao final, faça uma pergunta para eu fixar.\n\nContexto do paciente (gêmeo digital):\n' + lastPlan;
+      go('tutor', () => { if (window.cardioTutorExplica) window.cardioTutorExplica(prompt, '🎓 Por que: ' + nome + '?'); });
+    }
   }
 
   root.innerHTML =
     '<div class="rec-revbanner">Monte o paciente (dados clínicos + comorbidades + o que ele <b>já usa</b>) e o gêmeo digital mostra as <b>lacunas de tratamento</b> com benefício absoluto/NNT e estudo, o que está <b>em uso</b> e o que está <b>contraindicado</b>. Quanto mais dados (PA, NYHA, QRS, ferritina, albuminúria…), mais precisas as condutas. Botões levam a Scores/Pré-teste/Doses já preenchidos e você pode copiar o plano. Apoio à decisão; não substitui o julgamento clínico.</div>' +
     '<div class="pac-wrap"><div class="pac-form">' + CAMPOS + '</div><div class="pac-out" id="pac-out"></div></div>';
+
+  // expõe o resumo do paciente para o Tutor socrático discutir o caso
+  window.cardioPaciente = { texto: () => lastPlan };
 
   root.querySelectorAll('.pac-form input, .pac-form select').forEach(el => el.addEventListener('input', compute));
   document.getElementById('pac-out').addEventListener('click', e => {
