@@ -513,6 +513,25 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .pac-golinks .pac-go { font-size: 12px; padding: 5px 9px; }
 .pac-go-why { border-color: var(--accent); color: var(--accent); font-weight: 700; }
 .pac-go-why:hover { background: var(--accent); color: #fff; }
+.pac-legenda { font-size: 12.5px; color: var(--muted); margin: 2px 0 12px; }
+.pac-tier { font-weight: 800; font-size: 13.5px; margin: 18px 0 8px; padding: 6px 12px; border-radius: 8px; }
+.pac-tier-n { font-weight: 600; opacity: .7; }
+.pac-tier-I { background: #e7f4ec; color: #1d7a44; border-left: 4px solid #1d7a44; }
+.pac-tier-IIa { background: #fbf2e0; color: #9a6a12; border-left: 4px solid #d99a2b; }
+.pac-tier-IIb { background: #fdeede; color: #9a5512; border-left: 4px solid #d97b2b; }
+.pac-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 9px; }
+.pac-classe, .pac-nivel, .pac-impact { font-size: 11px; font-weight: 700; border-radius: 6px; padding: 3px 8px; }
+.pac-classe { color: #fff; }
+.pac-classe.c-I { background: #1d7a44; }
+.pac-classe.c-IIa { background: #d99a2b; }
+.pac-classe.c-IIb { background: #d97b2b; }
+.pac-classe.c-III { background: #c0392b; }
+.pac-nivel { background: var(--bg-soft); color: var(--muted); }
+.pac-impact { background: var(--bg-soft); color: var(--text); }
+.pac-impact.imp-alto { background: #e7f4ec; color: #1d7a44; }
+.pac-impact.imp-moderado { background: #fbf2e0; color: #9a6a12; }
+.pac-impact.imp-menor { background: #eef0f2; color: #6b7280; }
+.pac-impact.imp-quali { background: #eef3f9; color: #2f6f9f; }
 @media (max-width: 860px) { .pac-wrap { grid-template-columns: 1fr; } }
 /* ---- Tutor socrático ---- */
 .tutor-wrap { max-width: 820px; }
@@ -5215,6 +5234,32 @@ window.PROTOCOLOS = [
       estudo: { nome: 'IAMI trial (Circulation 2021)', q: 'IAMI influenza vaccination acute myocardial infarction 2021' } }
   ];
 
+  // Classe de recomendação e nível de evidência (referência geral ESC/AHA/SBC; pode variar por sociedade/contexto).
+  const CLASSE = {
+    raas: ['I', 'A'], bb: ['I', 'A'], mra: ['I', 'A'], sglt2hf: ['I', 'A'],
+    diur: ['I', 'C'], ivab: ['IIa', 'B'], ferro: ['IIa', 'A'], vericiguat: ['IIb', 'B'], hidnit: ['IIa', 'B'],
+    cdi: ['I', 'A'], trc: ['I', 'A'],
+    sglt2pef: ['I', 'A'], mrapef: ['IIa', 'B'],
+    aco: ['I', 'A'], fa_freq: ['I', 'B'], fa_ritmo: ['IIa', 'B'], fa_ablacao: ['I', 'A'],
+    dapt: ['I', 'A'], bbpos: ['IIa', 'B'], iecapos: ['I', 'A'], colchicina: ['IIa', 'A'], angina: ['I', 'B'], reab: ['I', 'A'],
+    estatina: ['I', 'A'], ezet: ['I', 'B'], pcsk9: ['I', 'A'], aas: ['I', 'A'],
+    sglt2dm: ['I', 'A'], glp1: ['I', 'A'], finer: ['I', 'A'],
+    sglt2ckd: ['I', 'A'], raas_ckd: ['I', 'A'], nefro: ['I', 'C'],
+    eao: ['I', 'B'], im: ['I', 'B'], em: ['I', 'C'],
+    hp: ['I', 'C'],
+    compass: ['IIa', 'A'], claudicacao: ['I', 'A'],
+    amiloidose: ['I', 'B'], cmh: ['I', 'B'], chagas: ['IIa', 'C'],
+    tabag: ['I', 'A'], pa_meta: ['I', 'A'], atividade: ['I', 'A'], glicemia: ['I', 'A'], obes_glp1: ['IIa', 'B'], vacina: ['I', 'B']
+  };
+  const CLASS_RANK = { I: 0, IIa: 1, IIb: 2, III: 3 };
+  function classOf(iv) { return CLASSE[iv.id] || ['IIa', 'C']; }
+  function impactTier(nnt) { if (nnt == null) return null; if (nnt <= 20) return 'alto'; if (nnt <= 50) return 'moderado'; return 'menor'; }
+  const TIERS = [
+    { cl: 'I', titulo: '✅ Classe I — recomendado (deve ser feito)' },
+    { cl: 'IIa', titulo: '🟡 Classe IIa — razoável (provavelmente fazer)' },
+    { cl: 'IIb', titulo: '🟠 Classe IIb — pode-se considerar' }
+  ];
+
   // ---------- formulário ----------
   const NUM = [
     ['idade', 'Idade', 'anos'], ['cr', 'Creatinina', 'mg/dL'], ['k', 'Potássio', 'mEq/L'],
@@ -5298,6 +5343,25 @@ window.PROTOCOLOS = [
     return '<div class="pac-golinks">' + bts.join('') + '</div>';
   }
 
+  function badges(iv, b) {
+    const cl = classOf(iv);
+    const it = impactTier(b.nnt);
+    const clCss = 'c-' + cl[0].replace(/[^A-Za-z0-9]/g, '');
+    let h = '<div class="pac-badges">';
+    h += '<span class="pac-classe ' + clCss + '">Classe ' + cl[0] + '</span>';
+    h += '<span class="pac-nivel">Nível ' + cl[1] + '</span>';
+    if (it) h += '<span class="pac-impact imp-' + it + '">' + (it === 'alto' ? 'Alto impacto' : it === 'moderado' ? 'Impacto moderado' : 'Impacto menor') + ' · NNT ' + b.nnt + '</span>';
+    else h += '<span class="pac-impact imp-quali">Benefício qualitativo</span>';
+    h += '</div>';
+    return h;
+  }
+  function gapCard(g) {
+    return '<div class="pac-card"><div class="pac-card-h">' + esc(g.iv.nome) + ' <span class="pac-tag">' + esc(g.iv.grupo) + '</span></div>' +
+      badges(g.iv, g.b) + nums(g.b) +
+      '<div class="pac-txt">' + g.b.txt + (g.b.arr != null ? ' <b>Redução absoluta ≈ ' + r1(g.b.arr) + '%.</b>' : '') + '</div>' +
+      estudoLink(g.iv.estudo) + cardLinks(g.iv) + '</div>';
+  }
+
   let lastPlan = '';
 
   function compute() {
@@ -5334,12 +5398,22 @@ window.PROTOCOLOS = [
     const totalInd = gaps.length + uso.length + contra.length;
     if (totalInd) html += '<div class="pac-score">Terapias indicadas: <b>' + totalInd + '</b> · em uso <b>' + uso.length + '</b> · <b style="color:#b07414">oportunidades ' + gaps.length + '</b> · contraindicadas ' + contra.length + '</div>';
 
+    // ordena por prioridade: Classe (I > IIa > IIb) e, dentro da classe, menor NNT (maior impacto)
+    gaps.sort((a, b) => {
+      const ra = CLASS_RANK[classOf(a.iv)[0]] ?? 1, rb = CLASS_RANK[classOf(b.iv)[0]] ?? 1;
+      if (ra !== rb) return ra - rb;
+      const na = a.b.nnt == null ? 9999 : a.b.nnt, nb = b.b.nnt == null ? 9999 : b.b.nnt;
+      return na - nb;
+    });
+
     if (gaps.length) {
-      html += '<h3 class="sc-title pac-h-gap">⚠ Oportunidades — terapias indicadas que faltam</h3>';
-      gaps.forEach(g => {
-        html += '<div class="pac-card"><div class="pac-card-h">' + esc(g.iv.nome) + ' <span class="pac-tag">' + esc(g.iv.grupo) + '</span></div>' +
-          nums(g.b) + '<div class="pac-txt">' + g.b.txt + (g.b.arr != null ? ' <b>Redução absoluta ≈ ' + r1(g.b.arr) + '%.</b>' : '') + '</div>' +
-          estudoLink(g.iv.estudo) + cardLinks(g.iv) + '</div>';
+      html += '<h3 class="sc-title pac-h-gap">⚠ Oportunidades — priorizadas por classe e impacto</h3>';
+      html += '<div class="pac-legenda">Ordenadas pela <b>força da recomendação</b> (Classe I → IIa → IIb) e, dentro de cada nível, pelo <b>impacto</b> (menor NNT primeiro).</div>';
+      TIERS.forEach(t => {
+        const lista = gaps.filter(g => classOf(g.iv)[0] === t.cl);
+        if (!lista.length) return;
+        html += '<div class="pac-tier pac-tier-' + t.cl.replace(/[^A-Za-z0-9]/g, '') + '">' + t.titulo + ' <span class="pac-tier-n">(' + lista.length + ')</span></div>';
+        lista.forEach(g => { html += gapCard(g); });
       });
     }
     if (uso.length) {
@@ -5371,8 +5445,8 @@ window.PROTOCOLOS = [
     if (P.k != null) perfil.push('K ' + P.k);
     L.push('Perfil: ' + perfil.join(', ') + '.');
     L.push('');
-    L.push('OPORTUNIDADES (otimizar):');
-    if (gaps.length) gaps.forEach(g => L.push('- ' + g.iv.nome.replace(/<[^>]+>/g, '') + (g.b.nnt != null ? ' (NNT ' + g.b.nnt + ', ' + g.iv.estudo.nome.split(' (')[0] + ')' : '')));
+    L.push('OPORTUNIDADES (otimizar — por prioridade):');
+    if (gaps.length) gaps.forEach(g => { const cl = classOf(g.iv); L.push('- [Classe ' + cl[0] + '/' + cl[1] + '] ' + g.iv.nome.replace(/<[^>]+>/g, '') + (g.b.nnt != null ? ' (NNT ' + g.b.nnt + ', ' + g.iv.estudo.nome.split(' (')[0] + ')' : '')); });
     else L.push('- (nenhuma identificada)');
     L.push('');
     L.push('EM USO (manter e titular):');
