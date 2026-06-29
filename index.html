@@ -533,6 +533,13 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .pac-impact.imp-moderado { background: #fbf2e0; color: #9a6a12; }
 .pac-impact.imp-menor { background: #eef0f2; color: #6b7280; }
 .pac-impact.imp-quali { background: #eef3f9; color: #2f6f9f; }
+.pac-agentes { margin: 10px 0 4px; padding: 10px 12px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: 8px; }
+.pac-agentes-t { font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); margin-bottom: 7px; }
+.pac-agente { font-size: 13px; line-height: 1.5; padding: 5px 0; border-top: 1px dashed var(--line); }
+.pac-agente:first-of-type { border-top: none; }
+.pac-agente-t { font-size: 11px; font-weight: 700; color: var(--blue); background: #eef3f9; border-radius: 5px; padding: 1px 6px; margin-left: 4px; }
+.pac-agente-o { color: var(--muted); font-size: 12.5px; margin-top: 1px; }
+.pac-agente-nota { font-size: 12px; color: #9a5512; background: #fdeede; border-radius: 6px; padding: 6px 9px; margin-top: 7px; }
 @media (max-width: 860px) { .pac-wrap { grid-template-columns: 1fr; } }
 /* ---- Tutor socrático ---- */
 .tutor-wrap { max-width: 820px; }
@@ -4881,7 +4888,14 @@ window.PROTOCOLOS = [
       aplica: (p, c) => c.icfer,
       emUso: p => p.m_bb,
       contra: (p, c) => (c.fc != null && c.fc < 50) ? 'FC < 50 bpm' : (p.asma ? 'asma/DPOC grave (preferir beta-1 seletivo, cautela)' : null),
-      beneficio: () => ({ base: 17.3, com: 11.8, arr: 5.5, nnt: 18, horiz: '~1,3 ano', txt: 'Pilar — reduz mortalidade. Iniciar com o paciente compensado e titular a cada 2 semanas.' }),
+      beneficio: () => ({ base: 17.3, com: 11.8, arr: 5.5, nnt: 18, horiz: '~1,3 ano', txt: 'Pilar — reduz mortalidade. Iniciar com o paciente compensado e titular a cada 2 semanas. <b>Use apenas os 4 com evidência de mortalidade na ICFEr.</b>' }),
+      agentes: [
+        { n: 'Carvedilol', t: 'COPERNICUS / US Carvedilol', o: 'β1+β2+α; benefício mesmo na IC grave' },
+        { n: 'Succinato de metoprolol (CR/XL)', t: 'MERIT-HF', o: 'β1 seletivo de liberação prolongada' },
+        { n: 'Bisoprolol', t: 'CIBIS-II', o: 'β1 seletivo' },
+        { n: 'Nebivolol', t: 'SENIORS', o: 'β1 + vasodilatador; evidência em idosos' }
+      ],
+      agentesNota: '<b>Atenolol</b> e <b>metoprolol tartarato</b> NÃO têm evidência de mortalidade na ICFEr — não substituem os acima.',
       estudo: { nome: 'CIBIS-II (Lancet 1999)', q: 'CIBIS-II bisoprolol heart failure mortality 1999' }, doses: 'carvedilol' },
 
     { id: 'mra', nome: 'Antagonista mineralocorticoide (espironolactona)', grupo: 'ICFEr — pilares',
@@ -4984,7 +4998,12 @@ window.PROTOCOLOS = [
       aplica: (p) => p.fa,
       emUso: p => p.m_bb || p.m_bcc || p.m_digoxina,
       contra: () => null,
-      beneficio: (p, c) => ({ txt: 'Alvo inicial de FC de repouso <b>&lt; 110 bpm</b> (controle leniente — RACE II). 1ª linha betabloqueador.' + (c.icfer ? ' <b>Na ICFEr, evitar verapamil/diltiazem</b> (inotrópicos negativos) — usar betabloqueador ± digoxina.' : ' Verapamil/diltiazem são alternativas se FEVE preservada.') }),
+      beneficio: (p, c) => ({ txt: 'Alvo inicial de FC de repouso <b>&lt; 110 bpm</b> (controle leniente — RACE II).' }),
+      agentes: [
+        { n: 'Betabloqueador', t: 'RACE II', o: '1ª linha; seguro na ICFEr' },
+        { n: 'BCC não-diidropiridínico (verapamil/diltiazem)', t: '—', o: 'alternativa se FEVE preservada; <b>EVITAR na ICFEr</b> (inotrópico negativo)' },
+        { n: 'Digoxina', t: '—', o: 'adjuvante (sobretudo na IC ou idoso sedentário); janela terapêutica estreita' }
+      ],
       estudo: { nome: 'RACE II (NEJM 2010)', q: 'RACE II lenient versus strict rate control atrial fibrillation 2010' }, doses: 'metoprolol' },
 
     { id: 'fa_ritmo', nome: 'Controle de ritmo precoce', grupo: 'Fibrilação atrial',
@@ -5008,7 +5027,13 @@ window.PROTOCOLOS = [
       aplica: (p) => p.sca_rec,
       emUso: p => p.m_aas && p.m_p2y12,
       contra: () => null,
-      beneficio: () => ({ txt: 'Pós-SCA/ICP: AAS + inibidor de P2Y12 por ~12 meses (<b>preferir ticagrelor ou prasugrel</b> ao clopidogrel na SCA). Ajustar a duração pelo equilíbrio isquêmico × hemorrágico (DAPT score / PRECISE-DAPT).' }),
+      beneficio: () => ({ txt: 'Pós-SCA/ICP: AAS + inibidor de P2Y12 por ~12 meses. Ajustar a duração pelo equilíbrio isquêmico × hemorrágico (DAPT score / PRECISE-DAPT).' }),
+      agentes: [
+        { n: 'Ticagrelor', t: 'PLATO', o: 'preferido na SCA; reversível; pode causar dispneia; não exige conhecer a anatomia coronária' },
+        { n: 'Prasugrel', t: 'TRITON-TIMI 38 · ISAR-REACT 5', o: 'na SCA tratada com ICP; <b>ISAR-REACT 5</b> sugeriu superioridade sobre o ticagrelor. <b>Contraindicado se AVC/AIT prévio</b>; cautela se &gt; 75 anos ou &lt; 60 kg' },
+        { n: 'Clopidogrel', t: 'CURE', o: 'quando ticagrelor/prasugrel são contraindicados, alto risco de sangramento, ou em associação a anticoagulante (terapia tripla curta)' }
+      ],
+      agentesNota: 'Na SCA, prefira ticagrelor ou prasugrel ao clopidogrel (PLATO; TRITON). O prasugrel não foi melhor no pré-tratamento sem anatomia conhecida (ACCOAST).',
       estudo: { nome: 'PLATO (NEJM 2009) / PEGASUS-TIMI 54', q: 'PLATO ticagrelor acute coronary syndrome 2009' }, score: 'dapt' },
 
     { id: 'bbpos', nome: 'Betabloqueador pós-IAM', grupo: 'Coronariopatia / pós-IAM',
@@ -5036,7 +5061,13 @@ window.PROTOCOLOS = [
       aplica: (p) => p.angina,
       emUso: p => p.m_nitrato || p.m_bcc,
       contra: () => null,
-      beneficio: () => ({ txt: '1ª linha <b>betabloqueador e/ou bloqueador de canal de cálcio</b>; nitrato de ação prolongada, ranolazina ou trimetazidina como adicionais. Objetivo é <b>sintoma/qualidade de vida</b> (não reduzem mortalidade).' }),
+      beneficio: () => ({ txt: 'Objetivo é <b>sintoma/qualidade de vida</b> (não reduzem mortalidade).' }),
+      agentes: [
+        { n: 'Betabloqueador', t: '—', o: '1ª linha; ideal se pós-IAM ou FC alta' },
+        { n: 'BCC diidropiridínico (anlodipino)', t: 'PRAISE', o: 'vasodilatador; <b>seguro na ICFEr</b> (anlodipino); útil se vasoespasmo/HAS' },
+        { n: 'BCC não-diidropiridínico (verapamil/diltiazem)', t: '—', o: 'reduz FC; <b>EVITAR na ICFEr</b>; não associar a betabloqueador (bradicardia/BAV)' },
+        { n: 'Nitrato / ranolazina / trimetazidina', t: '—', o: 'add-on para controle de sintomas refratários' }
+      ],
       estudo: { nome: 'ESC 2024 — Síndromes coronarianas crônicas', q: 'ESC 2024 chronic coronary syndromes antianginal therapy' }, doses: 'nitrato' },
 
     { id: 'reab', nome: 'Reabilitação cardíaca', grupo: 'Coronariopatia / pós-IAM',
@@ -5191,6 +5222,46 @@ window.PROTOCOLOS = [
       beneficio: () => ({ txt: 'Manejo de IC conforme a FEVE (pilares). <b>Alto risco de arritmia ventricular/morte súbita</b> e de bloqueios — avaliar Holter/CDI. <b>Tromboembolismo</b>: anticoagular conforme o escore de risco de Chagas (aneurisma apical, disfunção de VE, FA). Benznidazol na fase aguda/reativação ou em casos selecionados.' }),
       estudo: { nome: 'SBC 2023 — cardiopatia da doença de Chagas', q: 'Brazilian guideline Chagas cardiomyopathy management anticoagulation' } },
 
+    // ---------------- Tromboembolismo venoso ----------------
+    { id: 'aco_vte', nome: 'Anticoagulação (TEP/TVP)', grupo: 'Tromboembolismo venoso',
+      aplica: (p) => p.vte,
+      emUso: p => p.m_aco,
+      contra: () => null,
+      beneficio: () => ({ txt: '<b>DOAC de 1ª linha</b> (apixabana ou rivaroxabana — não exigem ponte com heparina). Mínimo de <b>3 meses</b>; estender se TEV não provocado ou fator de risco persistente (e baixo risco hemorrágico). No TEP, estratificar gravidade (sPESI + disfunção/biomarcadores de VD) — trombólise se alto risco/instável.' }),
+      estudo: { nome: 'EINSTEIN / AMPLIFY', q: 'apixaban rivaroxaban acute venous thromboembolism AMPLIFY EINSTEIN' }, doses: 'rivaroxabana', score: 'wells_tep' },
+
+    // ---------------- Pericárdio ----------------
+    { id: 'peric', nome: 'Pericardite aguda — AINE + colchicina', grupo: 'Pericárdio',
+      aplica: (p) => p.pericardite,
+      emUso: p => p.m_colchicina,
+      contra: () => null,
+      beneficio: () => ({ txt: 'AAS ou AINE em dose plena (com IBP) <b>+ colchicina</b> — a colchicina reduz sintomas e <b>recorrência</b> (COPE/ICAP/CORP). Restrição de exercício até resolução; corticoide apenas se refratário/contraindicação ao AINE (favorece recorrência). Investigar etiologia e derrame.' }),
+      estudo: { nome: 'ICAP (NEJM 2013)', q: 'ICAP colchicine acute pericarditis 2013' }, doses: 'colchicina' },
+
+    // ---------------- Hipertensão resistente ----------------
+    { id: 'resist', nome: 'Hipertensão resistente — 4ª droga', grupo: 'Hipertensão',
+      aplica: (p) => p.has_resist,
+      emUso: p => p.m_mra,
+      contra: (p, c) => (c.k != null && c.k > 5.0) ? 'K⁺ > 5,0 (cautela com espironolactona)' : null,
+      beneficio: () => ({ txt: 'Confirmar adesão e PA fora do consultório (afastar jaleco branco/pseudorresistência); otimizar <b>IECA/BRA + BCC + diurético tiazídico</b> em dose plena. Adicionar <b>espironolactona</b> como 4ª droga (PATHWAY-2). Investigar causas secundárias (apneia do sono, hiperaldosteronismo, doença renal, estenose de artéria renal).' }),
+      estudo: { nome: 'PATHWAY-2 (Lancet 2015)', q: 'PATHWAY-2 spironolactone resistant hypertension 2015' }, doses: 'espironolactona' },
+
+    // ---------------- Lípides — triglicérides ----------------
+    { id: 'icosapent', nome: 'Icosapento de etila (TG alto + alto risco)', grupo: 'Lípides / aterosclerose',
+      aplica: (p, c) => p.tg_alto && (c.ascvd || (p.dm && (p.risco10 == null || p.risco10 >= 7.5))) && p.m_estatina,
+      emUso: () => false,
+      contra: () => null,
+      beneficio: () => ({ base: 22.0, com: 17.2, arr: 4.8, nnt: 21, horiz: '~5 anos', txt: 'Alto risco com <b>TG 135–499 mg/dL apesar de estatina</b>: icosapento de etila 4 g/dia reduz eventos CV (REDUCE-IT). Atenção a risco de FA e sangramento. Fibrato não reduziu eventos nesse cenário; <b>não associar genfibrozila a estatina</b>.' }),
+      estudo: { nome: 'REDUCE-IT (NEJM 2019)', q: 'REDUCE-IT icosapent ethyl cardiovascular risk 2019' } },
+
+    // ---------------- Cardio-oncologia ----------------
+    { id: 'onco', nome: 'Cardioproteção / vigilância (cardio-oncologia)', grupo: 'Cardio-oncologia',
+      aplica: (p) => p.onco,
+      emUso: () => false,
+      contra: () => null,
+      beneficio: () => ({ txt: 'Estratificar o risco basal e fazer <b>vigilância de FEVE/strain</b> (eco/RMC) e biomarcadores (troponina/BNP) antes e durante terapias cardiotóxicas (antraciclinas, anti-HER2, inibidores de VEGF/proteassoma, ICIs). Otimizar fatores de risco; iniciar <b>IECA/BRA + betabloqueador</b> se queda de FEVE/disfunção. Discutir com a oncologia (não suspender oncológico sem necessidade).' }),
+      estudo: { nome: 'ESC 2022 — Cardio-oncologia', q: 'ESC 2022 cardio-oncology guidelines cardiotoxicity surveillance' } },
+
     // ---------------- Prevenção / estilo de vida ----------------
     { id: 'tabag', nome: 'Cessação do tabagismo', grupo: 'Prevenção / estilo de vida',
       aplica: (p) => p.tabag,
@@ -5250,6 +5321,7 @@ window.PROTOCOLOS = [
     hp: ['I', 'C'],
     compass: ['IIa', 'A'], claudicacao: ['I', 'A'],
     amiloidose: ['I', 'B'], cmh: ['I', 'B'], chagas: ['IIa', 'C'],
+    aco_vte: ['I', 'B'], peric: ['I', 'A'], resist: ['I', 'B'], icosapent: ['IIa', 'B'], onco: ['I', 'C'],
     tabag: ['I', 'A'], pa_meta: ['I', 'A'], atividade: ['I', 'A'], glicemia: ['I', 'A'], obes_glp1: ['IIa', 'B'], vacina: ['I', 'B']
   };
   const CLASS_RANK = { I: 0, IIa: 1, IIb: 2, III: 3 };
@@ -5282,7 +5354,7 @@ window.PROTOCOLOS = [
     </div>
     <div class="pac-sec">Comorbidades</div>
     <div class="pac-checks">
-      ${[['has', 'Hipertensão'], ['dm', 'Diabetes'], ['dislip', 'Dislipidemia'], ['tabag', 'Tabagismo'], ['obesidade', 'Obesidade / sobrepeso'], ['dcv', 'DCV aterosclerótica estabelecida'], ['iam', 'IAM prévio'], ['sca_rec', 'SCA/ICP recente (≤12 meses)'], ['angina', 'Angina estável'], ['fa', 'Fibrilação atrial'], ['ic', 'Insuficiência cardíaca'], ['avc', 'AVC/AIT prévio'], ['vascular', 'Doença arterial periférica/carótida'], ['eao', 'Estenose aórtica grave'], ['im', 'Insuf. mitral grave'], ['em', 'Estenose mitral reumática'], ['hp', 'Hipertensão pulmonar'], ['amiloidose', 'Amiloidose cardíaca (ATTR)'], ['cmh', 'Cardiomiopatia hipertrófica'], ['chagas', 'Doença de Chagas'], ['asma', 'Asma/DPOC grave'], ['gravidez', 'Gestante']]
+      ${[['has', 'Hipertensão'], ['dm', 'Diabetes'], ['dislip', 'Dislipidemia'], ['tabag', 'Tabagismo'], ['obesidade', 'Obesidade / sobrepeso'], ['dcv', 'DCV aterosclerótica estabelecida'], ['iam', 'IAM prévio'], ['sca_rec', 'SCA/ICP recente (≤12 meses)'], ['angina', 'Angina estável'], ['fa', 'Fibrilação atrial'], ['ic', 'Insuficiência cardíaca'], ['avc', 'AVC/AIT prévio'], ['vascular', 'Doença arterial periférica/carótida'], ['eao', 'Estenose aórtica grave'], ['im', 'Insuf. mitral grave'], ['em', 'Estenose mitral reumática'], ['hp', 'Hipertensão pulmonar'], ['amiloidose', 'Amiloidose cardíaca (ATTR)'], ['cmh', 'Cardiomiopatia hipertrófica'], ['chagas', 'Doença de Chagas'], ['vte', 'TEP/TVP (tromboembolismo venoso)'], ['pericardite', 'Pericardite aguda'], ['has_resist', 'Hipertensão resistente'], ['tg_alto', 'Hipertrigliceridemia (TG 135–499)'], ['onco', 'Terapia oncológica cardiotóxica'], ['asma', 'Asma/DPOC grave'], ['gravidez', 'Gestante']]
       .map(c => `<label class="sc-check"><input type="checkbox" id="pac-${c[0]}"><span>${c[1]}</span></label>`).join('')}
     </div>
     <div class="pac-sec">Medicações / terapias em uso</div>
@@ -5293,7 +5365,7 @@ window.PROTOCOLOS = [
 
   const NUM_KEYS = NUM.map(c => c[0]);
   const MED_KEYS = ['m_ieca', 'm_arni', 'm_bb', 'm_mra', 'm_isglt2', 'm_diur', 'm_ivab', 'm_vericiguat', 'm_hidnit', 'm_ferro', 'm_cdi', 'm_trc', 'm_estatina', 'm_ezet', 'm_pcsk9', 'm_aas', 'm_p2y12', 'm_colchicina', 'm_nitrato', 'm_bcc', 'm_reab', 'm_aco', 'm_digoxina', 'm_antiarr', 'm_ablacao', 'm_glp1'];
-  const COMORB_KEYS = ['bre', 'albumin', 'has', 'dm', 'dislip', 'tabag', 'obesidade', 'dcv', 'iam', 'sca_rec', 'angina', 'fa', 'ic', 'avc', 'vascular', 'eao', 'im', 'em', 'hp', 'amiloidose', 'cmh', 'chagas', 'asma', 'gravidez'];
+  const COMORB_KEYS = ['bre', 'albumin', 'has', 'dm', 'dislip', 'tabag', 'obesidade', 'dcv', 'iam', 'sca_rec', 'angina', 'fa', 'ic', 'avc', 'vascular', 'eao', 'im', 'em', 'hp', 'amiloidose', 'cmh', 'chagas', 'vte', 'pericardite', 'has_resist', 'tg_alto', 'onco', 'asma', 'gravidez'];
 
   function read() {
     P.sexo = document.getElementById('pac-sexo').value;
@@ -5356,11 +5428,20 @@ window.PROTOCOLOS = [
     h += '</div>';
     return h;
   }
+  function agentesBlock(iv) {
+    if (!iv.agentes) return '';
+    let h = '<div class="pac-agentes"><div class="pac-agentes-t">Escolha do agente / evidência comparada</div>';
+    iv.agentes.forEach(a => {
+      h += '<div class="pac-agente"><b>' + esc(a.n) + '</b>' + (a.t && a.t !== '—' ? ' <span class="pac-agente-t">' + esc(a.t) + '</span>' : '') + '<div class="pac-agente-o">' + a.o + '</div></div>';
+    });
+    if (iv.agentesNota) h += '<div class="pac-agente-nota">⚠ ' + iv.agentesNota + '</div>';
+    return h + '</div>';
+  }
   function gapCard(g) {
     return '<div class="pac-card"><div class="pac-card-h">' + esc(g.iv.nome) + ' <span class="pac-tag">' + esc(g.iv.grupo) + '</span></div>' +
       badges(g.iv, g.b) + nums(g.b) +
       '<div class="pac-txt">' + g.b.txt + (g.b.arr != null ? ' <b>Redução absoluta ≈ ' + r1(g.b.arr) + '%.</b>' : '') + '</div>' +
-      estudoLink(g.iv.estudo) + cardLinks(g.iv) + '</div>';
+      agentesBlock(g.iv) + estudoLink(g.iv.estudo) + cardLinks(g.iv) + '</div>';
   }
 
   let lastPlan = '';
