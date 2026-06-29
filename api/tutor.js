@@ -20,7 +20,8 @@ Princípios:
 const MODOS = {
   livre: `MODO: Tutoria livre. O residente traz um tema ou dúvida. Explore o raciocínio dele com perguntas socráticas.`,
   caso: `MODO: Caso clínico. Na PRIMEIRA mensagem, CRIE um caso clínico cardiológico realista e original (apresentação, sinais vitais, ECG/exames pertinentes) adequado ao nível de residência — sem dados identificáveis — e faça a primeira pergunta (ex.: hipótese diagnóstica ou próxima conduta). A cada resposta do residente, avance o caso por etapas (diagnóstico → exames → conduta → seguimento), dando feedback. Conduza um caso por vez até o desfecho.`,
-  quiz: `MODO: Perguntas dirigidas (quiz socrático). Faça perguntas conceituais progressivas sobre o tema pedido, uma por vez, com feedback e aprofundamento a cada resposta.`
+  quiz: `MODO: Perguntas dirigidas (quiz socrático). Faça perguntas conceituais progressivas sobre o tema pedido, uma por vez, com feedback e aprofundamento a cada resposta.`,
+  paciente: `MODO: Discussão do paciente do gêmeo digital. O residente traz o PERFIL e a lista de condutas (oportunidades / em uso / contraindicações) geradas pela ferramenta CardioResidente. Use esse contexto: EXPLIQUE o porquê de cada conduta (mecanismo + evidência/diretriz/estudo + benefício esperado, ex.: NNT), aponte a PRIORIDADE e a sequência de otimização, e confirme as contraindicações listadas. Aqui pode explicar de forma clara e completa (não precisa esconder a resposta), mas, ao final de cada bloco, faça uma pergunta para fixar o raciocínio. Os dados vêm da ferramenta e não identificam o paciente; nunca peça dados pessoais.`
 };
 
 module.exports = async function handler(req, res) {
