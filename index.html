@@ -5422,7 +5422,13 @@ window.PROTOCOLOS = [
     }
     if (contra.length) {
       html += '<h3 class="sc-title pac-h-contra">✕ Contraindicado / cautela</h3><div class="pac-lista">' +
-        contra.map(x => '<div class="pac-li pac-li-contra"><b>' + esc(x.iv.nome) + '</b> — ' + esc(x.motivo) + '</div>').join('') + '</div>';
+        contra.map(x => {
+          const cl = classOf(x.iv);
+          return '<div class="pac-li pac-li-contra"><b>' + esc(x.iv.nome) + '</b> '
+            + '<span class="pac-classe ' + ('c-' + cl[0].replace(/[^A-Za-z0-9]/g, '')) + '">Classe ' + cl[0] + '</span>'
+            + '<span class="pac-nivel">Nível ' + cl[1] + '</span>'
+            + ' — ' + esc(x.motivo) + '</div>';
+        }).join('') + '</div>';
     }
     if (!totalInd) html += '<p class="muted small">Preencha as comorbidades e as medicações para ver as oportunidades de otimização (ex.: marque Insuficiência cardíaca + FEVE 30% e veja os 4 pilares).</p>';
 
