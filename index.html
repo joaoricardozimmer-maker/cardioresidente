@@ -362,6 +362,29 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .lr-small { background: #b07414; }             /* pequena */
 .lr-min { background: #9aa5b1; }               /* mínima */
 .lr-na { background: transparent; color: var(--muted); font-weight: 600; min-width: 0; padding: 0; }
+/* Calculadora diagnóstica */
+.mbe-dxsel { display: block; margin-bottom: 12px; }
+.mbc-nota { font-size: 12.5px; color: var(--muted); background: var(--bg-soft); border-radius: 8px; padding: 9px 12px; margin-bottom: 12px; line-height: 1.5; }
+.mbc-pre { display: block; max-width: 320px; margin-bottom: 12px; }
+.mbc-table { width: 100%; border-collapse: collapse; margin: 6px 0; font-size: 13.5px; }
+.mbc-table th { text-align: left; background: var(--bg-soft); color: var(--muted); font-weight: 600; padding: 7px 9px; border-bottom: 1px solid var(--line); font-size: 12px; }
+.mbc-table td { padding: 8px 9px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.mbc-ach { line-height: 1.4; }
+.mbc-ref { color: var(--muted); font-size: 11px; margin-top: 2px; }
+.mbc-ctrl { width: 190px; }
+.mbc-seg-wrap { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.mbc-seg { font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; border: none; background: var(--card); color: var(--muted); padding: 7px 12px; }
+.mbc-seg + .mbc-seg { border-left: 1px solid var(--line); }
+.mbc-seg:disabled { opacity: .4; cursor: not-allowed; }
+.mbc-pos.on { background: #1f9d57; color: #fff; }
+.mbc-neg.on { background: #c0392b; color: #fff; }
+.mbc-barwrap { display: flex; align-items: center; gap: 10px; margin: 4px 0; }
+.mbc-barlbl { min-width: 92px; font-size: 13px; }
+.mbc-bar { flex: 1; height: 14px; background: var(--bg-soft); border-radius: 8px; overflow: hidden; }
+.mbc-bar span { display: block; height: 100%; background: #9aa5b1; }
+.mbc-bar-post span { background: var(--accent); }
+.mbc-post { font-size: 15px; margin: 8px 0 4px; }
+@media (max-width: 600px) { .mbc-ctrl { width: auto; } .mbc-seg { padding: 6px 9px; } }
 .mbe-usar { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 4px 9px; font-size: 11.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .mbe-usar:hover { background: var(--accent-soft); }
 
@@ -688,15 +711,6 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
       <div class="chips" id="busca-chips"></div>
 
       <div id="rec-results"></div>
-    </section>
-
-    <!-- ============ TUTOR ============ -->
-    <section class="view" id="view-tutor">
-      <div class="hero">
-        <h2>Tutor socrático</h2>
-        <p>Um tutor de cardiologia com IA que desenvolve seu raciocínio por perguntas — tutoria livre, casos clínicos e quiz dirigido, com base nas diretrizes. Não use dados que identifiquem pacientes.</p>
-      </div>
-      <div id="tutor-root"></div>
     </section>
 
     <!-- ============ TRANSCRIÇÃO ============ -->
@@ -4237,9 +4251,10 @@ window.PROTOCOLOS = [
 
 </script>
   <script>
-// Aba "Medicina baseada em evidências" (MBE)
-// Ferramentas: probabilidade pós-teste (Bayes/Fagan), medidas de efeito (NNT/NNH/RRA/RRR/OR)
-// e biblioteca robusta de razões de verossimilhança (LR) cardiológicas, com referências.
+// Aba "Medicina baseada em evidências" (MBE) — inspirada no getthediagnosis.org.
+// Ferramentas: (1) Calculadora diagnóstica interativa (pré→pós-teste em cadeia de LRs),
+// (2) probabilidade pós-teste manual (Bayes/Fagan), (3) medidas de efeito (NNT/NNH),
+// (4) biblioteca de razões de verossimilhança (LR).
 (function () {
   const menu = document.getElementById('mbe-menu');
   const panel = document.getElementById('mbe-panel');
@@ -4251,23 +4266,20 @@ window.PROTOCOLOS = [
   const r2 = x => Math.round(x * 100) / 100;
   const fmt = x => (x === null || x === undefined) ? '—' : String(r2(x)).replace('.', ',');
 
-  let pendingLR = null; // usado para enviar uma LR da tabela para a calculadora de Bayes
+  let pendingLR = null;
 
-  // Interpretação da magnitude da LR (Jaeschke, JAMA 1994)
   function forcaLR(lr, positiva) {
     if (positiva) {
       if (lr > 10) return 'mudança <b>grande</b> e em geral conclusiva na probabilidade';
       if (lr >= 5) return 'mudança <b>moderada</b> na probabilidade';
       if (lr >= 2) return 'mudança <b>pequena</b> (às vezes importante)';
       return 'mudança <b>mínima/insignificante</b>';
-    } else {
-      if (lr < 0.1) return 'mudança <b>grande</b> e em geral conclusiva (afasta o diagnóstico)';
-      if (lr <= 0.2) return 'mudança <b>moderada</b> na probabilidade';
-      if (lr <= 0.5) return 'mudança <b>pequena</b> (às vezes importante)';
-      return 'mudança <b>mínima/insignificante</b>';
     }
+    if (lr < 0.1) return 'mudança <b>grande</b> e em geral conclusiva (afasta o diagnóstico)';
+    if (lr <= 0.2) return 'mudança <b>moderada</b> na probabilidade';
+    if (lr <= 0.5) return 'mudança <b>pequena</b> (às vezes importante)';
+    return 'mudança <b>mínima/insignificante</b>';
   }
-  // Classe de cor do "chip" conforme a força da LR
   function chipClass(lr, positiva) {
     if (lr === null || lr === undefined) return 'lr-na';
     if (positiva) return lr >= 10 ? 'lr-strong' : (lr >= 5 ? 'lr-mod' : (lr >= 2 ? 'lr-small' : 'lr-min'));
@@ -4275,14 +4287,216 @@ window.PROTOCOLOS = [
   }
 
   // ------------------------------------------------------------------
-  // 1) PROBABILIDADE PÓS-TESTE (Bayes / nomograma de Fagan)
+  // BANCO DE DIAGNÓSTICOS (achados com LR+/LR− e referência)
+  // prev = prevalência/pré-teste sugerida (%) para a população típica da questão.
+  // Cada achado: {a: nome, lrp, lrn, ref}. lrp/lrn podem ser null.
+  // ------------------------------------------------------------------
+  const DIAGNOSTICOS = [
+    { id: 'ic', area: 'Cardiovascular', nome: 'Insuficiência cardíaca (dispneia aguda)', prev: 50,
+      nota: 'Adulto com dispneia aguda na emergência. Prevalência típica ~50%. Fonte: Wang, JAMA 2005 (“Does this dyspneic patient have heart failure?”).',
+      achados: [
+        { a: 'Terceira bulha (B3 / galope)', lrp: 11, lrn: 0.88, ref: 'Wang 2005' },
+        { a: 'Congestão venosa pulmonar no RX de tórax', lrp: 12, lrn: 0.48, ref: 'Wang 2005' },
+        { a: 'Refluxo hepatojugular', lrp: 6.4, lrn: 0.79, ref: 'Wang 2005' },
+        { a: 'História prévia de insuficiência cardíaca', lrp: 5.8, lrn: 0.45, ref: 'Wang 2005' },
+        { a: 'Turgência jugular', lrp: 5.1, lrn: 0.66, ref: 'Wang 2005' },
+        { a: 'Fibrilação atrial no ECG', lrp: 3.8, lrn: 0.79, ref: 'Wang 2005' },
+        { a: 'Cardiomegalia no RX de tórax', lrp: 3.3, lrn: 0.33, ref: 'Wang 2005' },
+        { a: 'Estertores pulmonares', lrp: 2.8, lrn: 0.51, ref: 'Wang 2005' },
+        { a: 'Dispneia paroxística noturna', lrp: 2.6, lrn: 0.70, ref: 'Wang 2005' },
+        { a: 'Edema de membros', lrp: 2.3, lrn: 0.64, ref: 'Wang 2005' },
+        { a: 'Ortopneia', lrp: 2.2, lrn: 0.65, ref: 'Wang 2005' },
+        { a: 'BNP < 100 pg/mL', lrp: null, lrn: 0.13, ref: 'Wang 2005' },
+        { a: 'NT-proBNP < 300 pg/mL', lrp: null, lrn: 0.02, ref: 'Januzzi (PRIDE) 2005' }
+      ] },
+    { id: 'sca', area: 'Cardiovascular', nome: 'Síndrome coronariana aguda (dor torácica)', prev: 20,
+      nota: 'Dor torácica na emergência. Pré-teste depende do risco (use a aba Pré-teste). Fontes: Swap, JAMA 2005 (dor) e Panju, JAMA 1998 (ECG/IAM).',
+      achados: [
+        { a: 'Supra de ST novo no ECG', lrp: 11, lrn: null, ref: 'Panju 1998' },
+        { a: 'Infra de ST novo no ECG', lrp: 5.2, lrn: null, ref: 'Panju 1998' },
+        { a: 'Irradiação para o braço/ombro DIREITO', lrp: 4.7, lrn: null, ref: 'Swap 2005' },
+        { a: 'Onda Q nova no ECG', lrp: 3.9, lrn: null, ref: 'Panju 1998' },
+        { a: 'Irradiação para AMBOS os braços', lrp: 2.6, lrn: null, ref: 'Swap 2005' },
+        { a: 'Dor desencadeada pelo esforço', lrp: 2.4, lrn: null, ref: 'Swap 2005' },
+        { a: 'Irradiação para o braço ESQUERDO', lrp: 2.3, lrn: null, ref: 'Swap 2005' },
+        { a: 'Sudorese (diaforese)', lrp: 2.0, lrn: null, ref: 'Swap 2005' },
+        { a: 'Náusea ou vômito', lrp: 1.9, lrn: null, ref: 'Swap 2005' },
+        { a: 'ECG completamente normal', lrp: 0.2, lrn: null, ref: 'Panju 1998' },
+        { a: 'Dor reprodutível à palpação', lrp: 0.3, lrn: null, ref: 'Swap 2005' },
+        { a: 'Dor posicional', lrp: 0.3, lrn: null, ref: 'Swap 2005' },
+        { a: 'Dor pleurítica', lrp: 0.2, lrn: null, ref: 'Swap 2005' }
+      ] },
+    { id: 'eao', area: 'Cardiovascular', nome: 'Estenose aórtica (sopro sistólico)', prev: 25,
+      nota: 'Adulto com sopro sistólico — avaliar EAo moderada/grave. Fonte: Etchells, JAMA 1997 / JGIM 1998.',
+      achados: [
+        { a: '3–4 achados combinados (S2 reduzida + carótida lenta + sopro aórtico)', lrp: 40, lrn: null, ref: 'Etchells 1998' },
+        { a: 'Ascensão carotídea lenta/tardia', lrp: 3.7, lrn: 0.42, ref: 'Etchells 1997' },
+        { a: 'Sopro irradiando para a carótida direita', lrp: 1.5, lrn: 0.10, ref: 'Etchells 1998' },
+        { a: 'Componente aórtico da 2ª bulha (A2) reduzido/ausente', lrp: 3.1, lrn: 0.50, ref: 'Etchells 1997' }
+      ] },
+    { id: 'iao', area: 'Cardiovascular', nome: 'Insuficiência aórtica', prev: 20,
+      nota: 'Sopro diastólico / suspeita de IAo. Fonte: Choudhry, JAMA 1999.',
+      achados: [
+        { a: 'Sopro diastólico precoce presente (LR+ 9–32)', lrp: 10, lrn: 0.1, ref: 'Choudhry 1999' },
+        { a: 'Aumento do sopro à oclusão arterial transitória (handgrip)', lrp: 8.4, lrn: 0.3, ref: 'Choudhry 1999' }
+      ] },
+    { id: 'sopro', area: 'Cardiovascular', nome: 'Sopro sistólico — manobras dinâmicas', prev: 30,
+      nota: 'Diferenciar a origem do sopro sistólico pela resposta às manobras. Fonte: Lembo, NEJM 1988.',
+      achados: [
+        { a: 'Sopro AUMENTA com Valsalva → cardiomiopatia hipertrófica', lrp: 16, lrn: 0.36, ref: 'Lembo 1988' },
+        { a: 'Sopro AUMENTA com handgrip → insuf. mitral / CIV', lrp: 8.5, lrn: 0.35, ref: 'Lembo 1988' }
+      ] },
+    { id: 'tampo', area: 'Cardiovascular', nome: 'Tamponamento cardíaco (com derrame)', prev: 30,
+      nota: 'Paciente com derrame pericárdico — avaliar repercussão hemodinâmica. Fonte: Roy, JAMA 2007.',
+      achados: [
+        { a: 'Pulso paradoxal > 20 mmHg', lrp: 8.8, lrn: null, ref: 'Roy 2007' },
+        { a: 'Pulso paradoxal > 12 mmHg', lrp: 5.9, lrn: null, ref: 'Roy 2007' },
+        { a: 'Pulso paradoxal > 10 mmHg', lrp: 3.3, lrn: 0.03, ref: 'Roy 2007' },
+        { a: 'Taquicardia', lrp: 1.4, lrn: 0.30, ref: 'Roy 2007' }
+      ] },
+    { id: 'tep', area: 'Cardiovascular', nome: 'Tromboembolismo pulmonar (TEP)', prev: 15,
+      nota: 'Suspeita de TEP — estratifique antes com Wells (aba Scores). Fontes: Stein 2004 (D-dímero) e meta-análise de angio-TC.',
+      achados: [
+        { a: 'Angio-TC de tórax positiva', lrp: 20.8, lrn: 0.18, ref: 'Meta-análise (sens 83/espec 96)' },
+        { a: 'D-dímero de alta sensibilidade', lrp: 1.6, lrn: 0.09, ref: 'Stein 2004' }
+      ] },
+    { id: 'carotida', area: 'Cardiovascular', nome: 'Estenose carotídea (50–99%)', prev: 15,
+      nota: 'Sopro cervical / rastreio de estenose carotídea. Fonte: Rational Clinical Exam (McGee).',
+      achados: [
+        { a: 'Sopro carotídeo presente', lrp: 3.7, lrn: 0.36, ref: 'RCE / McGee' }
+      ] },
+    { id: 'pneumonia', area: 'Respiratório', nome: 'Pneumonia (tosse/febre)', prev: 20,
+      nota: 'Adulto com tosse aguda. Prevalência ~5–20%. Fonte: Metlay, JAMA 1997.',
+      achados: [
+        { a: 'Egofonia', lrp: 4.1, lrn: 0.96, ref: 'Metlay 1997' },
+        { a: 'Macicez à percussão', lrp: 3.0, lrn: 0.86, ref: 'Metlay 1997' },
+        { a: 'Estertores (crepitações)', lrp: 2.0, lrn: 0.70, ref: 'Metlay 1997' },
+        { a: 'Todos os sinais vitais normais (FR<20, FC<100, T<37,8°C)', lrp: 0.18, lrn: null, ref: 'Metlay 1997' }
+      ] },
+    { id: 'dpoc', area: 'Respiratório', nome: 'DPOC (dispneia/tabagismo)', prev: 30,
+      nota: 'Adulto tabagista com dispneia crônica. Fonte: Straus, JAMA 2000.',
+      achados: [
+        { a: 'Tabagismo > 40 maços-ano', lrp: 8.3, lrn: 0.5, ref: 'Straus 2000' },
+        { a: 'Tempo expiratório forçado > 9 s', lrp: 4.8, lrn: 0.45, ref: 'Straus 2000' },
+        { a: 'Sibilância à ausculta', lrp: 2.8, lrn: 0.85, ref: 'Straus 2000' }
+      ] },
+    { id: 'ascite', area: 'Abdome', nome: 'Ascite', prev: 40,
+      nota: 'Distensão abdominal — detectar líquido livre. Fonte: Williams, JAMA 1992.',
+      achados: [
+        { a: 'Piparote (fluid wave)', lrp: 6.0, lrn: 0.4, ref: 'Williams 1992' },
+        { a: 'Macicez móvel (shifting dullness)', lrp: 2.7, lrn: 0.3, ref: 'Williams 1992' },
+        { a: 'Flancos abaulados', lrp: 2.0, lrn: 0.3, ref: 'Williams 1992' },
+        { a: 'Ausência de edema periférico', lrp: null, lrn: 0.2, ref: 'Williams 1992' }
+      ] },
+    { id: 'hipovolemia', area: 'Volemia', nome: 'Hipovolemia / perda sanguínea', prev: 30,
+      nota: 'Suspeita de hipovolemia. O incremento postural da FC ≥30 bpm sinaliza perda volêmica grande. Fonte: McGee, JAMA 1999.',
+      achados: [
+        { a: 'Aumento postural da FC ≥ 30 bpm (ou tontura postural grave)', lrp: 39, lrn: null, ref: 'McGee 1999 (perda ≥630 mL)' },
+        { a: 'Axila seca', lrp: 2.8, lrn: 0.6, ref: 'McGee 1999' },
+        { a: 'Mucosa oral úmida', lrp: null, lrn: 0.3, ref: 'McGee 1999' }
+      ] }
+  ];
+
+  // biblioteca de LRs derivada dos diagnósticos (fonte única)
+  const LRS = [];
+  DIAGNOSTICOS.forEach(d => d.achados.forEach(x => LRS.push({ g: d.nome, a: x.a, lrp: x.lrp, lrn: x.lrn, ref: x.ref })));
+
+  function odds(p) { return p / (1 - p); }
+  function prob(o) { return o / (1 + o); }
+
+  // ------------------------------------------------------------------
+  // 1) CALCULADORA DIAGNÓSTICA (interativa)
+  // ------------------------------------------------------------------
+  const estado = {}; // dxId -> { pre, sel: {idx: 'pos'|'neg'} }
+
+  function viewCalc() {
+    const areas = [...new Set(DIAGNOSTICOS.map(d => d.area))];
+    panel.innerHTML =
+      '<h3 class="sc-title">Calculadora diagnóstica (pré → pós-teste)</h3>' +
+      '<p class="muted small">Escolha o diagnóstico, ajuste a <b>probabilidade pré-teste</b> ao seu paciente e marque cada achado como <b>Presente</b> (aplica a LR+) ou <b>Ausente</b> (aplica a LR−). A probabilidade pós-teste é recalculada em cadeia. Assume independência entre os achados (aproximação) — use como apoio, não como valor absoluto.</p>' +
+      '<label class="sc-campo mbe-dxsel"><span>Diagnóstico / questão clínica</span><select id="mbc-dx">' +
+      areas.map(ar => '<optgroup label="' + esc(ar) + '">' +
+        DIAGNOSTICOS.filter(d => d.area === ar).map(d => '<option value="' + d.id + '">' + esc(d.nome) + '</option>').join('') +
+        '</optgroup>').join('') +
+      '</select></label>' +
+      '<div id="mbc-body"></div>';
+
+    const sel = document.getElementById('mbc-dx');
+    sel.addEventListener('change', () => renderDx(sel.value));
+    renderDx(sel.value);
+  }
+
+  function renderDx(dxId) {
+    const d = DIAGNOSTICOS.find(x => x.id === dxId); if (!d) return;
+    if (!estado[dxId]) estado[dxId] = { pre: d.prev, sel: {} };
+    const st = estado[dxId];
+    const body = document.getElementById('mbc-body');
+
+    let rows = d.achados.map((x, i) => {
+      const cur = st.sel[i] || null;
+      const posBtn = '<button class="mbc-seg mbc-pos' + (cur === 'pos' ? ' on' : '') + '" data-i="' + i + '" data-v="pos"' + (x.lrp == null ? ' disabled title="sem LR+"' : '') + '>Presente</button>';
+      const negBtn = '<button class="mbc-seg mbc-neg' + (cur === 'neg' ? ' on' : '') + '" data-i="' + i + '" data-v="neg"' + (x.lrn == null ? ' disabled title="sem LR−"' : '') + '>Ausente</button>';
+      return '<tr>' +
+        '<td class="mbc-ach">' + esc(x.a) + '<div class="mbc-ref">LR+ ' + fmt(x.lrp) + ' · LR− ' + fmt(x.lrn) + ' · ' + esc(x.ref) + '</div></td>' +
+        '<td class="mbc-ctrl"><div class="mbc-seg-wrap">' + posBtn + negBtn + '</div></td>' +
+        '</tr>';
+    }).join('');
+
+    body.innerHTML =
+      '<div class="mbc-nota">' + esc(d.nota) + '</div>' +
+      '<label class="sc-campo mbc-pre"><span>Probabilidade pré-teste <em>(%)</em></span><input type="number" step="any" id="mbc-pre" value="' + st.pre + '"></label>' +
+      '<div id="mbc-result"></div>' +
+      '<table class="mbc-table"><thead><tr><th>Achado / exame</th><th>Presente / Ausente</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+      '<button class="mbe-usar" id="mbc-reset" style="margin-top:10px">Limpar achados</button>';
+
+    const preEl = document.getElementById('mbc-pre');
+    preEl.addEventListener('input', () => { st.pre = n(preEl.value); recompute(dxId); });
+    body.querySelectorAll('.mbc-seg').forEach(b => b.addEventListener('click', () => {
+      if (b.disabled) return;
+      const i = +b.dataset.i, v = b.dataset.v;
+      st.sel[i] = (st.sel[i] === v) ? null : v;
+      renderDx(dxId);
+    }));
+    document.getElementById('mbc-reset').addEventListener('click', () => { st.sel = {}; renderDx(dxId); });
+    recompute(dxId);
+  }
+
+  function recompute(dxId) {
+    const d = DIAGNOSTICOS.find(x => x.id === dxId); const st = estado[dxId];
+    const out = document.getElementById('mbc-result'); if (!out) return;
+    const pre = st.pre;
+    if (pre === null || pre <= 0 || pre >= 100) {
+      out.className = 'sc-result sc-info';
+      out.innerHTML = '<div class="sc-conduta">Informe uma probabilidade pré-teste entre 0 e 100%.</div>';
+      return;
+    }
+    let o = odds(pre / 100); let netLR = 1; const aplicados = [];
+    d.achados.forEach((x, i) => {
+      const s = st.sel[i]; if (!s) return;
+      const lr = s === 'pos' ? x.lrp : x.lrn;
+      if (lr == null) return;
+      o *= lr; netLR *= lr;
+      aplicados.push((s === 'pos' ? '✚ ' : '– ') + x.a.replace(/ \(.*/, '') + ' (LR ' + fmt(lr) + ')');
+    });
+    const post = prob(o) * 100;
+    const nivel = post >= 50 ? 'sc-bad' : (post >= 15 ? 'sc-warn' : 'sc-ok');
+    const pct = v => Math.max(0, Math.min(100, v));
+    out.className = 'sc-result ' + nivel;
+    out.innerHTML = '<div class="sc-conduta">' +
+      '<div class="mbc-barwrap"><div class="mbc-barlbl">Pré ' + r1(pre) + '%</div><div class="mbc-bar"><span style="width:' + pct(pre) + '%"></span></div></div>' +
+      '<div class="mbc-barwrap"><div class="mbc-barlbl">Pós <b>' + r1(post) + '%</b></div><div class="mbc-bar mbc-bar-post"><span style="width:' + pct(post) + '%"></span></div></div>' +
+      '<div class="mbc-post">Probabilidade pós-teste ≈ <b class="mbe-big">' + r1(post) + '%</b>' + (aplicados.length ? ' · LR combinada ' + fmt(netLR) : '') + '</div>' +
+      (aplicados.length ? '<div class="sc-extra">Aplicados: ' + esc(aplicados.join(' · ')) + '.</div>' : '<div class="sc-extra">Marque achados como presentes/ausentes para atualizar.</div>') +
+      '</div>';
+  }
+
+  // ------------------------------------------------------------------
+  // 2) PROBABILIDADE PÓS-TESTE (Bayes / nomograma de Fagan) — manual
   // ------------------------------------------------------------------
   function viewPostTeste() {
     panel.innerHTML =
       '<h3 class="sc-title">Probabilidade pós-teste (teorema de Bayes)</h3>' +
-      '<p class="muted small">Informe a probabilidade pré-teste e as características do exame. ' +
-      'Use sensibilidade/especificidade <b>ou</b> as razões de verossimilhança (LR+/LR−). ' +
-      'O cálculo converte probabilidade em chance (odds), multiplica pela LR e reconverte.</p>' +
+      '<p class="muted small">Informe a probabilidade pré-teste e as características do exame. Use sensibilidade/especificidade <b>ou</b> as razões de verossimilhança (LR+/LR−).</p>' +
       '<div class="sc-campos">' +
       '<label class="sc-campo"><span>Probabilidade pré-teste <em>(%)</em></span><input type="number" step="any" id="mb-pre" placeholder="ex: 20"></label>' +
       '<div class="mbe-or">— informe sensibilidade e especificidade… —</div>' +
@@ -4293,7 +4507,7 @@ window.PROTOCOLOS = [
       '<label class="sc-campo"><span>LR− (razão de verossimilhança negativa)</span><input type="number" step="any" id="mb-lrn"></label>' +
       '</div>' +
       '<button id="mb-calc" class="btn-primary">Calcular</button>' +
-      '<div id="mb-out" class="sc-result sc-info"><div class="sc-conduta">Preencha os campos e clique em Calcular. Dica: na <b>biblioteca de LRs</b> você pode enviar um valor direto para cá.</div></div>';
+      '<div id="mb-out" class="sc-result sc-info"><div class="sc-conduta">Preencha os campos e clique em Calcular.</div></div>';
 
     const calc = () => {
       const pre = n(document.getElementById('mb-pre').value);
@@ -4302,61 +4516,30 @@ window.PROTOCOLOS = [
       let lrp = n(document.getElementById('mb-lrp').value);
       let lrn = n(document.getElementById('mb-lrn').value);
       const out = document.getElementById('mb-out');
-
-      if (pre === null || pre < 0 || pre > 100) {
-        out.className = 'sc-result sc-info';
-        out.innerHTML = '<div class="sc-conduta">Informe uma probabilidade pré-teste entre 0 e 100%.</div>';
-        return;
-      }
+      if (pre === null || pre < 0 || pre > 100) { out.className = 'sc-result sc-info'; out.innerHTML = '<div class="sc-conduta">Informe a pré-teste entre 0 e 100%.</div>'; return; }
       let origem = '';
       if (sens !== null && spec !== null && sens > 0 && sens < 100 && spec > 0 && spec < 100) {
-        const se = sens / 100, sp = spec / 100;
-        lrp = se / (1 - sp);
-        lrn = (1 - se) / sp;
-        origem = '<br><span class="sc-extra">A partir de sens ' + r1(sens) + '% e espec ' + r1(spec) + '%: LR+ = ' + r2(lrp) + ' · LR− = ' + r2(lrn) + '.</span>';
+        const se = sens / 100, sp = spec / 100; lrp = se / (1 - sp); lrn = (1 - se) / sp;
+        origem = '<br><span class="sc-extra">De sens ' + r1(sens) + '% e espec ' + r1(spec) + '%: LR+ = ' + r2(lrp) + ' · LR− = ' + r2(lrn) + '.</span>';
       }
-      if (lrp === null && lrn === null) {
-        out.className = 'sc-result sc-info';
-        out.innerHTML = '<div class="sc-conduta">Informe sensibilidade e especificidade, ou as LR+ / LR−.</div>';
-        return;
-      }
-      const preOdds = (pre / 100) / (1 - pre / 100);
-      let html = '';
-      if (lrp !== null && lrp > 0) {
-        const postP = (preOdds * lrp) / (1 + preOdds * lrp) * 100;
-        html += '<div class="mbe-res-line"><b>Se o teste der POSITIVO →</b> probabilidade pós-teste ≈ <b class="mbe-big">' + r1(postP) + '%</b><br>' +
-          '<span class="sc-extra">LR+ ' + r2(lrp) + ': ' + forcaLR(lrp, true) + '.</span></div>';
-      }
-      if (lrn !== null && lrn > 0) {
-        const postN = (preOdds * lrn) / (1 + preOdds * lrn) * 100;
-        html += '<div class="mbe-res-line"><b>Se o teste der NEGATIVO →</b> probabilidade pós-teste ≈ <b class="mbe-big">' + r1(postN) + '%</b><br>' +
-          '<span class="sc-extra">LR− ' + r2(lrn) + ': ' + forcaLR(lrn, false) + '.</span></div>';
-      }
-      html += origem;
-      out.className = 'sc-result sc-info';
-      out.innerHTML = '<div class="sc-conduta">' + html + '</div>';
+      if (lrp === null && lrn === null) { out.className = 'sc-result sc-info'; out.innerHTML = '<div class="sc-conduta">Informe sens/espec ou as LR+/LR−.</div>'; return; }
+      const preOdds = odds(pre / 100); let html = '';
+      if (lrp !== null && lrp > 0) { const p = prob(preOdds * lrp) * 100; html += '<div class="mbe-res-line"><b>Se POSITIVO →</b> pós-teste ≈ <b class="mbe-big">' + r1(p) + '%</b><br><span class="sc-extra">LR+ ' + r2(lrp) + ': ' + forcaLR(lrp, true) + '.</span></div>'; }
+      if (lrn !== null && lrn > 0) { const p = prob(preOdds * lrn) * 100; html += '<div class="mbe-res-line"><b>Se NEGATIVO →</b> pós-teste ≈ <b class="mbe-big">' + r1(p) + '%</b><br><span class="sc-extra">LR− ' + r2(lrn) + ': ' + forcaLR(lrn, false) + '.</span></div>'; }
+      out.className = 'sc-result sc-info'; out.innerHTML = '<div class="sc-conduta">' + html + origem + '</div>';
     };
     document.getElementById('mb-calc').addEventListener('click', calc);
     panel.querySelectorAll('input').forEach(el => el.addEventListener('change', calc));
 
-    // se chegou uma LR vinda da biblioteca, preenche e calcula
     if (pendingLR) {
-      const hadLR = (pendingLR.lrp !== null && pendingLR.lrp !== undefined) || (pendingLR.lrn !== null && pendingLR.lrn !== undefined);
-      if (pendingLR.lrp !== null && pendingLR.lrp !== undefined) document.getElementById('mb-lrp').value = pendingLR.lrp;
-      if (pendingLR.lrn !== null && pendingLR.lrn !== undefined) document.getElementById('mb-lrn').value = pendingLR.lrn;
-      document.getElementById('mb-pre').value = (pendingLR.pre !== null && pendingLR.pre !== undefined) ? pendingLR.pre : 20;
-      const veioPre = pendingLR.pre !== null && pendingLR.pre !== undefined;
-      pendingLR = null;
-      if (hadLR) calc();
-      const out = document.getElementById('mb-out');
-      const msg = (veioPre && !hadLR)
-        ? '<b>Probabilidade pré-teste preenchida (' + document.getElementById('mb-pre').value + '%).</b> Agora informe a sensibilidade/especificidade ou a LR do exame e clique em Calcular.'
-        : '<b>Ajuste a probabilidade pré-teste</b> ao seu paciente.';
-      out.insertAdjacentHTML('afterbegin', '<div class="sc-conduta" style="margin-bottom:8px">' + msg + '</div>');
+      const hadLR = pendingLR.lrp != null || pendingLR.lrn != null;
+      if (pendingLR.lrp != null) document.getElementById('mb-lrp').value = pendingLR.lrp;
+      if (pendingLR.lrn != null) document.getElementById('mb-lrn').value = pendingLR.lrn;
+      document.getElementById('mb-pre').value = pendingLR.pre != null ? pendingLR.pre : 20;
+      pendingLR = null; if (hadLR) calc();
     }
   }
 
-  // permite que a aba Pré-teste envie a probabilidade para o cálculo de Bayes
   window.MBE_setPreTeste = function (pre) {
     if (window.cardioGoView) window.cardioGoView('mbe');
     pendingLR = { pre: pre, lrp: null, lrn: null };
@@ -4365,165 +4548,66 @@ window.PROTOCOLOS = [
   };
 
   // ------------------------------------------------------------------
-  // 2) MEDIDAS DE EFEITO — RRA, RRR, NNT/NNH, RR, OR
+  // 3) MEDIDAS DE EFEITO
   // ------------------------------------------------------------------
   function viewEfeito() {
     panel.innerHTML =
       '<h3 class="sc-title">Medidas de efeito (NNT / NNH)</h3>' +
-      '<p class="muted small">Informe a taxa de eventos (desfecho) no grupo controle e no grupo tratado, em %. ' +
-      'Calcula redução absoluta/relativa de risco, NNT (número necessário para tratar) ou NNH (para causar dano), além de risco relativo e odds ratio.</p>' +
+      '<p class="muted small">Informe a taxa de eventos no grupo controle e no tratado (%). Calcula RRA/RRR, NNT/NNH, RR e OR.</p>' +
       '<div class="sc-campos">' +
       '<label class="sc-campo"><span>Eventos no grupo CONTROLE <em>(%)</em></span><input type="number" step="any" id="mb-cer" placeholder="ex: 10"></label>' +
       '<label class="sc-campo"><span>Eventos no grupo TRATADO <em>(%)</em></span><input type="number" step="any" id="mb-eer" placeholder="ex: 7"></label>' +
       '</div>' +
       '<button id="mb-calc2" class="btn-primary">Calcular</button>' +
       '<div id="mb-out2" class="sc-result sc-info"><div class="sc-conduta">Preencha as duas taxas e clique em Calcular.</div></div>';
-
     const calc = () => {
-      const cerP = n(document.getElementById('mb-cer').value);
-      const eerP = n(document.getElementById('mb-eer').value);
+      const cerP = n(document.getElementById('mb-cer').value), eerP = n(document.getElementById('mb-eer').value);
       const out = document.getElementById('mb-out2');
-      if (cerP === null || eerP === null || cerP < 0 || cerP > 100 || eerP < 0 || eerP > 100) {
-        out.className = 'sc-result sc-info';
-        out.innerHTML = '<div class="sc-conduta">Informe as duas taxas entre 0 e 100%.</div>';
-        return;
-      }
-      const cer = cerP / 100, eer = eerP / 100;
-      const ard = cer - eer;
-      const rrr = cer > 0 ? ard / cer : null;
-      const rr = cer > 0 ? eer / cer : null;
+      if (cerP === null || eerP === null || cerP < 0 || cerP > 100 || eerP < 0 || eerP > 100) { out.className = 'sc-result sc-info'; out.innerHTML = '<div class="sc-conduta">Informe as duas taxas entre 0 e 100%.</div>'; return; }
+      const cer = cerP / 100, eer = eerP / 100, ard = cer - eer;
+      const rrr = cer > 0 ? ard / cer : null, rr = cer > 0 ? eer / cer : null;
       const or = (cer > 0 && cer < 1 && eer < 1) ? (eer / (1 - eer)) / (cer / (1 - cer)) : null;
-      let html = '';
-      if (Math.abs(ard) < 1e-9) {
-        html = '<b>Sem diferença</b> entre os grupos (RRA = 0). NNT/NNH indefinidos.';
-      } else if (ard > 0) {
-        const nnt = Math.round(1 / ard);
-        html = 'O tratamento <b>reduz</b> o desfecho.<br>' +
-          '• Redução absoluta de risco (RRA): <b>' + r1(ard * 100) + '%</b><br>' +
-          (rrr !== null ? '• Redução relativa de risco (RRR): <b>' + r1(rrr * 100) + '%</b><br>' : '') +
-          '• <b class="mbe-big">NNT = ' + nnt + '</b> — é preciso tratar ' + nnt + ' paciente(s) para evitar 1 desfecho.';
-      } else {
-        const nnh = Math.round(1 / Math.abs(ard));
-        html = 'O tratamento <b>aumenta</b> o desfecho (possível dano).<br>' +
-          '• Aumento absoluto de risco: <b>' + r1(Math.abs(ard) * 100) + '%</b><br>' +
-          '• <b class="mbe-big">NNH = ' + nnh + '</b> — a cada ' + nnh + ' paciente(s) tratados, 1 desfecho a mais.';
-      }
-      html += '<br><span class="sc-extra">' +
-        (rr !== null ? 'Risco relativo (RR) = ' + r2(rr) + ' · ' : '') +
-        (or !== null ? 'Odds ratio (OR) = ' + r2(or) : '') +
-        '. NNT/NNH dependem do risco basal: o mesmo RRR gera NNT menor quanto maior o risco do paciente.</span>';
-      out.className = 'sc-result sc-info';
-      out.innerHTML = '<div class="sc-conduta">' + html + '</div>';
+      let html;
+      if (Math.abs(ard) < 1e-9) html = '<b>Sem diferença</b> (RRA = 0). NNT/NNH indefinidos.';
+      else if (ard > 0) { const nnt = Math.round(1 / ard); html = 'O tratamento <b>reduz</b> o desfecho.<br>• RRA: <b>' + r1(ard * 100) + '%</b><br>' + (rrr != null ? '• RRR: <b>' + r1(rrr * 100) + '%</b><br>' : '') + '• <b class="mbe-big">NNT = ' + nnt + '</b> — tratar ' + nnt + ' para evitar 1 desfecho.'; }
+      else { const nnh = Math.round(1 / Math.abs(ard)); html = 'O tratamento <b>aumenta</b> o desfecho (dano).<br>• Aumento absoluto: <b>' + r1(Math.abs(ard) * 100) + '%</b><br>• <b class="mbe-big">NNH = ' + nnh + '</b>.'; }
+      html += '<br><span class="sc-extra">' + (rr != null ? 'RR = ' + r2(rr) + ' · ' : '') + (or != null ? 'OR = ' + r2(or) : '') + '. NNT/NNH dependem do risco basal.</span>';
+      out.className = 'sc-result sc-info'; out.innerHTML = '<div class="sc-conduta">' + html + '</div>';
     };
     document.getElementById('mb-calc2').addEventListener('click', calc);
     panel.querySelectorAll('input').forEach(el => el.addEventListener('change', calc));
   }
 
   // ------------------------------------------------------------------
-  // 3) BIBLIOTECA DE LRs CARDIOLÓGICAS (robusta)
-  // lrp/lrn/sens/spec: número ou null. obs: texto opcional (faixa, ressalva).
+  // 4) BIBLIOTECA DE LRs
   // ------------------------------------------------------------------
-  const LRS = [
-    // ---- IC: exame e história (Wang, JAMA 2005) ----
-    { g: 'Insuficiência cardíaca — exame e história', a: 'Terceira bulha (B3 / galope)', lrp: 11, lrn: 0.88, ref: 'Wang, JAMA 2005' },
-    { g: 'Insuficiência cardíaca — exame e história', a: 'Refluxo hepatojugular', lrp: 6.4, lrn: 0.79, ref: 'Wang, JAMA 2005' },
-    { g: 'Insuficiência cardíaca — exame e história', a: 'História prévia de insuficiência cardíaca', lrp: 5.8, lrn: 0.45, ref: 'Wang, JAMA 2005' },
-    { g: 'Insuficiência cardíaca — exame e história', a: 'Turgência jugular', lrp: 5.1, lrn: 0.66, ref: 'Wang, JAMA 2005' },
-    { g: 'Insuficiência cardíaca — exame e história', a: 'Dispneia paroxística noturna', lrp: 2.6, lrn: 0.70, ref: 'Wang, JAMA 2005' },
-    { g: 'Insuficiência cardíaca — exame e história', a: 'Estertores pulmonares', lrp: 2.8, lrn: 0.51, ref: 'Wang, JAMA 2005' },
-    { g: 'Insuficiência cardíaca — exame e história', a: 'Ortopneia', lrp: 2.2, lrn: 0.65, ref: 'Wang, JAMA 2005' },
-    { g: 'Insuficiência cardíaca — exame e história', a: 'Edema de membros (ao exame)', lrp: 2.3, lrn: 0.64, ref: 'Wang, JAMA 2005' },
-    // ---- IC: biomarcadores e imagem ----
-    { g: 'Insuficiência cardíaca — biomarcadores e imagem', a: 'NT-proBNP < 300 pg/mL (afasta IC aguda)', lrp: null, lrn: 0.02, ref: 'Januzzi, PRIDE 2005' },
-    { g: 'Insuficiência cardíaca — biomarcadores e imagem', a: 'BNP < 100 pg/mL (afasta IC)', lrp: null, lrn: 0.13, ref: 'Wang, JAMA 2005' },
-    { g: 'Insuficiência cardíaca — biomarcadores e imagem', a: 'BNP 300–400 pg/mL (ponto de corte para confirmar)', lrp: 7.6, lrn: null, sens: 81, spec: 90, ref: 'Worster, meta-análise 2008' },
-    { g: 'Insuficiência cardíaca — biomarcadores e imagem', a: 'Congestão venosa pulmonar no RX de tórax', lrp: 12, lrn: 0.48, ref: 'Wang, JAMA 2005' },
-    { g: 'Insuficiência cardíaca — biomarcadores e imagem', a: 'Cardiomegalia no RX de tórax', lrp: 3.3, lrn: 0.33, ref: 'Wang, JAMA 2005' },
-    { g: 'Insuficiência cardíaca — biomarcadores e imagem', a: 'Fibrilação atrial no ECG', lrp: 3.8, lrn: 0.79, ref: 'Wang, JAMA 2005' },
-    // ---- SCA: características da dor (Swap & Nagurney, JAMA 2005) ----
-    { g: 'Dor torácica / SCA — características da dor', a: 'Irradiação para o braço/ombro DIREITO', lrp: 4.7, lrn: null, ref: 'Swap, JAMA 2005' },
-    { g: 'Dor torácica / SCA — características da dor', a: 'Irradiação para AMBOS os braços', lrp: 2.6, lrn: null, ref: 'Swap, JAMA 2005' },
-    { g: 'Dor torácica / SCA — características da dor', a: 'Dor desencadeada pelo esforço', lrp: 2.4, lrn: null, ref: 'Swap, JAMA 2005' },
-    { g: 'Dor torácica / SCA — características da dor', a: 'Irradiação para o braço ESQUERDO', lrp: 2.3, lrn: null, ref: 'Swap, JAMA 2005' },
-    { g: 'Dor torácica / SCA — características da dor', a: 'Sudorese (diaforese) associada', lrp: 2.0, lrn: null, ref: 'Swap, JAMA 2005' },
-    { g: 'Dor torácica / SCA — características da dor', a: 'Náusea ou vômito associados', lrp: 1.9, lrn: null, ref: 'Swap, JAMA 2005' },
-    { g: 'Dor torácica / SCA — características da dor', a: 'Dor reprodutível à palpação (torna SCA improvável)', lrp: 0.3, lrn: null, ref: 'Swap, JAMA 2005' },
-    { g: 'Dor torácica / SCA — características da dor', a: 'Dor posicional (torna SCA improvável)', lrp: 0.3, lrn: null, ref: 'Swap, JAMA 2005' },
-    { g: 'Dor torácica / SCA — características da dor', a: 'Dor pleurítica (torna SCA improvável)', lrp: 0.2, lrn: null, ref: 'Swap, JAMA 2005' },
-    // ---- DAC: testes não invasivos (meta-análises) ----
-    { g: 'Doença coronariana — testes não invasivos', a: 'Angio-TC de coronárias', lrp: 4.0, lrn: 0.07, sens: 95, spec: 76, ref: 'Meta-análise 2025 (104 estudos)' },
-    { g: 'Doença coronariana — testes não invasivos', a: 'Eco sob estresse', lrp: 5.4, lrn: 0.22, sens: 81, spec: 85, ref: 'Meta-análise 2025 (104 estudos)' },
-    { g: 'Doença coronariana — testes não invasivos', a: 'Cintilografia de perfusão (SPECT)', lrp: 3.2, lrn: 0.24, sens: 82, spec: 74, ref: 'Meta-análise 2025 (104 estudos)' },
-    { g: 'Doença coronariana — testes não invasivos', a: 'Teste ergométrico (ECG de esforço)', lrp: 1.7, lrn: 0.56, sens: 66, spec: 61, ref: 'Meta-análise 2025 (104 estudos)' },
-    // ---- Estenose aórtica (Etchells) ----
-    { g: 'Estenose aórtica (sopro sistólico)', a: '3–4 achados (S2 reduzida, volume/ascensão carotídea reduzidos, sopro em foco aórtico)', lrp: 40, lrn: null, ref: 'Etchells, JGIM 1998' },
-    { g: 'Estenose aórtica (sopro sistólico)', a: 'Ascensão carotídea lenta/tardia', lrp: 3.7, lrn: 0.42, ref: 'Etchells, JAMA 1997' },
-    { g: 'Estenose aórtica (sopro sistólico)', a: 'Ausência de sopro irradiando p/ carótida direita (afasta EAo ≥ moderada)', lrp: null, lrn: 0.10, ref: 'Etchells, JGIM 1998' },
-    // ---- Insuficiência aórtica (Choudhry, JAMA 1999) ----
-    { g: 'Insuficiência aórtica', a: 'Sopro diastólico precoce presente (faixa LR+ 9–32)', lrp: 10, lrn: 0.1, ref: 'Choudhry, JAMA 1999' },
-    { g: 'Insuficiência aórtica', a: 'Aumento do sopro à oclusão arterial transitória', lrp: 8.4, lrn: 0.3, ref: 'Choudhry, JAMA 1999' },
-    // ---- Sopros sistólicos: manobras (Lembo, NEJM 1988) ----
-    { g: 'Sopros sistólicos — manobras dinâmicas', a: 'Sopro AUMENTA com Valsalva → cardiomiopatia hipertrófica', lrp: 16, lrn: 0.36, sens: 65, spec: 96, ref: 'Lembo, NEJM 1988' },
-    { g: 'Sopros sistólicos — manobras dinâmicas', a: 'Sopro AUMENTA com handgrip → insuf. mitral / CIV', lrp: 8.5, lrn: 0.35, sens: 68, spec: 92, ref: 'Lembo, NEJM 1988' },
-    // ---- Tamponamento (Roy, JAMA 2007) ----
-    { g: 'Tamponamento cardíaco (com derrame pericárdico)', a: 'Pulso paradoxal > 20 mmHg', lrp: 8.8, lrn: null, ref: 'Roy, JAMA 2007' },
-    { g: 'Tamponamento cardíaco (com derrame pericárdico)', a: 'Pulso paradoxal > 12 mmHg', lrp: 5.9, lrn: null, ref: 'Roy, JAMA 2007' },
-    { g: 'Tamponamento cardíaco (com derrame pericárdico)', a: 'Pulso paradoxal > 10 mmHg', lrp: 3.3, lrn: null, ref: 'Roy, JAMA 2007' },
-    { g: 'Tamponamento cardíaco (com derrame pericárdico)', a: 'Pulso paradoxal ≤ 10 mmHg (torna tamponamento improvável)', lrp: null, lrn: 0.03, ref: 'Roy, JAMA 2007' },
-    // ---- PVC / volemia ----
-    { g: 'Pressão venosa central / volemia', a: 'PVJ > 8 cmH₂O à beira-leito → PVC elevada', lrp: 9.7, lrn: null, ref: 'Rational Clinical Exam (McGee)' },
-    // ---- Doença carotídea ----
-    { g: 'Doença carotídea', a: 'Sopro carotídeo → estenose 50–99%', lrp: 3.7, lrn: 0.36, sens: 71, spec: 81, ref: 'Northern Manhattan Study' },
-    // ---- TEP / TVP ----
-    { g: 'Tromboembolismo venoso', a: 'D-dímero de alta sensibilidade NEGATIVO (afasta TEP/TVP)', lrp: null, lrn: 0.09, ref: 'Stein, Ann Intern Med 2004' }
-  ];
-
   function viewLRs() {
     const grupos = [...new Set(LRS.map(x => x.g))];
-    let html =
+    panel.innerHTML =
       '<h3 class="sc-title">Biblioteca de razões de verossimilhança (LR)</h3>' +
-      '<p class="muted small">' + LRS.length + ' achados clínicos e exames em cardiologia, com sensibilidade/especificidade (quando disponível) e a referência. ' +
-      'Use o botão <b>→ Bayes</b> para enviar a LR à calculadora de probabilidade pós-teste. As LRs variam conforme a população — orientação, não valor absoluto.</p>' +
+      '<p class="muted small">' + LRS.length + ' achados clínicos e exames com LR+/LR− e referência. Use <b>→ Bayes</b> para enviar a LR à calculadora manual, ou a <b>Calculadora diagnóstica</b> para encadear vários achados.</p>' +
       '<div class="mbe-filtros">' +
-      '<input type="text" id="mb-lr-busca" placeholder="Buscar achado ou tema... (ex: B3, carótida, Valsalva)" class="mbe-search">' +
-      '<select id="mb-lr-grupo" class="mbe-search"><option value="">Todos os grupos</option>' +
-      grupos.map(g => '<option value="' + esc(g) + '">' + esc(g) + '</option>').join('') + '</select>' +
+      '<input type="text" id="mb-lr-busca" placeholder="Buscar achado ou tema... (ex: B3, Valsalva, D-dímero)" class="mbe-search">' +
+      '<select id="mb-lr-grupo" class="mbe-search"><option value="">Todos os grupos</option>' + grupos.map(g => '<option value="' + esc(g) + '">' + esc(g) + '</option>').join('') + '</select>' +
       '</div>' +
       '<div class="mbe-legenda"><span class="lr-chip lr-strong">grande</span><span class="lr-chip lr-mod">moderada</span><span class="lr-chip lr-small">pequena</span><span class="lr-chip lr-min">mínima</span> — força da mudança na probabilidade</div>' +
       '<div id="mb-lr-table"></div>';
-    panel.innerHTML = html;
-
     const render = (filtro, grupoSel) => {
-      const f = (filtro || '').toLowerCase();
-      const grp = {};
-      LRS.filter(x => (!grupoSel || x.g === grupoSel) && (!f || (x.a + ' ' + x.g + ' ' + x.ref).toLowerCase().includes(f)))
-        .forEach(x => { (grp[x.g] = grp[x.g] || []).push(x); });
+      const f = (filtro || '').toLowerCase(), grp = {};
+      LRS.filter(x => (!grupoSel || x.g === grupoSel) && (!f || (x.a + ' ' + x.g + ' ' + x.ref).toLowerCase().includes(f))).forEach(x => { (grp[x.g] = grp[x.g] || []).push(x); });
       let h = '';
       Object.keys(grp).forEach(g => {
         h += '<div class="evol-group-title" style="margin-top:14px">' + esc(g) + '</div>';
-        h += '<table class="mbe-table"><thead><tr><th>Achado / exame</th><th>LR+</th><th>LR−</th><th>Sens</th><th>Espec</th><th>Ref.</th><th></th></tr></thead><tbody>';
-        grp[g].forEach((x, i) => {
+        h += '<table class="mbe-table"><thead><tr><th>Achado / exame</th><th>LR+</th><th>LR−</th><th>Ref.</th><th></th></tr></thead><tbody>';
+        grp[g].forEach(x => {
           const idx = LRS.indexOf(x);
-          h += '<tr>' +
-            '<td>' + esc(x.a) + '</td>' +
-            '<td class="mbe-num"><span class="lr-chip ' + chipClass(x.lrp, true) + '">' + fmt(x.lrp) + '</span></td>' +
-            '<td class="mbe-num"><span class="lr-chip ' + chipClass(x.lrn, false) + '">' + fmt(x.lrn) + '</span></td>' +
-            '<td class="mbe-num">' + (x.sens != null ? x.sens + '%' : '—') + '</td>' +
-            '<td class="mbe-num">' + (x.spec != null ? x.spec + '%' : '—') + '</td>' +
-            '<td class="mbe-ref">' + esc(x.ref) + '</td>' +
-            '<td class="mbe-num"><button class="mbe-usar" data-i="' + idx + '">→ Bayes</button></td>' +
-            '</tr>';
+          h += '<tr><td>' + esc(x.a) + '</td><td class="mbe-num"><span class="lr-chip ' + chipClass(x.lrp, true) + '">' + fmt(x.lrp) + '</span></td><td class="mbe-num"><span class="lr-chip ' + chipClass(x.lrn, false) + '">' + fmt(x.lrn) + '</span></td><td class="mbe-ref">' + esc(x.ref) + '</td><td class="mbe-num"><button class="mbe-usar" data-i="' + idx + '">→ Bayes</button></td></tr>';
         });
         h += '</tbody></table>';
       });
       if (!h) h = '<p class="muted small">Nenhum achado encontrado.</p>';
-      const t = document.getElementById('mb-lr-table');
-      t.innerHTML = h;
-      t.querySelectorAll('.mbe-usar').forEach(b => b.addEventListener('click', () => {
-        const x = LRS[+b.dataset.i];
-        pendingLR = { lrp: x.lrp, lrn: x.lrn, pre: 20 };
-        irPara('post');
-      }));
+      const t = document.getElementById('mb-lr-table'); t.innerHTML = h;
+      t.querySelectorAll('.mbe-usar').forEach(b => b.addEventListener('click', () => { const x = LRS[+b.dataset.i]; pendingLR = { lrp: x.lrp, lrn: x.lrn, pre: 20 }; irPara('post'); }));
     };
     render('', '');
     document.getElementById('mb-lr-busca').addEventListener('input', e => render(e.target.value, document.getElementById('mb-lr-grupo').value));
@@ -4532,24 +4616,23 @@ window.PROTOCOLOS = [
 
   // ---------- menu ----------
   const TOOLS = [
+    { id: 'calc', nome: '🧭 Calculadora diagnóstica', fn: viewCalc },
     { id: 'post', nome: 'Probabilidade pós-teste (Bayes)', fn: viewPostTeste },
     { id: 'efeito', nome: 'Medidas de efeito (NNT / NNH)', fn: viewEfeito },
-    { id: 'lrs', nome: 'Biblioteca de LRs cardiológicas', fn: viewLRs }
+    { id: 'lrs', nome: 'Biblioteca de LRs', fn: viewLRs }
   ];
   const botoes = {};
   const gt = document.createElement('div'); gt.className = 'evol-group-title'; gt.textContent = 'Ferramentas'; menu.appendChild(gt);
   TOOLS.forEach(t => {
     const b = document.createElement('button'); b.className = 'evol-item'; b.textContent = t.nome; b.dataset.id = t.id;
-    botoes[t.id] = b;
-    b.addEventListener('click', () => irPara(t.id));
-    menu.appendChild(b);
+    botoes[t.id] = b; b.addEventListener('click', () => irPara(t.id)); menu.appendChild(b);
   });
   function irPara(id) {
     const t = TOOLS.find(x => x.id === id); if (!t) return;
     menu.querySelectorAll('.evol-item').forEach(x => x.classList.toggle('active', x === botoes[id]));
     t.fn();
   }
-  irPara('post');
+  irPara('calc');
 })();
 
 </script>
@@ -4796,133 +4879,6 @@ window.PROTOCOLOS = [
     '<div class="nv-fonte">' + esc(m.fonte) + '</div>' +
     '<ul class="nv-itens">' + m.itens.map(i => '<li>' + esc(i) + '</li>').join('') + '</ul></div>'
   ).join('');
-})();
-
-</script>
-  <script>
-// Tutor socrático de cardiologia — chat com IA (chama a função serverless /api/tutor).
-(function () {
-  const root = document.getElementById('tutor-root');
-  if (!root) return;
-  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  // markdown leve: **negrito**, *itálico*, quebras de linha
-  function fmt(t) {
-    return esc(t)
-      .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
-      .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<i>$2</i>')
-      .replace(/\n/g, '<br>');
-  }
-
-  const MODOS = [
-    { id: 'livre', t: '💬 Tutoria livre', d: 'Traga uma dúvida ou tema; o tutor explora seu raciocínio.' },
-    { id: 'caso', t: '🩺 Caso clínico', d: 'O tutor cria um caso e conduz você do diagnóstico à conduta.' },
-    { id: 'quiz', t: '❓ Quiz dirigido', d: 'Perguntas conceituais progressivas sobre um tema.' },
-    { id: 'paciente', t: '🧬 Meu paciente', d: 'Discuta o caso montado no gêmeo digital (aba Paciente) e o porquê de cada conduta.' }
-  ];
-  const TEMAS = ['Insuficiência cardíaca', 'Síndrome coronariana aguda (OCA/OMI)', 'Fibrilação atrial', 'Valvopatias', 'Dislipidemia e prevenção', 'Hipertensão', 'Arritmias e síncope', 'Emergências (plantão)'];
-
-  let modo = 'livre';
-  let messages = []; // { role:'user'|'model', text }
-  let busy = false;
-
-  root.innerHTML =
-    '<div class="tutor-wrap">' +
-    '<div class="tutor-modos" id="tutor-modos"></div>' +
-    '<div class="tutor-tema-wrap" id="tutor-tema-wrap"><label class="tutor-tema-label">Tema (opcional): <select id="tutor-tema"><option value="">— escolher —</option>' +
-    TEMAS.map(t => '<option value="' + esc(t) + '">' + esc(t) + '</option>').join('') + '</select></label>' +
-    '<button class="pac-go" id="tutor-iniciar">Iniciar</button></div>' +
-    '<div class="tutor-chat" id="tutor-chat"></div>' +
-    '<div class="tutor-input"><textarea id="tutor-txt" rows="2" placeholder="Escreva sua resposta ou pergunta…"></textarea>' +
-    '<button class="btn-primary" id="tutor-send">Enviar</button></div>' +
-    '<p class="muted small tutor-aviso">⚠️ Ferramenta de estudo com IA — pode conter erros; confirme nas diretrizes. Não insira dados que identifiquem pacientes.</p>' +
-    '</div>';
-
-  const chatEl = document.getElementById('tutor-chat');
-  const txtEl = document.getElementById('tutor-txt');
-  const modosEl = document.getElementById('tutor-modos');
-  const temaSel = document.getElementById('tutor-tema');
-
-  function renderModos() {
-    modosEl.innerHTML = MODOS.map(m => '<button class="tutor-modo' + (m.id === modo ? ' active' : '') + '" data-m="' + m.id + '" title="' + esc(m.d) + '">' + m.t + '</button>').join('');
-    modosEl.querySelectorAll('.tutor-modo').forEach(b => b.addEventListener('click', () => {
-      modo = b.dataset.m; renderModos(); resetChat();
-    }));
-  }
-  function resetChat() {
-    messages = []; chatEl.innerHTML = '';
-    const m = MODOS.find(x => x.id === modo);
-    addBubble('sys', m.d + (modo === 'livre' ? ' Mande sua primeira pergunta abaixo.' : ' Escolha um tema (opcional) e clique em Iniciar.'));
-  }
-  function addBubble(role, html) {
-    const div = document.createElement('div');
-    div.className = 'tutor-msg tutor-' + role;
-    div.innerHTML = (role === 'tutor' ? '<span class="tutor-av">🎓</span>' : '') + '<div class="tutor-bubble">' + html + '</div>';
-    chatEl.appendChild(div);
-    chatEl.scrollTop = chatEl.scrollHeight;
-    return div;
-  }
-
-  async function send(text, isStart, displayText) {
-    if (busy) return;
-    if (!isStart) { messages.push({ role: 'user', text }); addBubble('user', fmt(displayText || text)); }
-    busy = true;
-    const loading = addBubble('tutor', '<span class="tutor-dots"><i></i><i></i><i></i></span>');
-    try {
-      const res = await fetch('/api/tutor', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ modo, tema: temaSel.value || '', messages })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
-      messages.push({ role: 'model', text: data.resposta });
-      loading.querySelector('.tutor-bubble').innerHTML = fmt(data.resposta);
-    } catch (err) {
-      loading.querySelector('.tutor-bubble').innerHTML = '<span class="tutor-erro">Não foi possível obter resposta: ' + esc(err.message) + '<br>Verifique se a função /api/tutor está publicada e a chave de API configurada.</span>';
-    } finally {
-      busy = false; chatEl.scrollTop = chatEl.scrollHeight;
-    }
-  }
-
-  function doSend() {
-    const t = txtEl.value.trim(); if (!t || busy) return;
-    txtEl.value = '';
-    send(t, false);
-  }
-
-  document.getElementById('tutor-send').addEventListener('click', doSend);
-  txtEl.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSend(); } });
-  document.getElementById('tutor-iniciar').addEventListener('click', () => {
-    if (busy) return;
-    if (modo === 'paciente') { startPaciente(); return; }
-    chatEl.innerHTML = ''; messages = [];
-    const kick = modo === 'caso'
-      ? 'Crie um caso clínico cardiológico e faça a primeira pergunta.'
-      : (modo === 'quiz' ? 'Comece o quiz socrático sobre o tema.' : 'Vamos começar.');
-    messages.push({ role: 'user', text: kick });
-    send(null, true);
-  });
-
-  function startPaciente() {
-    const txt = window.cardioPaciente ? window.cardioPaciente.texto() : '';
-    if (!txt || !/OPORTUNIDADES/.test(txt)) {
-      chatEl.innerHTML = '';
-      addBubble('sys', 'Monte um paciente na aba 🧬 Paciente primeiro (preencha comorbidades e medicações). Depois volte aqui e clique em Iniciar — ou use o botão "🎓 Por quê?" em cada conduta.');
-      return;
-    }
-    chatEl.innerHTML = ''; messages = [];
-    send('Discuta comigo o paciente abaixo: explique o PORQUÊ de cada conduta (mecanismo + evidência/diretriz + benefício), a ordem de otimização e as contraindicações. Depois faça uma pergunta para fixar.\n\n' + txt,
-      false, 'Vamos discutir o paciente que montei no gêmeo digital — explique o porquê de cada conduta.');
-  }
-
-  // chamado pela aba Paciente (botão "🎓 Por quê?")
-  window.cardioTutorExplica = function (apiText, displayText) {
-    modo = 'paciente'; renderModos();
-    chatEl.innerHTML = ''; messages = [];
-    send(apiText, false, displayText);
-  };
-
-  renderModos();
-  resetChat();
 })();
 
 </script>
@@ -5487,7 +5443,6 @@ window.PROTOCOLOS = [
   }
   function cardLinks(iv) {
     const bts = [];
-    bts.push('<button class="pac-go pac-go-why" data-go="tutor" data-arg="' + esc(iv.id) + '">🎓 Por quê?</button>');
     if (iv.doses) bts.push('<button class="pac-go" data-go="doses" data-arg="' + esc(iv.doses) + '">💊 Dose / ajuste renal</button>');
     if (iv.score) bts.push('<button class="pac-go" data-go="score" data-arg="' + esc(iv.score) + '">🧮 Calcular score</button>');
     if (iv.score2) bts.push('<button class="pac-go" data-go="score" data-arg="' + esc(iv.score2) + '">🩸 ARC-HBR (sangramento)</button>');
@@ -5660,14 +5615,6 @@ window.PROTOCOLOS = [
     else if (act === 'pretest') go('pretest', () => { if (window.cardioPretestFill) window.cardioPretestFill(); });
     else if (act === 'evid') go('evidencia', () => { const i = document.getElementById('busca-input'); if (i) { i.value = arg; const f = document.getElementById('busca-form'); if (f) f.dispatchEvent(new Event('submit', { cancelable: true })); } });
     else if (act === 'copy') { if (window.copyText) window.copyText(lastPlan); else navigator.clipboard.writeText(lastPlan); }
-    else if (act === 'tutor') {
-      const iv = INTERV.find(x => x.id === arg); if (!iv) return;
-      const nome = iv.nome.replace(/<[^>]+>/g, '');
-      const prompt = 'Explique, como tutor, o PORQUÊ desta conduta para ESTE paciente específico: "' + nome + '" (grupo ' + iv.grupo + ').'
-        + ' Aborde o mecanismo, a evidência/diretriz' + (iv.estudo ? ' (ex.: ' + iv.estudo.nome + ')' : '') + ' e o benefício esperado; aponte cuidados e contraindicações relevantes.'
-        + ' Seja didático e, ao final, faça uma pergunta para eu fixar.\n\nContexto do paciente (gêmeo digital):\n' + lastPlan;
-      go('tutor', () => { if (window.cardioTutorExplica) window.cardioTutorExplica(prompt, '🎓 Por que: ' + nome + '?'); });
-    }
   }
 
   root.innerHTML =
@@ -5693,9 +5640,9 @@ window.PROTOCOLOS = [
     { id: 'paciente', label: '🧬 Paciente', views: [['paciente', '🧬 Paciente']] },
     { id: 'temas', label: '🫀 Temas', views: [['temas', '🫀 Temas']] },
     { id: 'evidencias', label: '📚 Evidências', views: [['evidencia', '🔎 Recomendações'], ['guias', '📚 Diretrizes'], ['ensaios', '🧪 Ensaios pivotais']] },
-    { id: 'ferramentas', label: '🧮 Ferramentas', views: [['scores', '🧮 Scores'], ['pretest', '🎯 Pré-teste'], ['mbe', '📐 MBE'], ['doses', '💊 Doses']] },
+    { id: 'ferramentas', label: '🧮 Ferramentas', views: [['scores', '🧮 Scores'], ['pretest', '🎯 Pré-teste'], ['doses', '💊 Doses']] },
+    { id: 'mbe', label: '📐 MBE', views: [['mbe', '📐 MBE']] },
     { id: 'plantao', label: '🚨 Plantão', views: [['protocolos', '🚨 Protocolos']] },
-    { id: 'tutor', label: '🎓 Tutor', views: [['tutor', '🎓 Tutor socrático']] },
     { id: 'prontuario', label: '📝 Prontuário', views: [['transcricao', '📝 Transcrever laudo'], ['evolucoes', '🗂️ Evoluções']] },
     { id: 'sobre', label: 'ℹ️ Sobre', views: [['novidades', '🆕 Atualizações'], ['sobre', 'ℹ️ Sobre']] }
   ];
