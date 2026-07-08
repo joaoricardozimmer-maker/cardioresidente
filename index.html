@@ -385,6 +385,19 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .mbc-bar-post span { background: var(--accent); }
 .mbc-post { font-size: 15px; margin: 8px 0 4px; }
 @media (max-width: 600px) { .mbc-ctrl { width: auto; } .mbc-seg { padding: 6px 9px; } }
+/* Raciocínio diagnóstico (sub-aba do Paciente) */
+.diag-ctx { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.diag-ctxbtn { font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; border: 1px solid var(--line); background: var(--card); color: var(--text); border-radius: 999px; padding: 9px 16px; }
+.diag-ctxbtn.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+.diag-tsel { display: block; max-width: 520px; margin-bottom: 14px; }
+.diag-wrap { display: grid; grid-template-columns: 340px 1fr; gap: 20px; }
+.diag-form { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px; align-self: start; }
+.diag-sub { font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 14px 0 6px; }
+.diag-pre { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 10px; padding: 11px 14px; font-size: 14px; margin-bottom: 12px; }
+.diag-rescell { width: 260px; }
+.diag-res { width: 100%; font: inherit; font-size: 13px; padding: 7px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--text); }
+.diag-grid { margin-bottom: 4px; }
+@media (max-width: 860px) { .diag-wrap { grid-template-columns: 1fr; } .diag-rescell { width: auto; } }
 .mbe-usar { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 4px 9px; font-size: 11.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .mbe-usar:hover { background: var(--accent-soft); }
 
@@ -681,6 +694,15 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
         <p>O recurso que falta em todo lugar: monte um paciente e veja, <strong>para ele</strong>, o benefício absoluto e o NNT de cada conduta — a evidência da diretriz traduzida em número individual.</p>
       </div>
       <div id="paciente-root"></div>
+    </section>
+
+    <!-- ============ DIAGNÓSTICO ============ -->
+    <section class="view" id="view-diagnostico">
+      <div class="hero">
+        <h2>Raciocínio diagnóstico (pré → pós-teste)</h2>
+        <p>Do quadro clínico à conduta: monte o caso por contexto (agudo ou ambulatorial), obtenha a probabilidade pré-teste automática, escolha o exame e lance o resultado — a probabilidade pós-teste se atualiza em cadeia.</p>
+      </div>
+      <div id="diagnostico-root"></div>
     </section>
 
     <!-- ============ TEMAS ============ -->
@@ -5634,10 +5656,230 @@ window.PROTOCOLOS = [
 
 </script>
   <script>
+// Hub Paciente — sub-aba "Diagnóstico": raciocínio bayesiano por contexto (agudo/ambulatorial).
+// Fluxo: quadro clínico → probabilidade PRÉ-teste automática → exame sugerido (com LR) →
+// lança-se o resultado → probabilidade PÓS-teste (em cadeia). Apoio à decisão; assume
+// independência entre os testes (aproximação). Fontes: ESC 2024 (RF-CL), Wells, e séries
+// Rational Clinical Examination (JAMA) + meta-análises de acurácia.
+(function () {
+  const root = document.getElementById('diagnostico-root');
+  if (!root) return;
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const r1 = x => Math.round(x * 10) / 10;
+  const fmt = x => (x == null) ? '—' : String(Math.round(x * 100) / 100).replace('.', ',');
+  const odds = p => p / (1 - p), prob = o => o / (1 + o);
+  const pct = v => Math.max(0, Math.min(100, v));
+
+  // Tabela RF-CL (ESC 2024, Figura 4) — % de DAC obstrutiva
+  const RFCL = {
+    s01: { W: [[0, 1, 2], [1, 1, 3], [1, 2, 5], [2, 4, 7], [4, 7, 11]], M: [[1, 2, 5], [2, 4, 8], [4, 7, 12], [8, 12, 17], [15, 19, 24]] },
+    s2: { W: [[0, 1, 3], [1, 2, 5], [2, 3, 7], [3, 6, 11], [6, 10, 16]], M: [[2, 4, 8], [3, 6, 12], [6, 11, 17], [12, 17, 25], [22, 27, 34]] },
+    s3: { W: [[2, 5, 10], [4, 7, 12], [6, 10, 15], [10, 14, 19], [16, 19, 23]], M: [[9, 14, 22], [14, 20, 27], [21, 27, 33], [32, 35, 39], [44, 44, 45]] }
+  };
+  function ageIdx(a) { return a == null ? 2 : a < 40 ? 0 : a < 50 ? 1 : a < 60 ? 2 : a < 70 ? 3 : 4; }
+
+  // ---------- alvos diagnósticos ----------
+  const TARGETS = [
+    {
+      id: 'dac', nome: 'Dor torácica → Doença coronariana (DAC)', contextos: ['agudo', 'ambulatorial'],
+      inputs: `
+        <div class="sc-campos diag-grid">
+          <label class="sc-campo"><span>Sexo</span><select id="dg-sexo"><option value="M">Masculino</option><option value="W">Feminino</option></select></label>
+          <label class="sc-campo"><span>Idade <em>(anos)</em></span><input type="number" id="dg-idade"></label>
+        </div>
+        <div class="diag-sub">Características da dor (score de sintomas)</div>
+        <div class="pac-checks">
+          <label class="sc-check"><input type="checkbox" id="dg-cp1"><span>Desconforto retroesternal típico</span></label>
+          <label class="sc-check"><input type="checkbox" id="dg-cp2"><span>Agravado por esforço/estresse</span></label>
+          <label class="sc-check"><input type="checkbox" id="dg-cp3"><span>Aliviado por repouso/nitrato em 5 min</span></label>
+          <label class="sc-check"><input type="checkbox" id="dg-disp"><span>Dispneia como sintoma principal (= 2 pontos)</span></label>
+        </div>
+        <div class="diag-sub">Fatores de risco</div>
+        <div class="pac-checks">
+          <label class="sc-check"><input type="checkbox" id="dg-fam"><span>História familiar de DAC precoce</span></label>
+          <label class="sc-check"><input type="checkbox" id="dg-tab"><span>Tabagismo</span></label>
+          <label class="sc-check"><input type="checkbox" id="dg-disl"><span>Dislipidemia</span></label>
+          <label class="sc-check"><input type="checkbox" id="dg-has"><span>Hipertensão</span></label>
+          <label class="sc-check"><input type="checkbox" id="dg-dm"><span>Diabetes</span></label>
+        </div>`,
+      pretest: function () {
+        const sexo = document.getElementById('dg-sexo').value;
+        const idade = parseFloat(document.getElementById('dg-idade').value);
+        const disp = document.getElementById('dg-disp').checked;
+        const score = disp ? 2 : ['dg-cp1', 'dg-cp2', 'dg-cp3'].filter(i => document.getElementById(i).checked).length;
+        const col = disp ? 's2' : (score <= 1 ? 's01' : score === 2 ? 's2' : 's3');
+        const nrf = ['dg-fam', 'dg-tab', 'dg-disl', 'dg-has', 'dg-dm'].filter(i => document.getElementById(i).checked).length;
+        const rfg = nrf <= 1 ? 0 : nrf <= 3 ? 1 : 2;
+        const p = RFCL[col][sexo][ageIdx(isFinite(idade) ? idade : null)][rfg];
+        return { pre: p, nota: 'RF-CL (ESC 2024): score de sintomas ' + (disp ? 'dispneia (2)' : score) + ', ' + nrf + ' fator(es) de risco.' };
+      },
+      exames: [
+        { ctx: 'agudo', nome: 'ECG', ref: 'Panju, JAMA 1998', res: [['Supra de ST novo', 11], ['Infra de ST novo', 5.2], ['Onda Q nova', 3.9], ['Alteração inespecífica de T', 1.3], ['Normal', 0.2]] },
+        { ctx: 'agudo', nome: 'Troponina de alta sensibilidade', ref: 'ESC 0/1h', res: [['Elevada / em ascensão', 10], ['Protocolo 0/1h negativo', 0.02], ['Indeterminada', 1]] },
+        { ctx: 'agudo', nome: 'Angio-TC de coronárias', ref: 'Meta-análise (sens 95/espec 76)', res: [['Estenose ≥ 50%', 4.0], ['Sem estenose significativa', 0.07]] },
+        { ctx: 'ambulatorial', nome: 'Teste ergométrico', ref: 'Meta-análise 2025', res: [['Positivo (isquemia)', 1.7], ['Negativo', 0.56], ['Inconclusivo', 1] ] },
+        { ctx: 'ambulatorial', nome: 'Ecocardiograma de estresse', ref: 'Meta-análise 2025', res: [['Positivo', 5.4], ['Negativo', 0.22]] },
+        { ctx: 'ambulatorial', nome: 'Cintilografia de perfusão (SPECT)', ref: 'Meta-análise 2025', res: [['Positivo', 3.2], ['Negativo', 0.24]] },
+        { ctx: 'ambulatorial', nome: 'RM cardíaca de estresse (perfusão)', ref: 'CE-MARC', res: [['Positivo', 6.8], ['Negativo', 0.13]] },
+        { ctx: 'ambulatorial', nome: 'Angio-TC de coronárias', ref: 'Meta-análise', res: [['Estenose ≥ 50%', 4.0], ['Sem estenose significativa', 0.07]] },
+        { ctx: 'ambulatorial', nome: 'Escore de cálcio coronário (CAC)', ref: 'CAD Consortium (aprox.)', res: [['CAC = 0', 0.15], ['CAC 1–99', 1.3], ['CAC 100–399', 4.0], ['CAC ≥ 400', 12]] }
+      ]
+    },
+    {
+      id: 'tep', nome: 'Suspeita de embolia pulmonar (TEP)', contextos: ['agudo'],
+      inputs: `
+        <div class="diag-sub">Critérios de Wells (TEP)</div>
+        <div class="pac-checks">
+          <label class="sc-check"><input type="checkbox" id="dg-w1"><span>Sinais clínicos de TVP (3)</span></label>
+          <label class="sc-check"><input type="checkbox" id="dg-w2"><span>TEP é o diagnóstico mais provável (3)</span></label>
+          <label class="sc-check"><input type="checkbox" id="dg-w3"><span>FC > 100 bpm (1,5)</span></label>
+          <label class="sc-check"><input type="checkbox" id="dg-w4"><span>Imobilização/cirurgia ≤ 4 sem (1,5)</span></label>
+          <label class="sc-check"><input type="checkbox" id="dg-w5"><span>TVP/TEP prévio (1,5)</span></label>
+          <label class="sc-check"><input type="checkbox" id="dg-w6"><span>Hemoptise (1)</span></label>
+          <label class="sc-check"><input type="checkbox" id="dg-w7"><span>Câncer ativo (1)</span></label>
+        </div>`,
+      pretest: function () {
+        const w = (id, v) => document.getElementById(id).checked ? v : 0;
+        const s = w('dg-w1', 3) + w('dg-w2', 3) + w('dg-w3', 1.5) + w('dg-w4', 1.5) + w('dg-w5', 1.5) + w('dg-w6', 1) + w('dg-w7', 1);
+        const p = s < 2 ? 3.6 : (s <= 6 ? 20.5 : 66.7);
+        const cat = s < 2 ? 'baixa' : (s <= 6 ? 'moderada' : 'alta');
+        return { pre: p, nota: 'Wells = ' + (Math.round(s * 10) / 10) + ' → probabilidade clínica ' + cat + '.' };
+      },
+      exames: [
+        { ctx: 'agudo', nome: 'D-dímero de alta sensibilidade', ref: 'Stein 2004', res: [['Negativo', 0.09], ['Positivo', 1.6]] },
+        { ctx: 'agudo', nome: 'Angio-TC de tórax', ref: 'Meta-análise (sens 83/espec 96)', res: [['Positiva (TEP)', 20.8], ['Negativa', 0.11]] },
+        { ctx: 'agudo', nome: 'Cintilografia V/Q', ref: 'PIOPED', res: [['Alta probabilidade', 18], ['Intermediária', 1], ['Normal/baixa', 0.05]] }
+      ]
+    },
+    {
+      id: 'ic', nome: 'Dispneia → Insuficiência cardíaca', contextos: ['agudo', 'ambulatorial'],
+      inputs: `
+        <div class="diag-sub">Probabilidade pré-teste (ajuste ao quadro)</div>
+        <label class="sc-campo" style="max-width:320px"><span>Pré-teste estimada <em>(%)</em></span><input type="number" id="dg-icpre"></label>
+        <p class="muted small">Sugestão: dispneia aguda na emergência ~50%; ambulatório ~30%. Os achados de exame abaixo entram como testes na cadeia.</p>`,
+      pretest: function (ctx) {
+        let p = parseFloat(document.getElementById('dg-icpre').value);
+        if (!isFinite(p)) p = ctx === 'agudo' ? 50 : 30;
+        return { pre: p, nota: 'Pré-teste estimada pelo contexto/quadro (' + r1(p) + '%).' };
+      },
+      exames: [
+        { ctx: 'ambos', nome: 'História prévia de IC', ref: 'Wang 2005', res: [['Presente', 5.8], ['Ausente', 0.45]] },
+        { ctx: 'ambos', nome: 'Terceira bulha (B3)', ref: 'Wang 2005', res: [['Presente', 11], ['Ausente', 0.88]] },
+        { ctx: 'agudo', nome: 'NT-proBNP', ref: 'Januzzi (PRIDE)', res: [['< 300 pg/mL', 0.02], ['Elevado (ajustado por idade)', 4], ['Zona cinzenta', 1]] },
+        { ctx: 'ambos', nome: 'BNP', ref: 'Wang 2005 / Worster', res: [['< 100 pg/mL', 0.13], ['> 400 pg/mL', 7.6], ['100–400', 1]] },
+        { ctx: 'ambos', nome: 'RX de tórax', ref: 'Wang 2005', res: [['Congestão venosa pulmonar', 12], ['Cardiomegalia', 3.3], ['Sem alterações', 0.48]] },
+        { ctx: 'ambos', nome: 'Ecocardiograma', ref: 'clínico', res: [['FEVE reduzida / disfunção', 4.3], ['Normal', 0.3]] }
+      ]
+    },
+    {
+      id: 'arritmia', nome: 'Palpitações / síncope → Arritmia', contextos: ['ambulatorial', 'agudo'], monitor: true,
+      inputs: '<p class="muted small">Investigação de arritmia paroxística: a escolha do monitor depende da <b>frequência dos sintomas</b>. Abaixo, o rendimento diagnóstico típico de cada método (não é razão de verossimilhança).</p>',
+      monitores: [
+        { nome: 'Holter 24–48 h', quando: 'sintomas diários', rend: '~10–15%' },
+        { nome: 'Holter prolongado (7–14 dias)', quando: 'sintomas algumas vezes/semana', rend: '~20–25%' },
+        { nome: 'Monitor de eventos (event recorder)', quando: 'sintomas semanais', rend: '~25–35%' },
+        { nome: 'Monitor externo prolongado (patch, 14–30 d)', quando: 'sintomas esparsos', rend: '~ até 50%' },
+        { nome: 'Looper implantável (ILR)', quando: 'síncope inexplicada recorrente / sintomas raros', rend: '~ até 50–70% em 1–3 anos' },
+        { nome: 'Teste ergométrico', quando: 'arritmia relacionada ao esforço', rend: 'seletivo' }
+      ]
+    }
+  ];
+
+  const S = { ctx: 'agudo', target: 'dac', res: {} };
+
+  function shell() {
+    return '<div class="rec-revbanner">Monte o caso, obtenha a <b>probabilidade pré-teste automática</b>, escolha um <b>exame</b> conforme o contexto e lance o resultado — a <b>probabilidade pós-teste</b> é recalculada em cadeia. Apoio à decisão (assume independência entre os testes); não substitui o julgamento clínico.</div>' +
+      '<div class="diag-ctx" id="diag-ctx">' +
+      '<button class="diag-ctxbtn" data-c="agudo">🚑 Agudo (emergência)</button>' +
+      '<button class="diag-ctxbtn" data-c="ambulatorial">🏥 Ambulatorial</button>' +
+      '</div>' +
+      '<label class="sc-campo diag-tsel"><span>Cenário / alvo diagnóstico</span><select id="diag-target"></select></label>' +
+      '<div class="diag-wrap"><div class="diag-form" id="diag-form"></div><div class="diag-out" id="diag-out"></div></div>';
+  }
+
+  function renderCtx() {
+    document.querySelectorAll('.diag-ctxbtn').forEach(b => b.classList.toggle('on', b.dataset.c === S.ctx));
+    const sel = document.getElementById('diag-target');
+    const avail = TARGETS.filter(t => t.contextos.includes(S.ctx));
+    sel.innerHTML = avail.map(t => '<option value="' + t.id + '">' + esc(t.nome) + '</option>').join('');
+    if (!avail.find(t => t.id === S.target)) S.target = avail[0].id;
+    sel.value = S.target;
+  }
+
+  function renderForm() {
+    const t = TARGETS.find(x => x.id === S.target);
+    const form = document.getElementById('diag-form');
+    form.innerHTML = '<h3 class="sc-title">' + esc(t.nome) + '</h3>' + (t.inputs || '');
+    form.querySelectorAll('input, select').forEach(el => el.addEventListener('input', () => { compute(); }));
+    S.res = {};
+    compute();
+  }
+
+  function examesDo(t) {
+    if (t.monitor) return [];
+    return t.exames.filter(e => e.ctx === S.ctx || e.ctx === 'ambos');
+  }
+
+  function compute() {
+    const t = TARGETS.find(x => x.id === S.target);
+    const out = document.getElementById('diag-out');
+    if (t.monitor) {
+      out.innerHTML = '<div class="pac-resumo"><b>Rendimento diagnóstico dos monitores</b> (escolha pela frequência dos sintomas):</div>' +
+        '<table class="mbc-table"><thead><tr><th>Método</th><th>Quando</th><th>Rendimento</th></tr></thead><tbody>' +
+        t.monitores.map(m => '<tr><td>' + esc(m.nome) + '</td><td class="mbc-ref" style="white-space:normal">' + esc(m.quando) + '</td><td class="mbe-num">' + esc(m.rend) + '</td></tr>').join('') +
+        '</tbody></table><p class="muted small">Valores aproximados da literatura; o rendimento cresce com a duração da monitorização e a correlação sintoma-ritmo.</p>';
+      return;
+    }
+    const pr = t.pretest(S.ctx);
+    let o = odds(pr.pre / 100), net = 1; const aplic = [];
+    const exs = examesDo(t);
+    exs.forEach((e, i) => {
+      const key = t.id + '_' + i; const sel = S.res[key];
+      if (sel == null || sel === '') return;
+      const lr = parseFloat(sel); if (!isFinite(lr)) return;
+      o *= lr; net *= lr;
+      const rot = e.res.find(r => String(r[1]) === sel);
+      aplic.push(esc(e.nome) + ': ' + (rot ? rot[0] : '') + ' (LR ' + fmt(lr) + ')');
+    });
+    const post = prob(o) * 100;
+    const nivel = post >= 50 ? 'sc-bad' : (post >= 15 ? 'sc-warn' : 'sc-ok');
+
+    let exHtml = exs.map((e, i) => {
+      const key = t.id + '_' + i; const cur = S.res[key] || '';
+      const opts = '<option value="">— não realizado —</option>' + e.res.map(r => '<option value="' + r[1] + '"' + (String(r[1]) === cur ? ' selected' : '') + '>' + esc(r[0]) + ' · LR ' + fmt(r[1]) + '</option>').join('');
+      return '<tr><td class="mbc-ach">' + esc(e.nome) + '<div class="mbc-ref">' + esc(e.ref) + '</div></td>' +
+        '<td class="diag-rescell"><select class="diag-res" data-k="' + key + '">' + opts + '</select></td></tr>';
+    }).join('');
+
+    out.innerHTML =
+      '<div class="diag-pre">Probabilidade <b>pré-teste</b>: <b class="mbe-big">' + r1(pr.pre) + '%</b><div class="mbc-ref" style="white-space:normal">' + esc(pr.nota) + '</div></div>' +
+      '<div class="sc-result ' + nivel + '"><div class="sc-conduta">' +
+      '<div class="mbc-barwrap"><div class="mbc-barlbl">Pré ' + r1(pr.pre) + '%</div><div class="mbc-bar"><span style="width:' + pct(pr.pre) + '%"></span></div></div>' +
+      '<div class="mbc-barwrap"><div class="mbc-barlbl">Pós <b>' + r1(post) + '%</b></div><div class="mbc-bar mbc-bar-post"><span style="width:' + pct(post) + '%"></span></div></div>' +
+      '<div class="mbc-post">Probabilidade <b>pós-teste</b> ≈ <b class="mbe-big">' + r1(post) + '%</b>' + (aplic.length ? ' · LR combinada ' + fmt(net) : '') + '</div>' +
+      (aplic.length ? '<div class="sc-extra">' + aplic.join(' · ') + '.</div>' : '<div class="sc-extra">Escolha o resultado de um exame para atualizar a pós-teste.</div>') +
+      '</div></div>' +
+      '<div class="diag-sub">Exames sugeridos — ' + (S.ctx === 'agudo' ? 'contexto agudo' : 'ambulatorial') + '</div>' +
+      '<table class="mbc-table"><thead><tr><th>Exame</th><th>Resultado</th></tr></thead><tbody>' + exHtml + '</tbody></table>' +
+      '<button class="mbe-usar" id="diag-reset">Limpar resultados</button>';
+
+    out.querySelectorAll('.diag-res').forEach(s => s.addEventListener('change', () => { S.res[s.dataset.k] = s.value; compute(); }));
+    const rb = document.getElementById('diag-reset'); if (rb) rb.addEventListener('click', () => { S.res = {}; compute(); });
+  }
+
+  root.innerHTML = shell();
+  document.querySelectorAll('.diag-ctxbtn').forEach(b => b.addEventListener('click', () => { S.ctx = b.dataset.c; renderCtx(); renderForm(); }));
+  document.getElementById('diag-target').addEventListener('change', e => { S.target = e.target.value; renderForm(); });
+  renderCtx();
+  renderForm();
+})();
+
+</script>
+  <script>
 // Navegação em hubs (2 níveis) + busca global + utilidades compartilhadas
 (function () {
   const HUBS = [
-    { id: 'paciente', label: '🧬 Paciente', views: [['paciente', '🧬 Paciente']] },
+    { id: 'paciente', label: '🧬 Paciente', views: [['paciente', '🧬 Conduta'], ['diagnostico', '🔍 Diagnóstico']] },
     { id: 'temas', label: '🫀 Temas', views: [['temas', '🫀 Temas']] },
     { id: 'evidencias', label: '📚 Evidências', views: [['evidencia', '🔎 Recomendações'], ['guias', '📚 Diretrizes'], ['ensaios', '🧪 Ensaios pivotais']] },
     { id: 'ferramentas', label: '🧮 Ferramentas', views: [['scores', '🧮 Scores'], ['pretest', '🎯 Pré-teste'], ['doses', '💊 Doses']] },
