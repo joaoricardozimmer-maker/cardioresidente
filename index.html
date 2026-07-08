@@ -4783,9 +4783,22 @@ window.PROTOCOLOS = [
       out.innerHTML = '<div class="sc-valor">RF-CL ≈ ' + p + '% · ' + cat.nome + '</div>' +
         '<div class="sc-conduta">' + cat.cond +
         '<br><span class="sc-extra">Score de sintomas: ' + scoreTxt + ' · fatores de risco: ' + nrf + ' (' + RFG[rfGroup] + ').</span>' +
-        '<br><button id="pt-bayes" class="mbe-usar" style="margin-top:10px">→ usar no cálculo de Bayes</button></div>';
+        '<br><button id="pt-bayes" class="mbe-usar" style="margin-top:10px">→ usar no cálculo de Bayes</button>' +
+        ' <button id="pt-diag" class="mbe-usar" style="margin-top:10px">→ levar ao Diagnóstico (DAC)</button></div>';
       const b = document.getElementById('pt-bayes');
       if (b) b.addEventListener('click', () => { if (window.MBE_setPreTeste) window.MBE_setPreTeste(p); });
+      const bd = document.getElementById('pt-diag');
+      if (bd) bd.addEventListener('click', () => {
+        const ageMap = [35, 45, 55, 65, 75];
+        const data = {
+          ctx: 'ambulatorial', sexo: (sexo === 'W' ? 'W' : 'M'), idade: ageMap[ageIdx],
+          cp1: document.getElementById('cp1').checked, cp2: document.getElementById('cp2').checked, cp3: document.getElementById('cp3').checked,
+          disp: disp, fam: document.getElementById('rf-fam').checked, tab: document.getElementById('rf-tab').checked,
+          disl: document.getElementById('rf-disl').checked, has: document.getElementById('rf-has').checked, dm: document.getElementById('rf-dm').checked
+        };
+        if (window.cardioGoView) window.cardioGoView('diagnostico');
+        if (window.cardioDiagSetDAC) window.cardioDiagSetDAC(data);
+      });
     };
     ['pt-sexo', 'pt-idade', 'pt-sint'].forEach(id => document.getElementById(id).addEventListener('change', compute));
     CPS.forEach(c => document.getElementById(c.id).addEventListener('change', compute));
@@ -5772,6 +5785,44 @@ window.PROTOCOLOS = [
       ]
     },
     {
+      id: 'aorta', nome: 'Dor torácica → Dissecção / síndrome aórtica aguda', contextos: ['agudo'],
+      inputs: `
+        <div class="diag-sub">ADD-RS (Aortic Dissection Detection Risk Score)</div>
+        <div class="pac-checks">
+          <label class="sc-check"><input type="checkbox" id="dg-acond"><span>Condição de alto risco (Marfan/conectivopatia, história familiar de doença aórtica, valva aórtica bicúspide, aneurisma ou manipulação aórtica prévia)</span></label>
+          <label class="sc-check"><input type="checkbox" id="dg-ador"><span>Dor de alto risco (início abrupto, intensidade máxima súbita, caráter dilacerante/rasgando)</span></label>
+          <label class="sc-check"><input type="checkbox" id="dg-aexame"><span>Exame de alto risco (déficit de pulso / diferença de PA entre membros, sopro de insuficiência aórtica novo, déficit neurológico focal com dor, hipotensão/choque)</span></label>
+        </div>`,
+      pretest: function () {
+        const n = ['dg-acond', 'dg-ador', 'dg-aexame'].filter(i => document.getElementById(i).checked).length;
+        const p = n === 0 ? 2 : (n === 1 ? 12 : 40);
+        return { pre: p, nota: 'ADD-RS = ' + n + ' categoria(s) de alto risco → probabilidade ' + (n === 0 ? 'baixa' : n === 1 ? 'intermediária' : 'alta') + ' (estimativa).' };
+      },
+      exames: [
+        { ctx: 'agudo', nome: 'D-dímero', ref: 'Klompas 2002 / ADvISED', res: [['Negativo (< 500 ng/mL)', 0.06], ['Positivo', 1.5]] },
+        { ctx: 'agudo', nome: 'RX de tórax (mediastino)', ref: 'Klompas 2002', res: [['Mediastino alargado', 2.0], ['Normal', 0.3]] },
+        { ctx: 'agudo', nome: 'Déficit de pulso ao exame', ref: 'Klompas 2002', res: [['Presente', 5.7], ['Ausente', 0.7]] },
+        { ctx: 'agudo', nome: 'Angio-TC de aorta', ref: 'padrão-ouro', res: [['Positiva (dissecção/hematoma)', 40], ['Negativa', 0.02]] }
+      ]
+    },
+    {
+      id: 'avc', nome: 'Déficit neurológico agudo → AVC', contextos: ['agudo'],
+      inputs: `
+        <div class="diag-sub">Probabilidade pré-teste (ajuste ao quadro)</div>
+        <label class="sc-campo" style="max-width:320px"><span>Pré-teste estimada <em>(%)</em></span><input type="number" id="dg-avcpre"></label>
+        <p class="muted small">Déficit neurológico focal de início súbito. Primeiro exclua hipoglicemia; a TC sem contraste diferencia isquêmico × hemorrágico. Fonte: Goldstein, JAMA 2005.</p>`,
+      pretest: function () {
+        let p = parseFloat(document.getElementById('dg-avcpre').value);
+        if (!isFinite(p)) p = 50;
+        return { pre: p, nota: 'Pré-teste estimada pelo quadro (' + r1(p) + '%).' };
+      },
+      exames: [
+        { ctx: 'agudo', nome: 'Escala pré-hospitalar (FAST / Cincinnati)', ref: 'Goldstein 2005', res: [['Qualquer item alterado (face/braço/fala)', 5.5], ['Todos normais', 0.4]] },
+        { ctx: 'agudo', nome: 'Glicemia capilar', ref: 'mimético', res: [['Hipoglicemia (mimético — corrigir e reavaliar)', 0.1], ['Normal', 1]] },
+        { ctx: 'agudo', nome: 'RM com difusão (DWI)', ref: 'alta sensibilidade p/ isquemia', res: [['Restrição à difusão (isquemia aguda)', 15], ['Sem restrição', 0.1]] }
+      ]
+    },
+    {
       id: 'arritmia', nome: 'Palpitações / síncope → Arritmia', contextos: ['ambulatorial', 'agudo'], monitor: true,
       inputs: '<p class="muted small">Investigação de arritmia paroxística: a escolha do monitor depende da <b>frequência dos sintomas</b>. Abaixo, o rendimento diagnóstico típico de cada método (não é razão de verossimilhança).</p>',
       monitores: [
@@ -5851,8 +5902,9 @@ window.PROTOCOLOS = [
         '<td class="diag-rescell"><select class="diag-res" data-k="' + key + '">' + opts + '</select></td></tr>';
     }).join('');
 
+    const preExtra = t.id === 'dac' ? ' <button class="mbe-usar" id="diag-topretest">📊 Ver tabela RF-CL (aba Pré-teste)</button>' : '';
     out.innerHTML =
-      '<div class="diag-pre">Probabilidade <b>pré-teste</b>: <b class="mbe-big">' + r1(pr.pre) + '%</b><div class="mbc-ref" style="white-space:normal">' + esc(pr.nota) + '</div></div>' +
+      '<div class="diag-pre">Probabilidade <b>pré-teste</b>: <b class="mbe-big">' + r1(pr.pre) + '%</b><div class="mbc-ref" style="white-space:normal">' + esc(pr.nota) + preExtra + '</div></div>' +
       '<div class="sc-result ' + nivel + '"><div class="sc-conduta">' +
       '<div class="mbc-barwrap"><div class="mbc-barlbl">Pré ' + r1(pr.pre) + '%</div><div class="mbc-bar"><span style="width:' + pct(pr.pre) + '%"></span></div></div>' +
       '<div class="mbc-barwrap"><div class="mbc-barlbl">Pós <b>' + r1(post) + '%</b></div><div class="mbc-bar mbc-bar-post"><span style="width:' + pct(post) + '%"></span></div></div>' +
@@ -5865,7 +5917,22 @@ window.PROTOCOLOS = [
 
     out.querySelectorAll('.diag-res').forEach(s => s.addEventListener('change', () => { S.res[s.dataset.k] = s.value; compute(); }));
     const rb = document.getElementById('diag-reset'); if (rb) rb.addEventListener('click', () => { S.res = {}; compute(); });
+    const tp = document.getElementById('diag-topretest'); if (tp) tp.addEventListener('click', () => { if (window.cardioGoView) window.cardioGoView('pretest'); });
   }
+
+  // recebe a pré-teste da aba Pré-teste e reproduz o cenário DAC aqui
+  window.cardioDiagSetDAC = function (d) {
+    S.ctx = d.ctx || 'ambulatorial'; S.target = 'dac';
+    renderCtx();
+    const sel = document.getElementById('diag-target'); if (sel) sel.value = 'dac';
+    renderForm();
+    const set = (id, v) => { const e = document.getElementById(id); if (e != null) { if (e.type === 'checkbox') e.checked = !!v; else if (v != null) e.value = v; } };
+    set('dg-sexo', d.sexo === 'W' ? 'W' : 'M'); set('dg-idade', d.idade);
+    set('dg-cp1', d.cp1); set('dg-cp2', d.cp2); set('dg-cp3', d.cp3); set('dg-disp', d.disp);
+    set('dg-fam', d.fam); set('dg-tab', d.tab); set('dg-disl', d.disl); set('dg-has', d.has); set('dg-dm', d.dm);
+    compute();
+    if (window.toast) window.toast('Pré-teste levada ao Diagnóstico (DAC)');
+  };
 
   root.innerHTML = shell();
   document.querySelectorAll('.diag-ctxbtn').forEach(b => b.addEventListener('click', () => { S.ctx = b.dataset.c; renderCtx(); renderForm(); }));
