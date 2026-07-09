@@ -398,6 +398,16 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .diag-res { width: 100%; font: inherit; font-size: 13px; padding: 7px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--text); }
 .diag-grid { margin-bottom: 4px; }
 .diag-metodo { display: block; max-width: 520px; margin-bottom: 12px; }
+.fagan-wrap { margin-top: 14px; }
+.fagan-wrap:empty { display: none; }
+.fagan-title { font-weight: 800; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; margin-bottom: 2px; }
+.fagan-legend { font-size: 11.5px; margin-bottom: 4px; }
+.fagan-legend .fg-pos { color: #1f9d57; font-weight: 700; }
+.fagan-legend .fg-neg { color: #c0392b; font-weight: 700; margin-left: 8px; }
+.fagan-svg { width: 100%; max-width: 380px; height: auto; }
+.fagan-axtitle { font-size: 10px; font-weight: 700; fill: var(--muted); }
+.fagan-tk { font-size: 8.5px; fill: var(--muted); }
+.fagan-post { font-size: 11px; font-weight: 800; }
 .diag-alerta { font-size: 12.5px; line-height: 1.5; background: #fdf3e3; border: 1px solid #eccb8a; border-left: 4px solid #d99a2b; border-radius: 8px; padding: 9px 12px; margin-bottom: 12px; color: #7a5512; }
 .diag-alerta-red { background: #fbeeec; border-color: #e3a9a1; border-left-color: #c0392b; color: #8a2820; font-size: 13.5px; }
 .diag-guard { font-size: 12px; color: #8a2820; background: #fbeeec; border-radius: 6px; padding: 5px 8px; margin-top: 5px; line-height: 1.45; }
@@ -4510,6 +4520,50 @@ window.PROTOCOLOS = [
   function prob(o) { return o / (1 + o); }
 
   // ------------------------------------------------------------------
+  // Nomograma de Fagan (SVG) — pré-teste × LR → pós-teste.
+  // Eixos: pré (esq., invertido) e pós (dir.) em log-odds em sentidos opostos;
+  // LR (centro) em log com metade da escala → qualquer reta satisfaz Bayes.
+  // ------------------------------------------------------------------
+  function nomograma(prePct, lrp, lrn) {
+    const W = 340, H = 380, yc = 190, k = 20, top = 34, bot = 346;
+    const xL = 52, xM = 170, xR = 288;
+    const lg = p => Math.log(p / (1 - p));
+    const clampy = y => Math.max(top, Math.min(bot, y));
+    const yPre = p => clampy(yc - k * lg(p));
+    const yPost = p => clampy(yc + k * lg(p));
+    const yLR = lr => clampy(yc + (k / 2) * Math.log(lr));
+    const probT = [0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 0.8, 0.9, 0.95, 0.98, 0.99, 0.999];
+    const lrT = [0.001, 0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 1000];
+    const lab = p => p >= 0.01 ? (p * 100).toString().replace('.', ',') : (p * 100).toString();
+    let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="fagan-svg" xmlns="http://www.w3.org/2000/svg">';
+    // eixos
+    [[xL, 'Pré-teste %'], [xM, 'LR'], [xR, 'Pós-teste %']].forEach(ax => {
+      s += '<line x1="' + ax[0] + '" y1="' + top + '" x2="' + ax[0] + '" y2="' + bot + '" stroke="var(--line)" stroke-width="1.5"/>';
+      s += '<text x="' + ax[0] + '" y="' + (top - 12) + '" text-anchor="middle" class="fagan-axtitle">' + ax[1] + '</text>';
+    });
+    probT.forEach(p => {
+      const y1 = yc - k * lg(p); if (y1 >= top && y1 <= bot) { s += '<line x1="' + (xL - 4) + '" y1="' + y1 + '" x2="' + (xL + 4) + '" y2="' + y1 + '" stroke="var(--muted)"/><text x="' + (xL - 8) + '" y="' + (y1 + 3) + '" text-anchor="end" class="fagan-tk">' + lab(p) + '</text>'; }
+      const y2 = yc + k * lg(p); if (y2 >= top && y2 <= bot) { s += '<line x1="' + (xR - 4) + '" y1="' + y2 + '" x2="' + (xR + 4) + '" y2="' + y2 + '" stroke="var(--muted)"/><text x="' + (xR + 8) + '" y="' + (y2 + 3) + '" text-anchor="start" class="fagan-tk">' + lab(p) + '</text>'; }
+    });
+    lrT.forEach(lr => { const y = yc + (k / 2) * Math.log(lr); if (y >= top && y <= bot) { s += '<line x1="' + (xM - 4) + '" y1="' + y + '" x2="' + (xM + 4) + '" y2="' + y + '" stroke="var(--muted)"/><text x="' + (xM + 8) + '" y="' + (y + 3) + '" text-anchor="start" class="fagan-tk">' + (lr < 1 ? lr : lr) + '</text>'; } });
+    const pre = Math.max(0.001, Math.min(0.999, prePct / 100));
+    function linha(lr, cor, dash) {
+      if (lr == null || lr <= 0) return '';
+      const post = prob(odds(pre) * lr);
+      const y1 = yPre(pre), y3 = yPost(post);
+      return '<line x1="' + xL + '" y1="' + y1 + '" x2="' + xR + '" y2="' + y3 + '" stroke="' + cor + '" stroke-width="2" ' + (dash ? 'stroke-dasharray="5 4"' : '') + '/>' +
+        '<circle cx="' + xL + '" cy="' + y1 + '" r="3.5" fill="' + cor + '"/>' +
+        '<circle cx="' + xM + '" cy="' + yLR(lr) + '" r="3" fill="' + cor + '"/>' +
+        '<circle cx="' + xR + '" cy="' + y3 + '" r="3.5" fill="' + cor + '"/>' +
+        '<text x="' + xR + '" y="' + (y3 - 6) + '" text-anchor="middle" class="fagan-post" fill="' + cor + '">' + r1(post * 100) + '%</text>';
+    }
+    s += linha(lrp, '#1f9d57', false);
+    s += linha(lrn, '#c0392b', true);
+    s += '</svg>';
+    return s;
+  }
+
+  // ------------------------------------------------------------------
   // 1) CALCULADORA DIAGNÓSTICA (interativa)
   // ------------------------------------------------------------------
   const estado = {}; // dxId -> { pre, sel: {idx: 'pos'|'neg'} }
@@ -4612,7 +4666,15 @@ window.PROTOCOLOS = [
       '<label class="sc-campo"><span>LR− (razão de verossimilhança negativa)</span><input type="number" step="any" id="mb-lrn"></label>' +
       '</div>' +
       '<button id="mb-calc" class="btn-primary">Calcular</button>' +
-      '<div id="mb-out" class="sc-result sc-info"><div class="sc-conduta">Preencha os campos e clique em Calcular.</div></div>';
+      '<div id="mb-out" class="sc-result sc-info"><div class="sc-conduta">Preencha os campos e clique em Calcular.</div></div>' +
+      '<div id="mb-nomo" class="fagan-wrap"></div>';
+
+    const setNomo = (pre, lrp, lrn) => {
+      const el = document.getElementById('mb-nomo'); if (!el) return;
+      el.innerHTML = (pre !== null && pre > 0 && pre < 100 && ((lrp && lrp > 0) || (lrn && lrn > 0)))
+        ? '<div class="fagan-title">Nomograma de Fagan</div><div class="fagan-legend"><span class="fg-pos">● positivo (LR+)</span> <span class="fg-neg">● negativo (LR−)</span></div>' + nomograma(pre, (lrp && lrp > 0) ? lrp : null, (lrn && lrn > 0) ? lrn : null)
+        : '';
+    };
 
     const calc = () => {
       const pre = n(document.getElementById('mb-pre').value);
@@ -4621,17 +4683,18 @@ window.PROTOCOLOS = [
       let lrp = n(document.getElementById('mb-lrp').value);
       let lrn = n(document.getElementById('mb-lrn').value);
       const out = document.getElementById('mb-out');
-      if (pre === null || pre < 0 || pre > 100) { out.className = 'sc-result sc-info'; out.innerHTML = '<div class="sc-conduta">Informe a pré-teste entre 0 e 100%.</div>'; return; }
+      if (pre === null || pre < 0 || pre > 100) { out.className = 'sc-result sc-info'; out.innerHTML = '<div class="sc-conduta">Informe a pré-teste entre 0 e 100%.</div>'; setNomo(null); return; }
       let origem = '';
       if (sens !== null && spec !== null && sens > 0 && sens < 100 && spec > 0 && spec < 100) {
         const se = sens / 100, sp = spec / 100; lrp = se / (1 - sp); lrn = (1 - se) / sp;
         origem = '<br><span class="sc-extra">De sens ' + r1(sens) + '% e espec ' + r1(spec) + '%: LR+ = ' + r2(lrp) + ' · LR− = ' + r2(lrn) + '.</span>';
       }
-      if (lrp === null && lrn === null) { out.className = 'sc-result sc-info'; out.innerHTML = '<div class="sc-conduta">Informe sens/espec ou as LR+/LR−.</div>'; return; }
+      if (lrp === null && lrn === null) { out.className = 'sc-result sc-info'; out.innerHTML = '<div class="sc-conduta">Informe sens/espec ou as LR+/LR−.</div>'; setNomo(null); return; }
       const preOdds = odds(pre / 100); let html = '';
       if (lrp !== null && lrp > 0) { const p = prob(preOdds * lrp) * 100; html += '<div class="mbe-res-line"><b>Se POSITIVO →</b> pós-teste ≈ <b class="mbe-big">' + r1(p) + '%</b><br><span class="sc-extra">LR+ ' + r2(lrp) + ': ' + forcaLR(lrp, true) + '.</span></div>'; }
       if (lrn !== null && lrn > 0) { const p = prob(preOdds * lrn) * 100; html += '<div class="mbe-res-line"><b>Se NEGATIVO →</b> pós-teste ≈ <b class="mbe-big">' + r1(p) + '%</b><br><span class="sc-extra">LR− ' + r2(lrn) + ': ' + forcaLR(lrn, false) + '.</span></div>'; }
       out.className = 'sc-result sc-info'; out.innerHTML = '<div class="sc-conduta">' + html + origem + '</div>';
+      setNomo(pre, lrp, lrn);
     };
     document.getElementById('mb-calc').addEventListener('click', calc);
     panel.querySelectorAll('input').forEach(el => el.addEventListener('change', calc));
@@ -4719,10 +4782,70 @@ window.PROTOCOLOS = [
     document.getElementById('mb-lr-grupo').addEventListener('change', e => render(document.getElementById('mb-lr-busca').value, e.target.value));
   }
 
+  // ------------------------------------------------------------------
+  // LIMIARES DE DECISÃO (Pauker-Kassirer): limiar de teste e de tratamento
+  // a partir do limiar terapêutico (benefício × dano) e das LRs do exame.
+  // ------------------------------------------------------------------
+  function viewLimiares() {
+    panel.innerHTML =
+      '<h3 class="sc-title">Limiares de decisão (Pauker-Kassirer)</h3>' +
+      '<p class="muted small">A partir do <b>limiar terapêutico</b> (onde tratar = não tratar) e das <b>LRs do exame</b>, calcula o <b>limiar de teste</b> (abaixo → não testar) e o <b>limiar de teste-tratamento</b> (acima → tratar sem testar). O limiar terapêutico vem da razão dano/benefício: p* = Dano / (Dano + Benefício). Versão simplificada (ignora o risco do próprio teste).</p>' +
+      '<div class="sc-campos">' +
+      '<label class="sc-campo"><span>Benefício de tratar o doente <em>(unidades)</em></span><input type="number" step="any" id="mb-ben" placeholder="ex: 10"></label>' +
+      '<label class="sc-campo"><span>Dano de tratar o não-doente <em>(unidades)</em></span><input type="number" step="any" id="mb-dano" placeholder="ex: 1"></label>' +
+      '<div class="mbe-or">— ou informe o limiar terapêutico direto —</div>' +
+      '<label class="sc-campo"><span>Limiar terapêutico p* <em>(%)</em></span><input type="number" step="any" id="mb-pstar" placeholder="ex: 9"></label>' +
+      '<div class="mbe-or">— características do exame —</div>' +
+      '<label class="sc-campo"><span>LR+ do exame</span><input type="number" step="any" id="mb-tlrp"></label>' +
+      '<label class="sc-campo"><span>LR− do exame</span><input type="number" step="any" id="mb-tlrn"></label>' +
+      '<label class="sc-campo"><span>Pré-teste do paciente <em>(%, opcional)</em></span><input type="number" step="any" id="mb-tpre"></label>' +
+      '</div>' +
+      '<button id="mb-tcalc" class="btn-primary">Calcular</button>' +
+      '<div id="mb-tout" class="sc-result sc-info"><div class="sc-conduta">Informe benefício/dano (ou p*) e as LRs do exame.</div></div>';
+
+    const calc = () => {
+      const B = n(document.getElementById('mb-ben').value), H = n(document.getElementById('mb-dano').value);
+      let pstar = n(document.getElementById('mb-pstar').value);
+      const lrp = n(document.getElementById('mb-tlrp').value), lrn = n(document.getElementById('mb-tlrn').value);
+      const pre = n(document.getElementById('mb-tpre').value);
+      const out = document.getElementById('mb-tout');
+      if ((pstar === null || pstar <= 0 || pstar >= 100) && B !== null && H !== null && (B + H) > 0) pstar = 100 * H / (H + B);
+      if (pstar === null || pstar <= 0 || pstar >= 100 || lrp === null || lrn === null || lrp <= 0 || lrn <= 0) {
+        out.className = 'sc-result sc-info'; out.innerHTML = '<div class="sc-conduta">Informe benefício/dano (ou p* entre 0 e 100) e LR+ e LR−.</div>'; return;
+      }
+      const oStar = odds(pstar / 100);
+      const testTh = prob(oStar / lrp) * 100;   // abaixo: nem um positivo cruza p*
+      const treatTh = prob(oStar / lrn) * 100;   // acima: nem um negativo desce de p*
+      const pctc = v => Math.max(0, Math.min(100, v));
+      let bar = '<div class="diag-thbar"><span class="thz thz-ok" style="width:' + pctc(testTh) + '%"></span><span class="thz thz-mid" style="width:' + pctc(treatTh - testTh) + '%"></span><span class="thz thz-hi" style="width:' + pctc(100 - treatTh) + '%"></span>';
+      if (pre !== null && pre > 0 && pre < 100) bar += '<span class="thz-marker" style="left:' + pctc(pre) + '%"></span>';
+      bar += '</div>';
+      let rec = '';
+      if (pre !== null && pre > 0 && pre < 100) {
+        rec = pre < testTh ? '<b>Não testar</b> — nem um resultado positivo levaria acima do limiar terapêutico.'
+          : (pre > treatTh ? '<b>Tratar sem testar</b> — nem um resultado negativo desceria abaixo do limiar terapêutico.'
+            : '<b>Testar</b> — o resultado do exame muda a conduta (zona de teste).');
+        rec = '<div class="mbc-post">Pré-teste ' + r1(pre) + '% → ' + rec + '</div>';
+      }
+      out.className = 'sc-result sc-info';
+      out.innerHTML = '<div class="sc-conduta">' +
+        '<div>Limiar terapêutico <b>p* = ' + r1(pstar) + '%</b>' + (B !== null && H !== null ? ' (dano/benefício ' + fmt(H) + '/' + fmt(B) + ')' : '') + '.</div>' +
+        '<div>Limiar de <b>teste</b> = <b class="mbe-big">' + r1(testTh) + '%</b> · limiar de <b>teste-tratamento</b> = <b class="mbe-big">' + r1(treatTh) + '%</b></div>' +
+        bar +
+        '<div class="diag-verdict">Zonas: &lt; ' + r1(testTh) + '% não testar · ' + r1(testTh) + '–' + r1(treatTh) + '% testar · &gt; ' + r1(treatTh) + '% tratar.</div>' +
+        rec +
+        '<div class="sc-extra">Modelo simplificado de Pauker-Kassirer: quanto pior o dano de tratar o não-doente, maior p*; testes mais potentes (LR+ alta, LR− baixa) alargam a faixa de teste.</div>' +
+        '</div>';
+    };
+    document.getElementById('mb-tcalc').addEventListener('click', calc);
+    panel.querySelectorAll('input').forEach(el => el.addEventListener('change', calc));
+  }
+
   // ---------- menu ----------
   const TOOLS = [
     { id: 'calc', nome: '🧭 Calculadora diagnóstica', fn: viewCalc },
-    { id: 'post', nome: 'Probabilidade pós-teste (Bayes)', fn: viewPostTeste },
+    { id: 'post', nome: 'Probabilidade pós-teste (Bayes) + nomograma', fn: viewPostTeste },
+    { id: 'limiares', nome: '⚖️ Limiares de decisão', fn: viewLimiares },
     { id: 'efeito', nome: 'Medidas de efeito (NNT / NNH)', fn: viewEfeito },
     { id: 'lrs', nome: 'Biblioteca de LRs', fn: viewLRs }
   ];
@@ -5851,7 +5974,7 @@ window.PROTOCOLOS = [
       },
       exames: [
         { ctx: 'agudo', grupo: 'ecg', nome: 'ECG', ref: 'Panju, JAMA 1998', res: [['Supra de ST novo', 11], ['Infra de ST novo', 5.2], ['Onda Q nova', 3.9], ['Alteração inespecífica de T', 1.3], ['Normal', 0.2]] },
-        { ctx: 'agudo', grupo: 'necrose', nome: 'Troponina hs — algoritmo 0/1 h (ESC)', ref: 'ESC 0/1 h', res: [['Rule-in (elevada ou Δ significativo)', 25], ['Zona de observação', 1], ['Rule-out (0 h muito baixa ou 0/1 h sem Δ)', 0.02]] },
+        { ctx: 'agudo', grupo: 'necrose', nome: 'Troponina hs — LR por intervalo (concentração/Δ)', ref: 'hs-cTn (cortes assay-específicos)', res: [['Muito baixa (< LoD; ex.: hs-cTnT < 5 ng/L)', 0.02], ['Baixa (ex.: 5–14 ng/L) e Δ 0/1 h pequeno', 0.3], ['Intermediária (ex.: 14–52 ng/L)', 3], ['Alta (> 52 ng/L) ou Δ 0/1 h significativo', 20]] },
         { ctx: 'agudo', grupo: 'anatomia', nome: 'Angio-TC de coronárias', ref: 'Meta-análise (sens 95/espec 76)', res: [['Estenose ≥ 50%', 4.0], ['Sem estenose significativa', 0.07]] }
       ]
     },
