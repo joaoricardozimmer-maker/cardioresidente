@@ -1236,7 +1236,7 @@ window.TEMAS = [
       '<p>A dor torácica é conduzida por aferentes <b>viscerais</b> (coração, aorta, esôfago, pleura) que convergem nos mesmos segmentos medulares dos dermátomos torácicos — por isso a localização é imprecisa e a irradiação ampla (braço, mandíbula, dorso). A isquemia miocárdica gera dor por acúmulo de metabólitos (adenosina) e estiramento.</p>' +
       '<p>Prioridade é excluir as <b>causas fatais</b>: SCA, dissecção de aorta, TEP, pneumotórax hipertensivo e rotura esofágica.</p>',
     resumo:
-      '<p><b>Abordagem:</b> ECG em ≤ 10 min + troponina (algoritmo 0/1 h); estratificar com o <b>HEART score</b>. Sinais que <u>reduzem</u> a chance de SCA: dor pleurítica, posicional ou reprodutível à palpação. Sinais de alarme para <b>dissecção</b>: dor lancinante/migratória, assimetria de pulsos/PA.</p>' +
+      '<p><b>Abordagem (Diretriz SBC 2025 — fluxo em 4 passos):</b> ECG em ≤ 10 min → estratificar (troponina hs 0/1–0/3 h + escore) → decidir → observar. O <b>HEART</b> é o escore preferencial na suspeita de SCA (superior a EDACS/ADAPT/TIMI/GRACE na avaliação inicial); alta se HEART < 4 e sem doença coronária prévia. Sinais que <u>reduzem</u> a chance de SCA: dor pleurítica, posicional ou reprodutível à palpação. <b>Dissecção</b>: dor lancinante/migratória, assimetria de pulsos/PA → escores ADD-RS/AORTA + angio-TC. <b>TEP</b>: Wells/Genebra + D-dímero.</p>' +
       '<p><b>Diferenciais:</b> cardíacos (SCA, pericardite, miocardite, dissecção), pulmonares (TEP, pneumotórax, pleurite/pneumonia), gastrointestinais (DRGE, espasmo esofágico, úlcera, pancreatite/colelitíase) e musculoesqueléticos (costocondrite, herpes-zóster).</p>',
     trials: [
       { n: 'HEART Pathway', t: 'Estratificação acelerada permite alta segura do baixo risco.' }
@@ -1389,6 +1389,18 @@ window.TEMAS_CRIT = {
   <script>
 // Changelog de diretrizes — "o que mudou" recentemente. Curado a partir das publicações oficiais.
 window.MUDANCAS = [
+  {
+    ano: '2025', area: 'Dor torácica na emergência',
+    fonte: 'SBC/GECETI/FLAME — Diretriz Brasileira de Atendimento à Dor Torácica na Unidade de Emergência 2025',
+    itens: [
+      'Fluxo padronizado em 4 passos: ECG ≤ 10 min → estratificação (troponina hs + escores) → decisão → observação.',
+      'HEART é o escore preferencial na suspeita de SCA (superior a EDACS, ADAPT, TIMI e GRACE na avaliação inicial, com melhor desempenho em estudo nacional). Bandas: 0–3 baixo, 4–6 médio, 7–10 alto risco de MACE em 6 semanas.',
+      'Troponina de alta sensibilidade com algoritmos 0/1 h, 0/2 h ou 0/3 h; valores < percentil 99 (com Δ pequeno) descartam IAM.',
+      'Rule-out: considerar alta se HEART < 4 e sem antecedente de doença coronária; se a suspeita persistir, investigação não invasiva.',
+      'Síndromes aórticas: escores ADD-RS e AORTA para probabilidade pré-teste (não descartar por D-dímero isolado no alto risco). TEP: Wells/Genebra + D-dímero (corte 500, ajustado por idade).',
+      'Novo protocolo de plantão "Dor torácica na emergência (SBC 2025)" adicionado ao site.'
+    ]
+  },
   {
     ano: '2025', area: 'Dislipidemia',
     fonte: 'ESC/EAS — Atualização focada 2025 (das diretrizes de 2019)',
@@ -3499,6 +3511,22 @@ window.PROTOCOLOS = [
       { t: 'passo', x: 'Emergência: internar (preferir UTI) e reduzir a PA de forma CONTROLADA com anti-hipertensivo EV titulável.' },
       { t: 'dose', x: 'Alvo geral: reduzir a PAM em ~25% na 1ª hora; depois ~160/100 nas 2–6 h. Opções: nitroprussiato 0,3–10 mcg/kg/min · nitroglicerina (se EAP/isquemia) · labetalol · esmolol.' },
       { t: 'alerta', x: 'Exceções ao alvo: DISSECÇÃO → PAS 100–120 e FC < 60 rapidamente. AVC isquêmico → só tratar se PA muito alta/trombólise (alvos específicos). Eclâmpsia → sulfato de magnésio + anti-hipertensivo.' }
+    ]
+  },
+  {
+    id: 'dortoracica', nome: 'Dor torácica na emergência (SBC 2025)', area: 'Síndrome coronariana',
+    passos: [
+      { t: 'passo', x: 'PASSO 1 — ECG de 12 derivações em ≤ 10 min de chegada + monitorização, acesso venoso e avaliação clínica dirigida. Pense sempre nas causas que matam: SCA, dissecção aórtica, TEP (e também pneumotórax hipertensivo, tamponamento, rotura esofágica).' },
+      { t: 'decisao', x: 'ECG COM CRITÉRIO DIAGNÓSTICO (supra de ST / equivalente de OCA)? → SIM: seguir a rota específica de reperfusão (ver protocolo OCA/OMI), sem esperar troponina.' },
+      { t: 'decisao', x: 'HÁ CRITÉRIO DE INSTABILIDADE? (ECG limítrofe, dor persistente, instabilidade hemodinâmica/má perfusão, congestão pulmonar aguda, taqui/bradiarritmia no cenário da dor).' },
+      { t: 'sub', items: ['SIM → rota do paciente instável: avaliação clínica + troponina, repetir ECG a cada 10–20 min (apoio de médico experiente), buscar ativamente diferenciais (POCUS), admitir e tratar conforme o diagnóstico; considerar time de choque.', 'NÃO → seguir para o Passo 2 (estratificação).'] },
+      { t: 'passo', x: 'PASSO 2 — Rota diagnóstica inicial: dosar TROPONINA de alta sensibilidade (algoritmo 0/1 h, 0/2 h ou 0/3 h) e estimar a PROBABILIDADE pré-teste. O escore preferencial na suspeita de SCA é o HEART (superior a EDACS/ADAPT/TIMI/GRACE na avaliação inicial — estudo nacional).' },
+      { t: 'nota', x: 'Troponina hs: valores < percentil 99 (isolado tardio ou seriado, com Δ pequeno) descartam IAM; elevação/Δ significativo (ou > 5× o limite) confirmam injúria — buscar o mecanismo (tipo 1 vs 2). Cortes são específicos do ensaio.' },
+      { t: 'nota', x: 'Suspeita de DISSECÇÃO/síndrome aórtica: use ADD-RS (≤ 1 baixo, 2–3 alto risco) ou AORTA; se pré-teste não-baixa → angio-TC de aorta (não descartar por D-dímero isolado no alto risco). Suspeita de TEP: Wells (≤ 4 improvável / > 4 provável) ou Genebra + D-dímero (corte 500, ajustado por idade se > 50 a; ou 1000 em improvável) → angio-TC.' },
+      { t: 'passo', x: 'PASSO 3 — Decisão após avaliação clínica detalhada + algoritmos/exames. Diagnóstico estabelecido → tratar pela rota específica. Não estabelecido e risco intermediário → Passo 4.' },
+      { t: 'passo', x: 'PASSO 4 — Observação/investigação adicional: 3ª dosagem de troponina, repetir ECG, aplicar GRACE e considerar exames conforme a suspeita (angio-TC de coronárias, teste funcional de isquemia).' },
+      { t: 'decisao', x: 'RULE-OUT (descartar IAM): na ausência de diagnóstico alternativo, considerar ALTA — especialmente se HEART < 4 em paciente sem antecedente de doença coronária. Se a suspeita de SCA persistir, seguir investigação não invasiva ambulatorial.' },
+      { t: 'alerta', x: 'RULE-IN: admitir; avaliar critérios de IAM e, na ausência deles, buscar ativamente a causa da injúria miocárdica. ECG normal + troponina negativa NÃO excluem angina instável se a suspeita clínica for alta.' }
     ]
   },
   {
@@ -5901,7 +5929,7 @@ window.PROTOCOLOS = [
     // ---------- AGUDO: dor torácica → SCA (HEART clínico) ----------
     {
       id: 'sca', nome: 'Dor torácica aguda → SCA', contextos: ['agudo'],
-      alerta: 'Pré-teste por componentes clínicos do HEART (história, idade, fatores de risco). <b>Supra de ST → ativar reperfusão</b>, não “calcular”. ECG normal + troponina 0/1 h negativa <b>não excluem angina instável</b>. Lembre dos diagnósticos competitivos (TEP, dissecção).',
+      alerta: 'Diretriz SBC 2025 (Dor Torácica na Emergência): o <b>HEART é o escore preferencial</b> na suspeita de SCA (superior a EDACS/ADAPT/TIMI/GRACE na avaliação inicial). Fluxo em 4 passos: ECG ≤ 10 min → estratificar (HEART + troponina hs 0/1–0/3 h) → decidir → observar. <b>Supra de ST → ativar reperfusão</b>, não “calcular”. ECG normal + troponina negativa <b>não excluem angina instável</b>. Lembre dos diagnósticos competitivos (TEP, dissecção).',
       thresholds: { test: 2, treat: 70, vTest: '≤ ~2% (MACE) — protocolo de alta/observação curta costuma ser razoável.', vTreat: '≥ ~70% — tratar como SCA / estratégia invasiva.' },
       inputs: function () {
         const m = S.scaMetodo;
