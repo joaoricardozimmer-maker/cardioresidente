@@ -397,6 +397,7 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .diag-rescell { width: 260px; }
 .diag-res { width: 100%; font: inherit; font-size: 13px; padding: 7px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--text); }
 .diag-grid { margin-bottom: 4px; }
+.diag-metodo { display: block; max-width: 520px; margin-bottom: 12px; }
 .diag-alerta { font-size: 12.5px; line-height: 1.5; background: #fdf3e3; border: 1px solid #eccb8a; border-left: 4px solid #d99a2b; border-radius: 8px; padding: 9px 12px; margin-bottom: 12px; color: #7a5512; }
 .diag-alerta-red { background: #fbeeec; border-color: #e3a9a1; border-left-color: #c0392b; color: #8a2820; font-size: 13.5px; }
 .diag-guard { font-size: 12px; color: #8a2820; background: #fbeeec; border-radius: 6px; padding: 5px 8px; margin-top: 5px; line-height: 1.45; }
@@ -5779,27 +5780,71 @@ window.PROTOCOLOS = [
       id: 'sca', nome: 'Dor torácica aguda → SCA', contextos: ['agudo'],
       alerta: 'Pré-teste por componentes clínicos do HEART (história, idade, fatores de risco). <b>Supra de ST → ativar reperfusão</b>, não “calcular”. ECG normal + troponina 0/1 h negativa <b>não excluem angina instável</b>. Lembre dos diagnósticos competitivos (TEP, dissecção).',
       thresholds: { test: 2, treat: 70, vTest: '≤ ~2% (MACE) — protocolo de alta/observação curta costuma ser razoável.', vTreat: '≥ ~70% — tratar como SCA / estratégia invasiva.' },
-      inputs: `
-        <div class="sc-campos diag-grid">
-          <label class="sc-campo"><span>Suspeição pela história</span><select id="dg-hist"><option value="0">Pouco suspeita</option><option value="1" selected>Moderadamente suspeita</option><option value="2">Muito suspeita</option></select></label>
-          <label class="sc-campo"><span>Idade <em>(anos)</em></span><input type="number" id="dg-sidade"></label>
-        </div>
-        <div class="diag-sub">Fatores de risco / DAC conhecida</div>
-        <div class="pac-checks">
-          <label class="sc-check"><input type="checkbox" id="dg-sfam"><span>História familiar de DAC precoce</span></label>
-          <label class="sc-check"><input type="checkbox" id="dg-stab"><span>Tabagismo</span></label>
-          <label class="sc-check"><input type="checkbox" id="dg-sdisl"><span>Dislipidemia</span></label>
-          <label class="sc-check"><input type="checkbox" id="dg-shas"><span>Hipertensão</span></label>
-          <label class="sc-check"><input type="checkbox" id="dg-sdm"><span>Diabetes</span></label>
-          <label class="sc-check"><input type="checkbox" id="dg-sdac"><span>DAC conhecida (IAM/ICP/CRM, estenose ≥ 50%)</span></label>
-        </div>`,
+      inputs: function () {
+        const m = S.scaMetodo;
+        const metodoSel = '<label class="sc-campo diag-metodo"><span>Método de pré-teste / estratificação</span><select id="dg-metodo">' +
+          '<option value="clinico"' + (m === 'clinico' ? ' selected' : '') + '>Clínico (H+idade+FR) → encadear ECG/troponina</option>' +
+          '<option value="heart"' + (m === 'heart' ? ' selected' : '') + '>HEART completo (score de MACE)</option>' +
+          '<option value="edacs"' + (m === 'edacs' ? ' selected' : '') + '>EDACS-ADP (via de baixo risco)</option>' +
+          '</select></label>';
+        const fr = '<div class="diag-sub">Fatores de risco / DAC conhecida</div><div class="pac-checks">' +
+          '<label class="sc-check"><input type="checkbox" id="dg-sfam"><span>História familiar de DAC precoce</span></label>' +
+          '<label class="sc-check"><input type="checkbox" id="dg-stab"><span>Tabagismo</span></label>' +
+          '<label class="sc-check"><input type="checkbox" id="dg-sdisl"><span>Dislipidemia</span></label>' +
+          '<label class="sc-check"><input type="checkbox" id="dg-shas"><span>Hipertensão</span></label>' +
+          '<label class="sc-check"><input type="checkbox" id="dg-sdm"><span>Diabetes</span></label>' +
+          '<label class="sc-check"><input type="checkbox" id="dg-sdac"><span>DAC conhecida (IAM/ICP/CRM, estenose ≥ 50%)</span></label></div>';
+        if (m === 'edacs') {
+          return metodoSel +
+            '<div class="sc-campos diag-grid"><label class="sc-campo"><span>Sexo</span><select id="dg-sexo"><option value="M">Masculino</option><option value="F">Feminino</option></select></label>' +
+            '<label class="sc-campo"><span>Idade <em>(anos)</em></span><input type="number" id="dg-sidade"></label></div>' +
+            '<div class="pac-checks">' +
+            '<label class="sc-check"><input type="checkbox" id="dg-cadedacs"><span>DAC conhecida ou ≥ 3 fatores de risco (18–50 a)</span></label>' +
+            '<label class="sc-check"><input type="checkbox" id="dg-diaf"><span>Diaforese</span></label>' +
+            '<label class="sc-check"><input type="checkbox" id="dg-irrad"><span>Dor irradia para braço/ombro/pescoço/mandíbula</span></label>' +
+            '<label class="sc-check"><input type="checkbox" id="dg-pleur"><span>Dor ocorre/piora com inspiração</span></label>' +
+            '<label class="sc-check"><input type="checkbox" id="dg-palp"><span>Dor reproduzível à palpação</span></label>' +
+            '<label class="sc-check"><input type="checkbox" id="dg-ecgisq"><span>ECG SEM nova isquemia</span></label>' +
+            '<label class="sc-check"><input type="checkbox" id="dg-tropneg"><span>Troponina 0/2 h negativa</span></label>' +
+            '</div>';
+        }
+        let h = metodoSel + '<div class="sc-campos diag-grid">' +
+          '<label class="sc-campo"><span>' + (m === 'heart' ? 'História' : 'Suspeição pela história') + '</span><select id="dg-hist"><option value="0">Pouco suspeita</option><option value="1" selected>Moderadamente suspeita</option><option value="2">Muito suspeita</option></select></label>' +
+          '<label class="sc-campo"><span>Idade <em>(anos)</em></span><input type="number" id="dg-sidade"></label></div>';
+        if (m === 'heart') {
+          h += '<div class="sc-campos diag-grid">' +
+            '<label class="sc-campo"><span>ECG</span><select id="dg-ecg"><option value="0">Normal</option><option value="1">Alteração inespecífica da repolarização</option><option value="2">Infra de ST significativo</option></select></label>' +
+            '<label class="sc-campo"><span>Troponina</span><select id="dg-trop"><option value="0">≤ limite</option><option value="1">1–3× o limite</option><option value="2">&gt; 3× o limite</option></select></label></div>';
+        }
+        return h + fr;
+      },
       pretest: function () {
-        const h = parseInt(document.getElementById('dg-hist').value, 10) || 0;
-        const idade = parseFloat(document.getElementById('dg-sidade').value);
-        const a = !isFinite(idade) ? 1 : (idade < 45 ? 0 : idade < 65 ? 1 : 2);
-        const nrf = ['dg-sfam', 'dg-stab', 'dg-sdisl', 'dg-shas', 'dg-sdm'].filter(i => document.getElementById(i).checked).length;
-        const dac = document.getElementById('dg-sdac').checked;
-        const rf = dac || nrf >= 3 ? 2 : (nrf >= 1 ? 1 : 0);
+        const m = S.scaMetodo;
+        const num = id => { const e = document.getElementById(id); return e ? parseFloat(e.value) : NaN; };
+        const chk = id => { const e = document.getElementById(id); return e ? e.checked : false; };
+        const sel = id => { const e = document.getElementById(id); return e ? (parseInt(e.value, 10) || 0) : 0; };
+        const nrf = ['dg-sfam', 'dg-stab', 'dg-sdisl', 'dg-shas', 'dg-sdm'].filter(i => { const e = document.getElementById(i); return e && e.checked; }).length;
+        if (m === 'heart') {
+          const idade = num('dg-sidade'); const a = !isFinite(idade) ? 1 : (idade < 45 ? 0 : idade < 65 ? 1 : 2);
+          const rf = (chk('dg-sdac') || nrf >= 3) ? 2 : (nrf >= 1 ? 1 : 0);
+          const s = sel('dg-hist') + sel('dg-ecg') + a + rf + sel('dg-trop');
+          let risk, disp;
+          if (s <= 3) { risk = 1.7; disp = '<b>Baixo risco</b> (MACE ~0,9–1,7%) — em geral permite alta com seguimento.'; }
+          else if (s <= 6) { risk = 15; disp = '<b>Risco moderado</b> (MACE ~12–17%) — internar/observar, seriar troponina, investigar isquemia.'; }
+          else { risk = 58; disp = '<b>Alto risco</b> (MACE ~50–65%) — estratégia invasiva precoce.'; }
+          return { pre: risk, nota: 'HEART completo = ' + s + '/10 (história + ECG + idade + FR + troponina).', scoreMode: true, disp: disp };
+        }
+        if (m === 'edacs') {
+          const idade = num('dg-sidade');
+          const ageP = !isFinite(idade) ? 0 : (idade < 46 ? 2 : idade < 51 ? 4 : idade < 56 ? 6 : idade < 61 ? 8 : idade < 66 ? 10 : idade < 71 ? 12 : idade < 76 ? 14 : idade < 81 ? 16 : idade < 86 ? 18 : 20);
+          const sexP = document.getElementById('dg-sexo') && document.getElementById('dg-sexo').value === 'M' ? 6 : 0;
+          let ed = ageP + sexP + (chk('dg-cadedacs') ? 4 : 0) + (chk('dg-diaf') ? 3 : 0) + (chk('dg-irrad') ? 5 : 0) + (chk('dg-pleur') ? -4 : 0) + (chk('dg-palp') ? -6 : 0);
+          const low = ed < 16 && chk('dg-ecgisq') && chk('dg-tropneg');
+          return { pre: low ? 1 : 15, nota: 'EDACS = ' + ed + (ed < 16 ? ' (< 16)' : ' (≥ 16)') + '. ADP exige também ECG sem isquemia + troponina 0/2 h negativa.', scoreMode: true, disp: low ? '<b>EDACS-ADP: baixo risco</b> — candidato a alta precoce (MACE muito baixo).' : '<b>Não preenche a via de baixo risco</b> — observar, seriar troponina e investigar.' };
+        }
+        const h = sel('dg-hist');
+        const idade = num('dg-sidade'); const a = !isFinite(idade) ? 1 : (idade < 45 ? 0 : idade < 65 ? 1 : 2);
+        const rf = (chk('dg-sdac') || nrf >= 3) ? 2 : (nrf >= 1 ? 1 : 0);
         const score = h + a + rf;
         const map = { 0: 3, 1: 6, 2: 10, 3: 18, 4: 30, 5: 45, 6: 58 };
         return { pre: map[score], nota: 'HEART clínico (H+A+FR, sem troponina/ECG) = ' + score + '/6 → estimativa ' + map[score] + '%. ECG e troponina entram como testes abaixo.' };
@@ -5980,7 +6025,7 @@ window.PROTOCOLOS = [
     }
   ];
 
-  const S = { ctx: 'agudo', target: 'sca', res: {} };
+  const S = { ctx: 'agudo', target: 'sca', res: {}, scaMetodo: 'clinico' };
 
   function shell() {
     return '<div class="rec-revbanner">Monte o caso, obtenha a <b>probabilidade pré-teste automática</b>, escolha um <b>exame</b> conforme o contexto e lance o resultado — a <b>probabilidade pós-teste</b> é recalculada em cadeia, com <b>limiares de ação</b>. Assume independência entre os testes (aproximação); não substitui o julgamento clínico.</div>' +
@@ -6004,8 +6049,11 @@ window.PROTOCOLOS = [
   function renderForm() {
     const t = TARGETS.find(x => x.id === S.target);
     const form = document.getElementById('diag-form');
-    form.innerHTML = '<h3 class="sc-title">' + esc(t.nome) + '</h3>' + (t.inputs || '');
+    const inputsHtml = typeof t.inputs === 'function' ? t.inputs() : (t.inputs || '');
+    form.innerHTML = '<h3 class="sc-title">' + esc(t.nome) + '</h3>' + inputsHtml;
     form.querySelectorAll('input, select').forEach(el => el.addEventListener('input', () => { compute(); }));
+    const mm = document.getElementById('dg-metodo');
+    if (mm) mm.addEventListener('change', () => { S.scaMetodo = mm.value; renderForm(); });
     S.res = {};
     compute();
   }
@@ -6038,6 +6086,19 @@ window.PROTOCOLOS = [
       return;
     }
     const pr = t.pretest(S.ctx);
+    if (pr.scoreMode) {
+      const nivel = pr.pre >= 50 ? 'sc-bad' : (pr.pre >= 15 ? 'sc-warn' : 'sc-ok');
+      out.innerHTML =
+        (t.alerta ? '<div class="diag-alerta">⚠ ' + t.alerta + '</div>' : '') +
+        '<div class="diag-pre">' + esc(pr.nota) + '</div>' +
+        '<div class="sc-result ' + nivel + '"><div class="sc-conduta">' +
+        '<div class="mbc-barwrap"><div class="mbc-barlbl">Risco</div><div class="mbc-bar mbc-bar-post"><span style="width:' + pct(pr.pre) + '%"></span></div></div>' +
+        '<div class="mbc-post">' + pr.disp + '</div>' +
+        threshBar(t, pr.pre) +
+        '<div class="sc-extra">Score de decisão validado — o ECG e a troponina já entram no cálculo, por isso não são encadeados novamente (evita dupla contagem).</div>' +
+        '</div></div>';
+      return;
+    }
     const exs = examesDo(t);
     let o = odds(pr.pre / 100), net = 1; const aplic = []; const gruposSel = {}; let stSupra = false;
     exs.forEach((e, i) => {
