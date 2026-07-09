@@ -3646,6 +3646,78 @@ window.PROTOCOLOS = [
       }
     },
     {
+      id:'edacs', grupo:'Síndrome coronariana / dor torácica', nome:'EDACS (dor torácica)',
+      desc:'Emergency Department Assessment of Chest pain Score. Com ECG sem isquemia + troponina 0/2h negativa (EDACS-ADP), EDACS < 16 identifica candidatos à alta precoce.',
+      campos:[
+        {id:'idade', tipo:'sel', label:'Idade', opts:[
+          {v:'2',t:'18–45 (2)'},{v:'4',t:'46–50 (4)'},{v:'6',t:'51–55 (6)'},{v:'8',t:'56–60 (8)'},{v:'10',t:'61–65 (10)'},
+          {v:'12',t:'66–70 (12)'},{v:'14',t:'71–75 (14)'},{v:'16',t:'76–80 (16)'},{v:'18',t:'81–85 (18)'},{v:'20',t:'≥ 86 (20)'}
+        ]},
+        {id:'sexo', tipo:'sel', label:'Sexo', opts:[{v:'6',t:'Masculino (6)'},{v:'0',t:'Feminino (0)'}]},
+        {id:'cad', tipo:'chk', label:'DAC conhecida OU ≥ 3 fatores de risco (idade 18–50)', p:4},
+        {id:'diaf', tipo:'chk', label:'Diaforese (sudorese)', p:3},
+        {id:'irrad', tipo:'chk', label:'Dor irradiada para braço/ombro/pescoço/mandíbula', p:5},
+        {id:'inspir', tipo:'chk', label:'Dor ocorre/piora com a inspiração', p:-4},
+        {id:'palp', tipo:'chk', label:'Dor reproduzível à palpação', p:-6}
+      ],
+      calc(v){
+        const pts=(n(v.idade)||0)+(n(v.sexo)||0)+somaChk(v,this.campos);
+        let nivel,cond;
+        if(pts<16){ nivel='ok'; cond='<b>EDACS &lt; 16.</b> Se o ECG não mostrar isquemia e a troponina 0/2h for negativa (EDACS-ADP), é candidato a <b>alta precoce</b> (risco de MACE muito baixo).'; }
+        else { nivel='warn'; cond='<b>EDACS ≥ 16 — não é baixo risco.</b> Observar, seriar troponina e considerar investigação isquêmica.'; }
+        return { valor: pts+' pontos', nivel, conduta: cond };
+      }
+    },
+    {
+      id:'csrs', grupo:'Síncope', nome:'Canadian Syncope Risk Score (CSRS)',
+      desc:'Risco de evento adverso grave em 30 dias após síncope avaliada na emergência.',
+      campos:[
+        {id:'vaso', tipo:'chk', label:'Predisposição a síncope vasovagal (ambiente quente/lotado, medo/dor/emoção, ortostase prolongada)', p:-1},
+        {id:'cardio', tipo:'chk', label:'História de doença cardíaca', p:1},
+        {id:'pa', tipo:'chk', label:'Qualquer PAS < 90 ou > 180 mmHg na emergência', p:2},
+        {id:'tropo', tipo:'chk', label:'Troponina > percentil 99', p:2},
+        {id:'axis', tipo:'chk', label:'Eixo do QRS anormal (< −30° ou > 100°)', p:1},
+        {id:'qrs', tipo:'chk', label:'QRS > 130 ms', p:1},
+        {id:'qtc', tipo:'chk', label:'QTc > 480 ms', p:2},
+        {id:'dxvaso', tipo:'chk', label:'Diagnóstico de síncope vasovagal na emergência', p:-2},
+        {id:'dxcard', tipo:'chk', label:'Diagnóstico de síncope cardíaca na emergência', p:2}
+      ],
+      calc(v){
+        const pts=somaChk(v,this.campos);
+        let nivel,cat,risco;
+        if(pts<=-2){ nivel='ok'; cat='muito baixo'; risco='~0,4–0,7%'; }
+        else if(pts<=0){ nivel='ok'; cat='baixo'; risco='~1,2%'; }
+        else if(pts<=3){ nivel='warn'; cat='médio'; risco='~2–8%'; }
+        else if(pts<=5){ nivel='bad'; cat='alto'; risco='~14–28%'; }
+        else { nivel='bad'; cat='muito alto'; risco='> 28%'; }
+        const cond='Risco <b>'+cat+'</b> de evento grave em 30 dias ('+risco+'). '+(pts<=0?'Em geral permite alta com orientação/seguimento.':(pts<=3?'Observação/monitorização e avaliação dirigida.':'Monitorização e investigação cardíaca; considerar internação.'));
+        return { valor: (pts>0?'+':'')+pts+' ('+cat+')', nivel, conduta: cond };
+      }
+    },
+    {
+      id:'endocardite', grupo:'Infecção / endocardite', nome:'Critérios de Duke (endocardite) — 2023 ISCVID',
+      desc:'Classifica endocardite infecciosa em Definitiva / Possível / Improvável. EI = ≥ 1 critério MAIOR e/ou MENORES conforme a regra.',
+      campos:[
+        {id:'micro_maj', tipo:'chk', maj:true, label:'MAIOR — microbiológico: hemocultura(s) positiva(s) para microrganismo típico (2 amostras) ou persistentemente positiva; ou PCR/sorologia específica'},
+        {id:'img_maj', tipo:'chk', maj:true, label:'MAIOR — imagem: vegetação, abscesso, pseudoaneurisma, deiscência protética nova, perfuração/fístula (eco/TC), ou captação anormal em PET/TC (prótese)'},
+        {id:'predispo', tipo:'chk', label:'menor — condição cardíaca predisponente ou uso de droga injetável'},
+        {id:'febre', tipo:'chk', label:'menor — febre ≥ 38 °C'},
+        {id:'vascular', tipo:'chk', label:'menor — fenômenos vasculares (êmbolo arterial, infarto pulmonar séptico, aneurisma micótico, hemorragia intracraniana/conjuntival, lesões de Janeway)'},
+        {id:'imuno', tipo:'chk', label:'menor — fenômenos imunológicos (glomerulonefrite, nódulos de Osler, manchas de Roth, fator reumatoide)'},
+        {id:'micro_min', tipo:'chk', label:'menor — evidência microbiológica que não preenche o critério maior'}
+      ],
+      calc(v){
+        let maj=0,min=0;
+        this.campos.forEach(c=>{ if(v[c.id]){ if(c.maj) maj++; else min++; } });
+        let res,nivel;
+        if(maj>=2 || (maj===1&&min>=3) || min>=5){ res='EI DEFINITIVA'; nivel='bad'; }
+        else if((maj===1&&min>=1) || min>=3){ res='EI POSSÍVEL'; nivel='warn'; }
+        else { res='EI improvável (critérios não preenchidos)'; nivel='ok'; }
+        const cond='<b>'+res+'</b> — '+maj+' maior(es), '+min+' menor(es). Regra: Definitiva = 2 maiores, ou 1 maior + 3 menores, ou 5 menores; Possível = 1 maior + 1 menor, ou 3 menores.'+(res!=='EI improvável (critérios não preenchidos)'?' Ecocardiograma (TT/TE), hemoculturas seriadas e equipe multidisciplinar (endocarditis team).':'');
+        return { valor: res, nivel, conduta: cond };
+      }
+    },
+    {
       id:'rcri', grupo:'Avaliação perioperatória', nome:'Índice de Lee (RCRI)',
       desc:'Risco de evento cardíaco maior em cirurgia não cardíaca.',
       campos:[
@@ -4327,14 +4399,14 @@ window.PROTOCOLOS = [
     { id: 'ic', area: 'Cardiovascular', nome: 'Insuficiência cardíaca (dispneia aguda)', prev: 50,
       nota: 'Adulto com dispneia aguda na emergência. Prevalência típica ~50%. Fonte: Wang, JAMA 2005 (“Does this dyspneic patient have heart failure?”).',
       achados: [
-        { a: 'Terceira bulha (B3 / galope)', lrp: 11, lrn: 0.88, ref: 'Wang 2005' },
-        { a: 'Congestão venosa pulmonar no RX de tórax', lrp: 12, lrn: 0.48, ref: 'Wang 2005' },
-        { a: 'Refluxo hepatojugular', lrp: 6.4, lrn: 0.79, ref: 'Wang 2005' },
-        { a: 'História prévia de insuficiência cardíaca', lrp: 5.8, lrn: 0.45, ref: 'Wang 2005' },
-        { a: 'Turgência jugular', lrp: 5.1, lrn: 0.66, ref: 'Wang 2005' },
+        { a: 'Terceira bulha (B3 / galope)', lrp: 11, lrn: 0.88, ref: 'Wang 2005', ci: 'LR+ 4,9–25' },
+        { a: 'Congestão venosa pulmonar no RX de tórax', lrp: 12, lrn: 0.48, ref: 'Wang 2005', ci: 'LR+ 6,8–21' },
+        { a: 'Refluxo hepatojugular', lrp: 6.4, lrn: 0.79, ref: 'Wang 2005', ci: 'LR+ 0,8–51 (amplo)' },
+        { a: 'História prévia de insuficiência cardíaca', lrp: 5.8, lrn: 0.45, ref: 'Wang 2005', ci: 'LR+ 4,1–8,0' },
+        { a: 'Turgência jugular', lrp: 5.1, lrn: 0.66, ref: 'Wang 2005', ci: 'LR+ 3,2–7,9' },
         { a: 'Fibrilação atrial no ECG', lrp: 3.8, lrn: 0.79, ref: 'Wang 2005' },
         { a: 'Cardiomegalia no RX de tórax', lrp: 3.3, lrn: 0.33, ref: 'Wang 2005' },
-        { a: 'Estertores pulmonares', lrp: 2.8, lrn: 0.51, ref: 'Wang 2005' },
+        { a: 'Estertores pulmonares', lrp: 2.8, lrn: 0.51, ref: 'Wang 2005', ci: 'LR+ 1,9–4,1' },
         { a: 'Dispneia paroxística noturna', lrp: 2.6, lrn: 0.70, ref: 'Wang 2005' },
         { a: 'Edema de membros', lrp: 2.3, lrn: 0.64, ref: 'Wang 2005' },
         { a: 'Ortopneia', lrp: 2.2, lrn: 0.65, ref: 'Wang 2005' },
@@ -4346,7 +4418,7 @@ window.PROTOCOLOS = [
       achados: [
         { a: 'Supra de ST novo no ECG', lrp: 11, lrn: null, ref: 'Panju 1998' },
         { a: 'Infra de ST novo no ECG', lrp: 5.2, lrn: null, ref: 'Panju 1998' },
-        { a: 'Irradiação para o braço/ombro DIREITO', lrp: 4.7, lrn: null, ref: 'Swap 2005' },
+        { a: 'Irradiação para o braço/ombro DIREITO', lrp: 4.7, lrn: null, ref: 'Swap 2005', ci: 'LR+ 1,9–12' },
         { a: 'Onda Q nova no ECG', lrp: 3.9, lrn: null, ref: 'Panju 1998' },
         { a: 'Irradiação para AMBOS os braços', lrp: 2.6, lrn: null, ref: 'Swap 2005' },
         { a: 'Dor desencadeada pelo esforço', lrp: 2.4, lrn: null, ref: 'Swap 2005' },
@@ -4354,9 +4426,9 @@ window.PROTOCOLOS = [
         { a: 'Sudorese (diaforese)', lrp: 2.0, lrn: null, ref: 'Swap 2005' },
         { a: 'Náusea ou vômito', lrp: 1.9, lrn: null, ref: 'Swap 2005' },
         { a: 'ECG completamente normal', lrp: 0.2, lrn: null, ref: 'Panju 1998' },
-        { a: 'Dor reprodutível à palpação', lrp: 0.3, lrn: null, ref: 'Swap 2005' },
+        { a: 'Dor reprodutível à palpação', lrp: 0.3, lrn: null, ref: 'Swap 2005', ci: 'LR 0,2–0,4' },
         { a: 'Dor posicional', lrp: 0.3, lrn: null, ref: 'Swap 2005' },
-        { a: 'Dor pleurítica', lrp: 0.2, lrn: null, ref: 'Swap 2005' }
+        { a: 'Dor pleurítica', lrp: 0.2, lrn: null, ref: 'Swap 2005', ci: 'LR 0,1–0,3' }
       ] },
     { id: 'eao', area: 'Cardiovascular', nome: 'Estenose aórtica (sopro sistólico)', prev: 25,
       nota: 'Adulto com sopro sistólico — avaliar EAo moderada/grave. Fonte: Etchells, JAMA 1997 / JGIM 1998.',
@@ -4431,7 +4503,7 @@ window.PROTOCOLOS = [
 
   // biblioteca de LRs derivada dos diagnósticos (fonte única)
   const LRS = [];
-  DIAGNOSTICOS.forEach(d => d.achados.forEach(x => LRS.push({ g: d.nome, a: x.a, lrp: x.lrp, lrn: x.lrn, ref: x.ref })));
+  DIAGNOSTICOS.forEach(d => d.achados.forEach(x => LRS.push({ g: d.nome, a: x.a, lrp: x.lrp, lrn: x.lrn, ref: x.ref, ci: x.ci })));
 
   function odds(p) { return p / (1 - p); }
   function prob(o) { return o / (1 + o); }
@@ -4469,7 +4541,7 @@ window.PROTOCOLOS = [
       const posBtn = '<button class="mbc-seg mbc-pos' + (cur === 'pos' ? ' on' : '') + '" data-i="' + i + '" data-v="pos"' + (x.lrp == null ? ' disabled title="sem LR+"' : '') + '>Presente</button>';
       const negBtn = '<button class="mbc-seg mbc-neg' + (cur === 'neg' ? ' on' : '') + '" data-i="' + i + '" data-v="neg"' + (x.lrn == null ? ' disabled title="sem LR−"' : '') + '>Ausente</button>';
       return '<tr>' +
-        '<td class="mbc-ach">' + esc(x.a) + '<div class="mbc-ref">LR+ ' + fmt(x.lrp) + ' · LR− ' + fmt(x.lrn) + ' · ' + esc(x.ref) + '</div></td>' +
+        '<td class="mbc-ach">' + esc(x.a) + '<div class="mbc-ref">LR+ ' + fmt(x.lrp) + ' · LR− ' + fmt(x.lrn) + (x.ci ? ' · IC 95% ' + esc(x.ci) : '') + ' · ' + esc(x.ref) + '</div></td>' +
         '<td class="mbc-ctrl"><div class="mbc-seg-wrap">' + posBtn + negBtn + '</div></td>' +
         '</tr>';
     }).join('');
@@ -4617,7 +4689,7 @@ window.PROTOCOLOS = [
     const grupos = [...new Set(LRS.map(x => x.g))];
     panel.innerHTML =
       '<h3 class="sc-title">Biblioteca de razões de verossimilhança (LR)</h3>' +
-      '<p class="muted small">' + LRS.length + ' achados clínicos e exames com LR+/LR− e referência. Use <b>→ Bayes</b> para enviar a LR à calculadora manual, ou a <b>Calculadora diagnóstica</b> para encadear vários achados.</p>' +
+      '<p class="muted small">' + LRS.length + ' achados clínicos e exames com LR+/LR− e referência. As LRs têm <b>intervalos de confiança frequentemente amplos</b> (mostrados quando disponíveis) — leia-as como faixas, não valores exatos. Testes contínuos (troponina, BNP, escore de cálcio) são melhor lidos por <b>LR por intervalo</b>. Use <b>→ Bayes</b> para enviar a LR à calculadora, ou a <b>Calculadora diagnóstica</b> para encadear achados.</p>' +
       '<div class="mbe-filtros">' +
       '<input type="text" id="mb-lr-busca" placeholder="Buscar achado ou tema... (ex: B3, Valsalva, D-dímero)" class="mbe-search">' +
       '<select id="mb-lr-grupo" class="mbe-search"><option value="">Todos os grupos</option>' + grupos.map(g => '<option value="' + esc(g) + '">' + esc(g) + '</option>').join('') + '</select>' +
@@ -4633,7 +4705,7 @@ window.PROTOCOLOS = [
         h += '<table class="mbe-table"><thead><tr><th>Achado / exame</th><th>LR+</th><th>LR−</th><th>Ref.</th><th></th></tr></thead><tbody>';
         grp[g].forEach(x => {
           const idx = LRS.indexOf(x);
-          h += '<tr><td>' + esc(x.a) + '</td><td class="mbe-num"><span class="lr-chip ' + chipClass(x.lrp, true) + '">' + fmt(x.lrp) + '</span></td><td class="mbe-num"><span class="lr-chip ' + chipClass(x.lrn, false) + '">' + fmt(x.lrn) + '</span></td><td class="mbe-ref">' + esc(x.ref) + '</td><td class="mbe-num"><button class="mbe-usar" data-i="' + idx + '">→ Bayes</button></td></tr>';
+          h += '<tr><td>' + esc(x.a) + '</td><td class="mbe-num"><span class="lr-chip ' + chipClass(x.lrp, true) + '">' + fmt(x.lrp) + '</span></td><td class="mbe-num"><span class="lr-chip ' + chipClass(x.lrn, false) + '">' + fmt(x.lrn) + '</span></td><td class="mbe-ref">' + esc(x.ref) + (x.ci ? '<br>IC 95% ' + esc(x.ci) : '') + '</td><td class="mbe-num"><button class="mbe-usar" data-i="' + idx + '">→ Bayes</button></td></tr>';
         });
         h += '</tbody></table>';
       });
