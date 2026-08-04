@@ -216,8 +216,16 @@ select:focus, textarea:focus { outline: none; border-color: var(--blue); }
   max-height: calc(100vh - var(--stick-top, 250px) - 20px);
   overflow-y: auto; overscroll-behavior: contain; padding-right: 6px;
 }
-#view-evolucoes .evol-search { position: sticky; top: 0; z-index: 3; background: var(--card); }
-#view-evolucoes .evol-count  { position: sticky; top: 41px; z-index: 3; background: var(--bg); padding-bottom: 4px; }
+/* busca e contador ficam presos no topo do menu; as margens negativas fecham o
+   vão de 6px do flex-gap, senão os itens aparecem passando por trás */
+#view-evolucoes .evol-search {
+  position: sticky; top: 0; z-index: 4; background: var(--card);
+  box-shadow: 0 -6px 0 6px var(--bg);
+}
+#view-evolucoes .evol-count {
+  position: sticky; top: 38px; z-index: 4; background: var(--bg);
+  margin: -6px 4px 0; padding: 6px 0 8px;
+}
 #view-evolucoes .evol-editor { position: sticky; top: var(--stick-top, 250px); }
 #view-evolucoes .evol-editor-head { position: sticky; top: 0; z-index: 2; background: var(--bg); }
 #view-evolucoes #evol-text {
