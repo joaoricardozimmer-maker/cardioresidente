@@ -1,7 +1,9 @@
 // Modelos de evolução e receitas editáveis. Use [colchetes] ou ___ para campos a preencher.
-// Formatação padrão: título de bloco em MAIÚSCULAS e uma linha em branco entre blocos,
-// entre sistemas do exame físico e entre itens de conduta com mais de uma linha.
-// Atualizado em 04/08/2026. Backup: assets/js/data-evolucoes.ORIGINAL-2026-08-03.js.bak
+// Formatação padrão: título de bloco em MAIÚSCULAS e uma linha em branco entre blocos.
+// Revisão de condutas em 04/08/2026: SBC HAS 2025 (fim do termo urgência hipertensiva),
+// AHA/ACC TEP 2026 (categorias A–E), betabloqueador pós-IAM (REDUCE-AMI e REBOOT),
+// Surviving Sepsis 2026 e terapias atuais para ATTR-CM.
+// Backup: assets/js/data-evolucoes.ORIGINAL-2026-08-03.js.bak
 window.EVOLUCOES = [
   {
     grupo: "Plantão — ROP Crônicos",
@@ -365,7 +367,8 @@ CONDUTA
 
 2. Controle do foco: ____________ (drenagem / retirada de cateter / cirurgia) — realizado/programado para __/__ .
 
-3. Ressuscitação volêmica: cristaloide balanceado 30 mL/kg nas primeiras 3 h (individualizar se IC/DRC),
+3. Ressuscitação volêmica: cristaloide balanceado, pelo menos 30 mL/kg nas primeiras 3 h
+   (SSC 2026; individualizar se IC ou DRC e reavaliar com frequência),
    guiada por resposta a fluidos (elevação passiva de pernas, VTI, variação de PP), não por PVC isolada.
 
 4. Vasopressor: noradrenalina para PAM ≥65 mmHg. Se dose alta, associar vasopressina 0,03 U/min.
@@ -883,6 +886,9 @@ CONDUTA
 2. Anticoagulação: ____________ (suspender após a ICP, salvo indicação: FA, trombo de VE, TEV).
 
 3. Betabloqueador: ____________ — titular conforme FC e PA.
+   Definir na alta se mantém: FEVE ≤40%, angina ou arritmia → manter.
+   FEVE >40% sem outra indicação → benefício de longo prazo não demonstrado
+   (REDUCE-AMI, REBOOT); reavaliar e registrar a decisão.
 
 4. IECA/BRA: ____________ — indicado se FEVE ≤40%, HAS, DM ou DRC.
 
@@ -1198,7 +1204,11 @@ CONDUTA:
 2. Estatina de alta intensidade: [atorvastatina 40–80 mg / rosuvastatina 20–40 mg] à noite. Se fora da meta,
    associar ezetimiba 10 mg/dia; se ainda fora, considerar iPCSK9 ou ácido bempedoico.
 
-3. Betabloqueador: ____________ (indicação mais forte se FEVE reduzida, angina ou arritmia).
+3. Betabloqueador: ____________ .
+   Manter indefinidamente se FEVE ≤40%, angina ou arritmia.
+   Se FEVE >40% e sem outra indicação, discutir suspensão: REDUCE-AMI e REBOOT não
+   mostraram redução de morte, reinfarto ou internação por IC, e o REBOOT sinalizou
+   possível dano em mulheres com FEVE ≥50%.
 
 4. IECA/BRA: ____________ (indicado se HAS, DM, DRC ou FEVE ≤40%).
 
@@ -1331,7 +1341,9 @@ CONDUTA:
    (CMH obstrutiva: betabloqueador → verapamil/diltiazem → disopiramida; inibidor de miosina cardíaca se disponível;
     EVITAR vasodilatadores, diuréticos em excesso e digoxina.
     CMD: 4 pilares da IC-FEr — ver seção de medicações.
-    ATTR-CM: tafamidis se elegível; evitar betabloqueador/BCC em doses altas; cuidado com digoxina.)
+    ATTR-CM: terapia modificadora de doença — tafamida 61 mg/dia, acoramidis (aprovado pela
+    Anvisa em maio de 2026) ou vutrisirana. Evitar betabloqueador e BCC em doses altas;
+    cautela com digoxina.)
 
 2. Anticoagulação: ____________ (indicada em CMH com FA independentemente do CHA2DS2-VA; trombo intracavitário).
 
@@ -1708,6 +1720,8 @@ USO ORAL E CONTÍNUO
 
 4) Succinato de metoprolol 50 mg
    Tomar 1 comprimido ao dia, pela manhã.
+   Manter se FEVE ≤40%, angina ou arritmia. Se FEVE >40% e sem outra indicação,
+   rever a necessidade com o cardiologista.
 
 5) Enalapril 10 mg
    Tomar 1 comprimido de 12 em 12 horas.
@@ -2301,7 +2315,15 @@ MEDIDAS IMEDIATAS
 7. Nitrato: isossorbida 5 mg SL ou nitroglicerina EV se dor/HAS/congestão.
    CONTRAINDICADO se: PAS <90 mmHg, IAM de VD, uso de inibidor de PDE5 nas últimas 24–48 h.
 
-8. Betabloqueador VO nas primeiras 24 h se SEM: IC aguda, baixo débito, risco de choque, BAV avançado, broncoespasmo.
+8. Betabloqueador VO nas primeiras 24 h se SEM: IC aguda, baixo débito, risco de choque,
+   BAV avançado ou broncoespasmo. Na fase aguda a indicação permanece Classe 1
+   (reduz arritmia e reinfarto).
+   MANUTENÇÃO APÓS A ALTA — mudou:
+   • FEVE ≤40%, angina ou arritmia → manter indefinidamente, é onde o benefício está estabelecido.
+   • FEVE >40% sem outra indicação → benefício de longo prazo NÃO demonstrado
+     (REDUCE-AMI, FEVE ≥50%, n=5.020; REBOOT, FEVE >40%, n=8.438: sem redução de morte,
+     reinfarto ou internação por IC). O REBOOT sinalizou possível dano em mulheres com FEVE ≥50%.
+     Reavaliar a manutenção caso a caso e registrar a decisão.
 
 9. Estatina de alta intensidade: atorvastatina 80 mg VO.
 
@@ -2339,7 +2361,10 @@ CONDUTA
 
 4. Anticoagulação: enoxaparina 1 mg/kg SC 12/12 h OU fondaparinux 2,5 mg SC/dia OU HNF.
 
-5. Betabloqueador VO se sem contraindicação. Nitrato para controle sintomático.
+5. Betabloqueador VO se sem contraindicação, na fase aguda.
+   Após a alta, manter indefinidamente apenas se FEVE ≤40%, angina ou arritmia;
+   com FEVE >40% o benefício de longo prazo não foi demonstrado (REDUCE-AMI, REBOOT).
+   Nitrato para controle sintomático.
 
 6. Atorvastatina 80 mg/dia (ou rosuvastatina 20–40 mg).
 
@@ -2396,8 +2421,10 @@ NÃO ESQUECER
        desde que isso não atrase a 1ª dose em mais de 45 min.
 [ ] 3. ANTIBIÓTICO de amplo espectro EV — o mais rápido possível (idealmente <1 h no choque séptico).
        Esquema conforme foco: ____________ .
-[ ] 4. CRISTALOIDE BALANCEADO 30 mL/kg EV se hipotensão ou lactato ≥4 mmol/L.
-       Individualizar em IC, DRC dialítica e cirrose — reavaliar responsividade a fluido a cada bolus.
+[ ] 4. CRISTALOIDE BALANCEADO — pelo menos 30 mL/kg EV nas primeiras 3 h, se hipotensão
+       induzida por sepse ou lactato ≥4 mmol/L. A recomendação foi mantida na SSC 2026.
+       O volume necessário varia muito entre pacientes: reavaliar com frequência para não
+       sub-ressuscitar nem hiper-ressuscitar. Individualizar em IC, DRC dialítica e cirrose.
 [ ] 5. VASOPRESSOR se PAM <65 mmHg após (ou durante) a reposição: NORADRENALINA — pode ser iniciada
        em acesso periférico calibroso enquanto se obtém o central.
 [ ] 6. Controle do FOCO em até 6–12 h: drenagem, retirada de cateter, desbridamento, cirurgia.
@@ -2411,7 +2438,10 @@ REAVALIAÇÃO CONTINUADA
 • Hemotransfusão se Hb <7 g/dL (<8 se isquemia miocárdica).
 • Ventilação protetora se SDRA: Vc 6 mL/kg de peso predito, P plateau <30 cmH2O, driving pressure <15.
 • Glicemia alvo 140–180 mg/dL. Profilaxia de TEV e de LAMG. Nutrição enteral precoce.
-• Reavaliar espectro do ATB em 48–72 h — DESCALONAR e definir duração.`
+• Reavaliar espectro do ATB em 48–72 h — DESCALONAR e definir duração.
+
+Referência: Surviving Sepsis Campaign — International Guidelines for Management of Sepsis
+and Septic Shock, 2026.`
   },
   {
     grupo: "Pacotes de conduta",
@@ -2463,80 +2493,138 @@ TSH, eletrólitos (K, Mg), hemograma, função renal, troponina se dor, ecocardi
   },
   {
     grupo: "Pacotes de conduta",
-    nome: "Crise hipertensiva — emergência x urgência",
-    texto: `CONDUTA — CRISE HIPERTENSIVA
+    nome: "Crise hipertensiva — elevação importante da PA x emergência",
+    texto: `CONDUTA — ELEVAÇÃO IMPORTANTE DA PA (SBC 2025)
 
-DEFINIR: HÁ LESÃO AGUDA DE ÓRGÃO-ALVO?
-Procurar ativamente: dor torácica (SCA/dissecção), dispneia (EAP), déficit neurológico (AVC), cefaleia com
-alteração visual ou confusão (encefalopatia), oligúria/elevação de creatinina, hematúria, papiledema,
-eclâmpsia/pré-eclâmpsia grave.
+NOTA DE TERMINOLOGIA
+A Diretriz Brasileira de Hipertensão Arterial 2025 RETIROU o termo «urgência hipertensiva».
+PA muito elevada sem lesão aguda de órgão-alvo passou a ser chamada de
+«elevação importante da PA sem lesão progressiva de órgão-alvo» — e não é emergência.
 
-EMERGÊNCIA HIPERTENSIVA (COM LESÃO DE ÓRGÃO-ALVO) — TRATAMENTO EV, EM UNIDADE MONITORIZADA
-Meta geral: reduzir a PAM em ATÉ 25% na 1ª hora, depois para ~160/100 em 2–6 h e normalizar em 24–48 h.
+A PERGUNTA QUE DEFINE TUDO: HÁ LESÃO AGUDA DE ÓRGÃO-ALVO?
 
-EXCEÇÕES à redução gradual:
-  • DISSECÇÃO DE AORTA: PAS <120 mmHg e FC <60 bpm em 20 min. Betabloqueador EV PRIMEIRO (esmolol/metoprolol),
-    só depois vasodilatador (nitroprussiato) — para evitar taquicardia reflexa e aumento do dP/dt.
-  • AVC ISQUÊMICO: só tratar se PA >220/120 (ou >185/110 se candidato a trombólise). Redução de 15% em 24 h.
-  • AVC HEMORRÁGICO: PAS alvo 130–140 mmHg.
-  • ECLÂMPSIA: hidralazina ou labetalol + sulfato de magnésio.
+Procurar ativamente:
+Dor torácica → SCA ou dissecção de aorta.
+Dispneia → edema agudo de pulmão.
+Déficit neurológico → AVC.
+Cefaleia com alteração visual ou confusão → encefalopatia hipertensiva.
+Oligúria, elevação de creatinina ou hematúria → lesão renal aguda.
+Papiledema à fundoscopia.
+Gestante com PA elevada → pré-eclâmpsia grave ou eclâmpsia.
 
-FÁRMACOS EV
-  • Nitroprussiato 0,3–10 mcg/kg/min (fotossensível; risco de cianeto)
-  • Nitroglicerina 5–200 mcg/min (preferida se SCA ou EAP)
-  • Metoprolol 5 mg EV lento, repetir; esmolol 0,5 mg/kg bolus + 50–300 mcg/kg/min
-  • Hidralazina 5–10 mg EV a cada 20–30 min (gestação)
+EMERGÊNCIA HIPERTENSIVA — COM LESÃO AGUDA E PROGRESSIVA DE ÓRGÃO-ALVO
 
-URGÊNCIA HIPERTENSIVA (PA MUITO ELEVADA SEM LESÃO AGUDA DE ÓRGÃO-ALVO)
-• Repouso em ambiente calmo por 30 min e reaferir — boa parte normaliza.
-• Tratar dor, ansiedade, retenção urinária.
-• Redução ORAL e gradual em 24–48 h. NÃO usar nifedipino sublingual (risco de isquemia por queda abrupta).
-• Reintroduzir/ajustar a medicação de uso habitual; investigar má adesão.
-• Alta com reavaliação ambulatorial precoce (dias), não internação.
+Internação em unidade de terapia intensiva, monitorização e anti-hipertensivo endovenoso.
+Meta geral: reduzir a PAM em ATÉ 25% na 1ª hora, depois para cerca de 160/100 mmHg
+em 2 a 6 h, e normalizar em 24 a 48 h.
 
-PSEUDOCRISE
-PA elevada secundária a dor, ansiedade, abstinência ou desconforto, sem lesão de órgão-alvo.
-→ Tratar a causa, não a pressão.`
+EXCEÇÕES À REDUÇÃO GRADUAL
+
+Dissecção de aorta: PAS <120 mmHg e FC <60 bpm em 20 minutos.
+  Betabloqueador EV PRIMEIRO (esmolol ou metoprolol), só depois o vasodilatador
+  (nitroprussiato) — evita taquicardia reflexa e aumento do dP/dt.
+AVC isquêmico: só tratar se PA >220/120 mmHg, ou >185/110 mmHg se candidato a trombólise.
+  Redução de 15% em 24 h.
+AVC hemorrágico: PAS alvo 130 a 140 mmHg.
+Eclâmpsia e pré-eclâmpsia grave: hidralazina ou labetalol, associados a sulfato de magnésio.
+
+FÁRMACOS ENDOVENOSOS
+
+Nitroprussiato de sódio 0,3 a 10 mcg/kg/min — fotossensível; risco de cianeto.
+Nitroglicerina 5 a 200 mcg/min — preferida se SCA ou edema agudo de pulmão.
+Metoprolol 5 mg EV lento, podendo repetir.
+Esmolol 0,5 mg/kg em bolus, seguido de 50 a 300 mcg/kg/min.
+Hidralazina 5 a 10 mg EV a cada 20 a 30 minutos — opção na gestação.
+
+ELEVAÇÃO IMPORTANTE DA PA SEM LESÃO PROGRESSIVA DE ÓRGÃO-ALVO
+
+Definição: PAS ≥180 e/ou PAD ≥110 mmHg, sem lesão aguda de órgão-alvo.
+NÃO é emergência e NÃO exige redução rápida nem internação.
+
+Repouso em ambiente calmo por 30 minutos e reaferir — boa parte normaliza.
+Tratar dor, ansiedade e retenção urinária.
+Iniciar ou ajustar o anti-hipertensivo de uso habitual, por via ORAL.
+Investigar má adesão, que é a causa mais frequente.
+NÃO usar nifedipino sublingual — risco de isquemia por queda abrupta da PA.
+Alta com REAVALIAÇÃO AMBULATORIAL EM ATÉ 7 DIAS.
+
+PSEUDOCRISE HIPERTENSIVA
+
+PA elevada secundária a dor, ansiedade, abstinência ou desconforto,
+sem lesão de órgão-alvo.
+Tratar a causa, não o número da pressão.
+
+Referência: Diretriz Brasileira de Hipertensão Arterial — SBC/SBN/SBH, 2025.`
   },
   {
     grupo: "Pacotes de conduta",
     nome: "TEP — estratificação e tratamento",
     texto: `CONDUTA — TROMBOEMBOLISMO PULMONAR
 
-1. PROBABILIDADE PRÉ-TESTE
-Wells: TVP clínica 3 | TEP mais provável que alternativa 3 | FC >100 = 1,5 | imobilização/cirurgia recente 1,5 |
-TEP/TVP prévio 1,5 | hemoptise 1 | câncer 1. → ≤4 improvável | >4 provável.
-• Improvável → D-dímero (ajustado pela idade se >50 anos: idade × 10 ng/mL). Negativo exclui.
-• Provável ou D-dímero positivo → angio-TC de tórax.
-• Instável demais para TC → ecocardiograma à beira-leito (disfunção de VD) autoriza tratamento empírico.
+PROBABILIDADE PRÉ-TESTE
 
-2. ESTRATIFICAÇÃO DE GRAVIDADE
-• ALTO RISCO (maciço): hipotensão (PAS <90 mmHg por >15 min), choque ou PCR.
-• RISCO INTERMEDIÁRIO: disfunção de VD (TC/eco) e/ou troponina elevada, sem hipotensão.
-    Alto-intermediário = ambos positivos. Baixo-intermediário = apenas um.
-• BAIXO RISCO: PESI classe I–II ou sPESI 0, sem disfunção de VD nem biomarcador alterado.
+Escore de Wells: TVP clínica 3 | TEP mais provável que alternativa 3 | FC >100 = 1,5 |
+imobilização ou cirurgia recente 1,5 | TEP/TVP prévio 1,5 | hemoptise 1 | câncer 1.
+→ ≤4 improvável | >4 provável.
 
-3. TRATAMENTO
-• ALTO RISCO → TROMBÓLISE sistêmica: alteplase 100 mg EV em 2 h (ou 0,6 mg/kg em 15 min se PCR iminente).
-  Se contraindicada ou falha → trombectomia (cateter ou cirúrgica), considerar ECMO. Anticoagular com HNF.
-• INTERMEDIÁRIO-ALTO → anticoagulação plena + MONITORIZAÇÃO em unidade fechada;
-  trombólise de resgate se deterioração hemodinâmica. Considerar dose reduzida/cateter em centros com experiência.
-• BAIXO RISCO / INTERMEDIÁRIO-BAIXO → anticoagulação plena. Baixo risco selecionado pode ser tratado ambulatorialmente.
+Improvável → D-dímero, ajustado pela idade se >50 anos (idade × 10 ng/mL). Negativo exclui.
+Provável, ou D-dímero positivo → angio-TC de tórax.
+Instável demais para a TC → ecocardiograma à beira-leito; disfunção de VD autoriza
+tratamento empírico.
 
-4. ANTICOAGULAÇÃO
-• Início: enoxaparina 1 mg/kg SC 12/12 h; ou HNF (preferida se instabilidade, obesidade extrema, ClCr <30
-  ou possibilidade de trombólise/procedimento).
-• DOAC: rivaroxabana 15 mg 12/12 h por 21 dias → 20 mg/dia; OU apixabana 10 mg 12/12 h por 7 dias → 5 mg 12/12 h.
-  Dabigatrana e edoxabana exigem 5 dias de parenteral antes.
-• Câncer ativo: DOAC ou HBPM (cuidado com DOAC em tumor GI/GU por sangramento).
-• SAF: varfarina (DOAC contraindicado).
-• Duração: 3 meses se fator provocador transitório e reversível; indefinida se não provocado com baixo risco
-  de sangramento, TEP recorrente, câncer ativo ou trombofilia de alto risco.
+CATEGORIAS CLÍNICAS AHA/ACC 2026
 
-5. SUPORTE
-O2 para SpO2 ≥94%. Cautela com volume (VD já sobrecarregado — no máximo 500 mL).
-Se hipotensão: noradrenalina (mantém pressão de perfusão coronariana do VD); dobutamina se baixo débito com VD dilatado.
-Investigar TVP com Doppler de MMII. Filtro de veia cava apenas se contraindicação absoluta à anticoagulação.`
+A diretriz conjunta AHA/ACC de 2026 substituiu o modelo alto / intermediário / baixo risco
+por cinco categorias clínicas, que consideram gravidade clínica, biomarcadores, imagem do VD,
+hemodinâmica e comprometimento respiratório — e não a carga anatômica do trombo.
+
+A — Subclínico: achado incidental, sem sintomas.
+B — Sintomático com baixa gravidade clínica.
+C — Sintomático com gravidade clínica elevada (PESI III–V, sPESI ≥1 ou Hestia ≥1),
+    com ou sem disfunção cardiopulmonar.
+D — Falência cardiopulmonar incipiente.
+E — Falência cardiopulmonar estabelecida, com hipotensão persistente.
+
+→ Categoria atual: ______
+
+TRATAMENTO POR CATEGORIA
+
+A e B → anticoagulação; manejo ambulatorial é razoável, desde que haja acesso imediato
+ao anticoagulante e seguimento estruturado.
+C → anticoagulação com internação e monitorização; reavaliar deterioração.
+D → anticoagulação, monitorização em unidade fechada e terapia de reperfusão de resgate
+se houver deterioração; discutir com equipe de resposta a TEP (PERT).
+E → reperfusão: trombólise sistêmica com alteplase 100 mg EV em 2 h
+(ou 0,6 mg/kg em 15 min se PCR iminente). Se contraindicada ou se houver falha,
+trombectomia por cateter ou cirúrgica; considerar ECMO.
+
+ANTICOAGULAÇÃO
+
+Início: enoxaparina 1 mg/kg SC de 12 em 12 horas.
+HNF preferida se instabilidade, obesidade extrema, ClCr <30 ou possibilidade de
+trombólise ou procedimento.
+Rivaroxabana 15 mg de 12 em 12 horas por 21 dias, depois 20 mg ao dia.
+Apixabana 10 mg de 12 em 12 horas por 7 dias, depois 5 mg de 12 em 12 horas.
+Dabigatrana e edoxabana exigem 5 dias de parenteral antes.
+Câncer ativo: DOAC ou HBPM — cautela com DOAC em tumor gastrointestinal ou geniturinário.
+Síndrome antifosfolípide: varfarina; DOAC contraindicado.
+
+DURAÇÃO
+3 meses se fator provocador transitório e reversível.
+Indefinida se não provocado com baixo risco de sangramento, TEP recorrente,
+câncer ativo ou trombofilia de alto risco.
+
+SUPORTE
+
+O2 para SpO2 ≥94%.
+Cautela com volume — o VD já está sobrecarregado; no máximo 500 mL.
+Hipotensão: noradrenalina, que mantém a pressão de perfusão coronariana do VD.
+Dobutamina se baixo débito com VD dilatado.
+Investigar TVP com Doppler de MMII.
+Filtro de veia cava apenas se contraindicação absoluta à anticoagulação.
+
+Referência: 2026 AHA/ACC/ACCP/ACEP/CHEST/SCAI/SHM/SIR/SVM/SVN Guideline for the Evaluation
+and Management of Acute Pulmonary Embolism in Adults.`
   },
   {
     grupo: "Hemodinâmica (Dante Pazzanese)",
