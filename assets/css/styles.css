@@ -207,6 +207,29 @@ select:focus, textarea:focus { outline: none; border-color: var(--blue); }
 .evol-search:focus { outline: none; border-color: var(--blue); }
 .evol-count { font-size: 11px; color: var(--muted); margin: 2px 4px 2px; }
 
+/* ---------- Evoluções: menu e editor acompanham a rolagem ----------
+   Escopo restrito a #view-evolucoes para não afetar Scores, MBE, Temas
+   e Protocolos, que reaproveitam as mesmas classes .evol-grid/.evol-menu. */
+#view-evolucoes .evol-grid { align-items: start; }
+#view-evolucoes .evol-menu {
+  position: sticky; top: var(--stick-top, 250px);
+  max-height: calc(100vh - var(--stick-top, 250px) - 20px);
+  overflow-y: auto; overscroll-behavior: contain; padding-right: 6px;
+}
+#view-evolucoes .evol-search { position: sticky; top: 0; z-index: 3; background: var(--card); }
+#view-evolucoes .evol-count  { position: sticky; top: 41px; z-index: 3; background: var(--bg); padding-bottom: 4px; }
+#view-evolucoes .evol-editor { position: sticky; top: var(--stick-top, 250px); }
+#view-evolucoes .evol-editor-head { position: sticky; top: 0; z-index: 2; background: var(--bg); }
+#view-evolucoes #evol-text {
+  height: calc(100vh - var(--stick-top, 250px) - 104px);
+  min-height: 300px; resize: vertical;
+}
+@media (max-width: 900px) {
+  #view-evolucoes .evol-menu, #view-evolucoes .evol-editor { position: static; max-height: none; overflow: visible; }
+  #view-evolucoes .evol-search, #view-evolucoes .evol-count, #view-evolucoes .evol-editor-head { position: static; }
+  #view-evolucoes #evol-text { height: auto; }
+}
+
 /* ---------- Ensaios pivotais ---------- */
 .ens-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 22px; }
 .ens-controls input { flex: 1; min-width: 240px; padding: 12px 14px; font-size: 14.5px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; color: var(--text); }
