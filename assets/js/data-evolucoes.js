@@ -1,45 +1,53 @@
 // Modelos de evolução e receitas editáveis. Use [colchetes] ou ___ para campos a preencher.
-// Atualizado em 04/08/2026 — modelos por setor, banco de exame físico alterado,
-// pacotes de conduta e receitas prontas por ambulatório.
-// Backup da versão original: assets/js/data-evolucoes.ORIGINAL-2026-08-03.js.bak
+// Formatação padrão: título de bloco em MAIÚSCULAS e uma linha em branco entre blocos,
+// entre sistemas do exame físico e entre itens de conduta com mais de uma linha.
+// Atualizado em 04/08/2026. Backup: assets/js/data-evolucoes.ORIGINAL-2026-08-03.js.bak
 window.EVOLUCOES = [
   {
     grupo: "Plantão — ROP Crônicos",
     nome: "Evolução diária — paciente em VM/TQT + DVA + sedação",
     texto: `EVOLUÇÃO — ROP CRÔNICOS — D__ de internação / __º DPO de ____________
 
-# IDENTIFICAÇÃO E SÍNTESE
+IDENTIFICAÇÃO E SÍNTESE
 Paciente ___ anos, sexo ___, internado em __/__/____ por ____________.
 Antecedentes: HAS / DM2 / DAC / DRC / TBG / ____________.
 Cirurgia: ____________ em __/__/____ (CEC ___ min, pinçamento ___ min).
 Intercorrência que motivou permanência: ____________.
 
-# SUBJETIVO / INTERCORRÊNCIAS DAS ÚLTIMAS 24 H
+SUBJETIVO / INTERCORRÊNCIAS DAS ÚLTIMAS 24 H
 Sem intercorrências no plantão. Sem febre, sem sangramento, sem arritmia sustentada.
 Diurese mantida. Dieta enteral em curso sem resíduo aumentado.
 Comunicação com a família realizada em __/__/____ .
 
-# EXAME FÍSICO
+EXAME FÍSICO
+
 GERAL: REG, corado, hidratado, anictérico, acianótico, afebril. Perfusão periférica <3 s.
+
 NEURO: Sedado, RASS ___ (alvo ___), com fentanil + midazolam em BIC. Pupilas isocóricas fotorreagentes.
   [ou] Desperto, contactuante, orientado, sem déficit focal, CAM-ICU negativo.
+
 RESP: Em VM por TOT/TQT, modo PCV/VCV, FiO2 ___%, PEEP ___, Vc ___ mL (___ mL/kg PI), FR ___, P plateau ___, driving pressure ___, complacência ___.
   MV presente bilateralmente, sem RA. Secreção traqueal em pequena quantidade, aspecto claro.
   SpO2 ___% . Gasometria (___h): pH ___ / pCO2 ___ / pO2 ___ / HCO3 ___ / BE ___ / Lac ___ / P/F ___.
+
 CV: RCR 2T, BNF, sem sopros. PA ___/___ (PAM ___), FC ___ bpm. Ritmo em RS ao monitor.
   Sem turgência jugular a 45°. Extremidades quentes e bem perfundidas.
   Noradrenalina ___ mcg/kg/min (↓/↑/estável em relação a ontem). PVC ___ mmHg.
+
 ABD: Plano, flácido, RHA+, indolor, sem visceromegalias. SNE/SNG em posição, resíduo ___ mL.
+
 FERIDA OPERATÓRIA: Esternotomia com bordas coaptadas, seca, sem sinais flogísticos, sem instabilidade esternal.
   Safenectomia em MID/MIE limpa. Drenos: ____________ com débito ___ mL/24 h, aspecto ___.
+
 EXTREMIDADES: Sem edema. Panturrilhas livres. Pulsos periféricos presentes e simétricos.
+
 DISPOSITIVOS: AVC em ____________ (D__), PAI em ____________ (D__), SVD (D__), TQT (D__), dreno ____________ (D__).
   Pele íntegra; sem LPP. Escala de Braden ___.
 
-# BALANÇO E DÉBITOS (24 h)
+BALANÇO E DÉBITOS (24 H)
 BH: ___ mL (acumulado ___ mL). Diurese ___ mL (___ mL/kg/h). Débito de dreno ___ mL.
 
-# EXAMES (__/__/____)
+EXAMES (__/__/____)
 Hb ___ / Ht ___ / Leuco ___ (bast ___ ) / Plaq ___
 Ur ___ / Cr ___ (basal ___) / Na ___ / K ___ / Mg ___ / Ca iônico ___ / P ___
 PCR ___ / Lactato ___ / Procalcitonina ___
@@ -47,7 +55,7 @@ TGO ___ / TGP ___ / BT ___ / Alb ___ / INR ___ / TTPa ___
 Glicemias: ___ – ___ – ___ – ___
 Culturas: ____________
 
-# AVALIAÇÃO / PROBLEMAS ATIVOS
+AVALIAÇÃO / PROBLEMAS ATIVOS
 1. ____________ — [estável / em melhora / em piora]
 2. ____________
 3. ____________
@@ -57,7 +65,7 @@ Culturas: ____________
   Dias em inotrópico: ___ | Tentativas de desmame: ___ | Motivo da falha: ____________
   → Trajetória: [melhorando / estável / deteriorando] → ver item 9 da conduta.
 
-# CONDUTA
+CONDUTA
 1. Mantenho suporte ventilatório atual; teste de respiração espontânea se ____________.
 2. Desmame de noradrenalina conforme PAM >65 mmHg.
 3. Ajuste de sedação para RASS alvo ___; despertar diário programado.
@@ -76,25 +84,32 @@ Assinatura / CRM`
     nome: "Pós-operatório imediato de cirurgia cardíaca (POI–PO2)",
     texto: `EVOLUÇÃO — ROP — POI de ____________ (CEC ___ min / pinçamento ___ min)
 
-# SÍNTESE
+SÍNTESE
 Paciente ___ anos, submetido a ____________ em __/__/____ .
 Achado intraoperatório: ____________ . Intercorrência intraoperatória: nenhuma / ____________ .
 Recebeu ___ CH, ___ PFC, ___ plaquetas, ___ crio no intraoperatório.
 Chegou à unidade às ___h, sob VM, em uso de ____________ .
 
-# EXAME FÍSICO
+EXAME FÍSICO
+
 GERAL: BEG/REG, hipocorado +/4+, perfusão ___ s, extremidades aquecidas/frias, Tax ___ °C.
+
 NEURO: Sedado RASS ___ / em despertar. Pupilas isofotorreagentes. Sem déficit motor evidente à mobilização.
+
 RESP: VM em PCV, FiO2 ___%, PEEP ___, Vc ___ mL, FR ___. MV+ bilat, sem RA. SpO2 ___%.
+
 CV: Ritmo ___ ao monitor (RS / FA / ritmo de MP epicárdico DDD ___ bpm). PA ___/___ (PAM ___), PVC ___ mmHg.
   BNF, sem sopros novos, sem atrito pericárdico. Sem pulso paradoxal.
   DVA: noradrenalina ___ mcg/kg/min, dobutamina ___ mcg/kg/min, milrinona ___ mcg/kg/min.
   Fios de MP epicárdico presentes e testados (limiar ___ mA).
+
 DRENOS: Mediastinal ___ mL/h; pleural E/D ___ mL/h. Aspecto serossanguinolento, sem coágulos.
+
 ABD: Plano, flácido, RHA presentes, indolor.
+
 EXTREMIDADES: Pulsos ___ . Safenectomia ___ .
 
-# CONTROLES
+CONTROLES
 BH desde a chegada: ___ mL. Diurese ___ mL/h.
 Gaso arterial: pH ___ / pCO2 ___ / pO2 ___ / HCO3 ___ / BE ___ / Lac ___ / SvcO2 ___%.
 Hb ___ / Plaq ___ / INR ___ / TTPa ___ / Fibrinogênio ___ .
@@ -102,20 +117,30 @@ K ___ / Mg ___ / Ca iônico ___ / Glicemia ___ .
 ECG: ____________ . RX de tórax: ____________ .
 Eco à beira-leito: FEVE ___%, sem derrame pericárdico significativo, VD ____________ .
 
-# AVALIAÇÃO
+AVALIAÇÃO
 POI de ____________ , [hemodinamicamente estável em desmame de DVA / em baixo débito / com sangramento em investigação].
 
-# CONDUTA
+CONDUTA
+
 1. Metas: PAM 65–80 mmHg, IC >2,2 L/min/m², Lac em queda, diurese >0,5 mL/kg/h, SvcO2 >65%.
+
 2. Sangramento: manter Hb >7–8 g/dL (>8 se isquemia ativa), Plaq >50.000 (>100.000 se sangrando), INR <1,5, fibrinogênio >150–200 mg/dL.
    Reavaliar reabordagem cirúrgica se débito >200 mL/h por 2 h, >300 mL em 1 h ou queda abrupta com instabilidade (suspeita de tamponamento).
+
 3. Manter K 4,0–5,0 mEq/L e Mg >2,0 mg/dL — reposição agressiva para profilaxia de FA pós-operatória.
+
 4. Betabloqueador VO assim que estável e sem DVA/broncoespasmo (reduz FA pós-op).
+
 5. Analgesia: dipirona 1 g EV 6/6 h + morfina resgate; evitar AINE.
+
 6. Extubação quando: desperto, hemodinâmica estável, sangramento controlado, normotermia, gasometria adequada, sem DVA em dose alta.
+
 7. Profilaxia ATB cirúrgica: ____________ (suspender em ≤48 h).
+
 8. AAS 100 mg/dia a partir de ___ h de pós-operatório (pós-CRM). Anticoagulação conforme prótese: ____________ .
+
 9. Controle glicêmico alvo 140–180 mg/dL com insulina EV/SC.
+
 10. Mobilização e fisioterapia respiratória a partir do POI/PO1.
 
 Assinatura / CRM`
@@ -128,6 +153,7 @@ Assinatura / CRM`
 Paciente ___ anos, ____________ , em programa de desmame ventilatório e reabilitação.
 
 SUBJETIVO: Plantão sem intercorrências. Afebril. Tolerou ___ h de nebulização em TQT/tubo T.
+
 EF: BEG, corado, hidratado, afebril, eupneico em ____________ .
   NEURO: Desperto, contactuante, obedece comandos, RASS 0, sem déficits.
   RESP: MV+ bilat sem RA; secreção traqueal escassa e clara. SpO2 ___% com FiO2 ___%.
@@ -136,6 +162,7 @@ EF: BEG, corado, hidratado, afebril, eupneico em ____________ .
   EXTR: Sem edemas; força muscular grau ___ globalmente (MRC ___/60). Sem LPP.
   DISPOSITIVOS: TQT nº ___ (D__), SNE (D__), AVP. AVC e SVD já retirados em __/__ .
 BH 24 h: ___ mL. Diurese ___ mL.
+
 EXAMES: sem novos.
 
 AVALIAÇÃO: Paciente em desmame ventilatório progressivo, sem sinais de infecção ativa, com fraqueza adquirida na UTI.
@@ -171,40 +198,47 @@ Metas de cuidado: pleno suporte / ordem de não reanimar / cuidados paliativos.`
     nome: "Evolução diária — UTI clínica",
     texto: `EVOLUÇÃO — UTI PS — D__ de internação
 
-# SÍNTESE
+SÍNTESE
 Paciente ___ anos, admitido em __/__/____ por ____________ .
 Antecedentes: ____________ . Medicações de uso prévio: ____________ .
 
-# SUBJETIVO (24 h)
+SUBJETIVO (24 H)
 Plantão [sem intercorrências / com ____________ ]. Refere ____________ .
 Afebril. Sem dor torácica, sem dispneia em repouso, sem palpitação, sem síncope.
 
-# EXAME FÍSICO
+EXAME FÍSICO
+
 GERAL: BEG/REG, LOTE, corado, hidratado, anictérico, acianótico, afebril (Tax ___ °C). Perfusão periférica <3 s.
+
 NEURO: Glasgow 15 (AO4 RV5 RM6) / RASS ___ . Pupilas isocóricas e fotorreagentes. Sem déficit focal. CAM-ICU negativo.
+
 RESP: Eupneico em ar ambiente / O2 ___ L/min em cateter nasal / VNI / VM (parâmetros: ____________ ).
   Tórax simétrico, expansibilidade preservada, FTV normal, som claro pulmonar à percussão.
   MV presente e simétrico bilateralmente, sem ruídos adventícios. FR ___ irpm. SpO2 ___%.
+
 CV: Ictus não visível nem palpável, no 5º EIE na LHC. RCR em 2T, BNF, sem sopros, sem B3/B4, sem atrito.
   PA ___/___ mmHg (PAM ___), FC ___ bpm. Pulsos periféricos amplos e simétricos.
   Sem turgência jugular patológica a 45°. Sem refluxo hepatojugular.
+
 ABD: Plano, RHA presentes e normoativos, flácido, indolor, sem massas ou visceromegalias. Traube livre.
+
 EXTREMIDADES: Sem edema, panturrilhas livres e indolores, sem sinais de TVP. Pulsos pediosos e tibiais posteriores presentes.
+
 DISPOSITIVOS: ____________ .
 
-# CONTROLES 24 H
+CONTROLES 24 H
 PA média ___ | FC ___ | Tax máx ___ | Diurese ___ mL (___ mL/kg/h) | BH ___ mL | Glicemias ___ .
 
-# EXAMES (__/__)
+EXAMES (__/__)
 Hb ___ Ht ___ Leuco ___ Plaq ___ | Ur ___ Cr ___ | Na ___ K ___ Mg ___ | PCR ___ Lac ___
 Trop ___ → ___ | BNP/NT-proBNP ___ | Gaso: pH ___ pCO2 ___ pO2 ___ HCO3 ___ BE ___
 ECG: ____________ | RX tórax: ____________ | Eco: ____________
 
-# AVALIAÇÃO / PROBLEMAS
+AVALIAÇÃO / PROBLEMAS
 1. ____________
 2. ____________
 
-# CONDUTA
+CONDUTA
 1. ____________
 2. Mantenho ____________ .
 3. Profilaxia de TEV: ____________ . Profilaxia de LAMG: ____________ .
@@ -218,11 +252,11 @@ Assinatura / CRM`
     nome: "IC descompensada grave / choque cardiogênico",
     texto: `EVOLUÇÃO — UTI PS — IC DESCOMPENSADA / CHOQUE CARDIOGÊNICO — D__
 
-# SÍNTESE
+SÍNTESE
 Paciente ___ anos com IC ____________ (FEVE ___% , etiologia ____________ ), NYHA prévia ___ ,
 admitido por descompensação com fator desencadeante: [má adesão / infecção / SCA / FA de alta resposta / anemia / disfunção renal / transgressão salina / ____________ ].
 
-# PERFIL HEMODINÂMICO
+PERFIL HEMODINÂMICO
 Congestão: [presente = úmido / ausente = seco]. Perfusão: [adequada = quente / inadequada = frio].
 → STEVENSON: PERFIL ____ (A seco-quente / B úmido-quente / C úmido-frio / L seco-frio).
 → SCAI de choque: [A risco / B início / C clássico / D deteriorando / E extremo].
@@ -231,48 +265,63 @@ Congestão: [presente = úmido / ausente = seco]. Perfusão: [adequada = quente 
    3 estável mas dependente de inotrópico, falha de desmame (semanas) | 4 sintomas em repouso sem inotrópico |
    5 restrito ao domicílio | 6 limitação após pequenos esforços | 7 NYHA III avançada, estável.
 
-# EXAME FÍSICO DIRIGIDO
+EXAME FÍSICO DIRIGIDO
+
 GERAL: REG, dispneico, ortopneico, sudoreico. Perfusão periférica ___ s. Extremidades [quentes/frias].
+
 CV: Ictus desviado para ___ , difuso. RCR/irregular em 2T com B3 audível em foco mitral. Sopro ____________ .
   PA ___/___ (PAM ___), pressão de pulso proporcional ___% (<25% sugere baixo débito). FC ___ .
   Turgência jugular ___ cm a 45° / a 90°. Refluxo hepatojugular presente.
+
 RESP: MV+ com estertores crepitantes em ___ terços bilateralmente. FR ___ , SpO2 ___% em ____________ .
+
 ABD: Fígado a ___ cm do RCD, doloroso à palpação. Ascite [ausente/presente].
+
 EXTR: Edema de MMII ___/4+, frio, cacifo ___ .
 
-# CONTROLES
+CONTROLES
 Peso hoje ___ kg (ontem ___ kg; admissão ___ kg). BH 24 h ___ mL (acumulado ___ mL). Diurese ___ mL.
 Lactato ___ → ___ . SvcO2 ___% . Cr ___ (basal ___). Na ___ . NT-proBNP ___ .
 
-# DROGAS EM CURSO
+DROGAS EM CURSO
 Furosemida ___ mg EV ___/___ h ou ___ mg/h em BIC. Dobutamina ___ mcg/kg/min. Milrinona ___ mcg/kg/min.
 Noradrenalina ___ mcg/kg/min. Nitroglicerina ___ mcg/min. Nitroprussiato ___ mcg/kg/min.
 
-# AVALIAÇÃO
+AVALIAÇÃO
 IC ____________ descompensada, Stevenson ____ / SCAI ____ / INTERMACS ____ , [respondendo / refratária] à terapia atual.
 Disfunção renal associada: [ausente / síndrome cardiorrenal tipo ___ ].
 Trajetória em relação a ontem: [melhorando / estável / deteriorando] — INTERMACS de ontem ____ .
 
-# CONDUTA
+CONDUTA
+
 1. Diurético de alça EV: dose inicial = 1–2,5× a dose oral diária em bolus EV (ou 20–40 mg se virgem de alça).
    Meta: diurese >100–150 mL/h nas primeiras 6 h e BH negativo de 1–2 L/dia. Reavaliar em 2–6 h;
    se resposta insuficiente (Na urinário <50–70 mEq/L em 2 h ou diurese <100 mL/h), DOBRAR a dose.
+
 2. Se congestão refratária: associar tiazídico (hidroclorotiazida 25–50 mg VO ou clortalidona) 30 min antes da alça,
    ou acetazolamida 500 mg EV/dia (ADVOR), ou considerar UF/diálise se refratariedade + disfunção renal.
+
 3. Vasodilatador se PAS >110 mmHg e congestão pulmonar importante: nitroglicerina EV titulada.
+
 4. Inotrópico APENAS se hipoperfusão (perfil C/L): dobutamina 2,5–10 mcg/kg/min ou milrinona 0,25–0,5 mcg/kg/min
    (preferir milrinona se em uso de betabloqueador; ajustar em DRC).
+
 5. Vasopressor se PAM <65 mmHg apesar de inotrópico: noradrenalina (1ª escolha no choque cardiogênico).
+
 6. Manter/otimizar TMO conforme tolerância — NÃO suspender betabloqueador rotineiramente; reduzir 50% se baixo débito
    e suspender apenas se choque/inotrópico. Reintroduzir antes da alta.
+
 7. Monitorar diariamente: peso, BH, Cr/Na/K, sinais de congestão. Aumento de Cr isolado com melhora da congestão não obriga suspender diurético.
+
 8. Investigar/tratar o fator descompensante: ____________ .
+
 9. Suporte mecânico e IC avançada — decidir pelo INTERMACS:
    • INTERMACS 1 → suporte circulatório mecânico em HORAS (BIA / Impella / ECMO-VA). Acionar equipe AGORA.
    • INTERMACS 2 → decisão em DIAS: DAV como ponte para transplante/decisão, ou transplante em prioridade.
    • INTERMACS 3 → decisão em SEMANAS: listar para transplante ou DAV eletivo; documentar as falhas de desmame.
    • INTERMACS 4–7 → otimizar TMO, avaliar dispositivos (CDI/TRC) e encaminhar ao ambulatório de IC avançada.
    Registrar hoje: perfil ____ , modificador ____ , equipe de IC avançada [acionada em __/__ / não acionada].
+
 10. Profilaxia de TEV. Restrição hídrica ___ mL/dia e sódio <2 g/dia (individualizar).
 
 Assinatura / CRM`
@@ -282,38 +331,54 @@ Assinatura / CRM`
     nome: "Sepse / choque séptico",
     texto: `EVOLUÇÃO — UTI PS — SEPSE / CHOQUE SÉPTICO — D__ (D__ de ATB)
 
-# SÍNTESE
+SÍNTESE
 Paciente ___ anos, admitido por ____________ . Foco presumido: [pulmonar / urinário / abdominal / partes moles / cateter / endocardite / indeterminado].
 qSOFA ___ | SOFA ___ | Tempo porta–ATB: ___ min.
 
-# EXAME FÍSICO
+EXAME FÍSICO
+
 GERAL: REG/MEG, [febril Tax ___ °C / hipotérmico], sudoreico, perfusão ___ s, pele [quente/moteada, livedo].
+
 NEURO: Glasgow ___ / RASS ___ , [lúcido / torporoso / agitado]. CAM-ICU [neg/pos].
+
 RESP: FR ___ , SpO2 ___% em ____________ . MV+ [com estertores em ___ / sem RA].
+
 CV: Taquicárdico, RCR 2T BNF. PA ___/___ (PAM ___). Noradrenalina ___ mcg/kg/min.
+
 ABD: ____________ .
+
 FOCO: ____________ (ferida, cateter, partes moles, etc.).
+
 DISPOSITIVOS: AVC ____________ (D__) — sítio sem sinais flogísticos; SVD (D__) — reavaliar necessidade.
 
-# CONTROLES
+CONTROLES
 Lactato ___ → ___ → ___ (clearance ___%). Diurese ___ mL/kg/h. BH 24 h ___ mL.
 Leuco ___ (bast ___), PCR ___ , procalcitonina ___ → ___ .
 Culturas colhidas em __/__ : hemocultura ___ | urocultura ___ | aspirado traqueal ___ | outras ___ .
 
-# AVALIAÇÃO
+AVALIAÇÃO
 Sepse/choque séptico de foco ____________ , [em resposta / sem resposta] à terapia. Disfunções orgânicas: ____________ .
 
-# CONDUTA
+CONDUTA
+
 1. Antibioticoterapia: ____________ — D__/__ . Reavaliar espectro com culturas (descalonar em 48–72 h).
+
 2. Controle do foco: ____________ (drenagem / retirada de cateter / cirurgia) — realizado/programado para __/__ .
+
 3. Ressuscitação volêmica: cristaloide balanceado 30 mL/kg nas primeiras 3 h (individualizar se IC/DRC),
    guiada por resposta a fluidos (elevação passiva de pernas, VTI, variação de PP), não por PVC isolada.
+
 4. Vasopressor: noradrenalina para PAM ≥65 mmHg. Se dose alta, associar vasopressina 0,03 U/min.
    Considerar hidrocortisona 200 mg/dia (50 mg 6/6 h EV) se choque refratário.
+
 5. Reavaliar lactato a cada 2–4 h até normalização.
+
 6. Hemotransfusão se Hb <7 g/dL (<8 se isquemia miocárdica ativa).
+
 7. Ventilação protetora se SDRA: Vc 6 mL/kg PI, P plateau <30, driving pressure <15.
+
 8. Controle glicêmico 140–180 mg/dL. Profilaxia de TEV e de LAMG.
+
 9. Suspender ATB e dispositivos desnecessários; revisar diariamente.
 
 Assinatura / CRM`
@@ -323,29 +388,40 @@ Assinatura / CRM`
     nome: "Pós-PCR / cuidados pós-ROSC",
     texto: `EVOLUÇÃO — UTI PS — PÓS-PCR (ROSC em __/__/____ às ___h) — D__
 
-# EVENTO
+EVENTO
 PCR [intra/extra-hospitalar], ritmo inicial [FV/TVSP / AESP / assistolia], testemunhada [sim/não], RCP por leigo [sim/não].
 Tempo de no-flow ___ min; low-flow ___ min. Adrenalina ___ mg. Desfibrilações ___ .
 Causa presumida: [SCA / arritmia / TEP / hipóxia / distúrbio hidroeletrolítico / hipovolemia / tamponamento / outros].
 
-# EXAME
+EXAME
+
 NEURO: Glasgow ___ / RASS ___ . Pupilas ___ mm, fotorreagentes [sim/não]. Reflexo corneopalpebral ___ , tosse ___ ,
   reflexo oculocefálico ___ . Mioclonias [ausentes/presentes]. Sob sedação com ____________ .
+
 RESP: VM, FiO2 ___%, PEEP ___ , Vc ___ , FR ___ . Gaso: pH ___ pCO2 ___ pO2 ___ Lac ___ .
+
 CV: Ritmo ___ ao monitor. PA ___/___ (PAM ___). Noradrenalina ___ mcg/kg/min. FEVE ao eco ___% .
 Tax ___ °C (controle direcionado de temperatura em curso: alvo ___ °C).
 
-# CONDUTA
+CONDUTA
+
 1. Alvo de PAM ≥65 mmHg (considerar 80–100 se hipertenso crônico) — noradrenalina titulada.
+
 2. Alvo de oxigenação: SpO2 92–98% — EVITAR hiperóxia. Alvo de PaCO2 35–45 mmHg — evitar hipo e hipercapnia.
+
 3. Controle direcionado de temperatura: evitar ativamente febre (manter <37,5 °C) por ≥72 h. Sedação/analgesia adequadas.
+
 4. ECG imediato: se supra de ST → CATE de urgência. Se sem supra e causa cardíaca provável → coronariografia
    conforme instabilidade (não obrigatoriamente imediata em pacientes sem supra).
+
 5. Investigação etiológica: ECG seriado, troponina, eletrólitos (K, Mg, Ca), gasometria, ecocardiograma,
    angio-TC de tórax se suspeita de TEP, TC de crânio se suspeita neurológica.
+
 6. Prognóstico neurológico: NÃO prognosticar antes de 72 h do ROSC e sem sedação residual. Avaliação multimodal
    (exame neurológico, NSE, EEG, potenciais evocados somatossensitivos, TC/RM).
+
 7. Profilaxia de convulsão apenas se documentada; EEG se mioclonias ou suspeita de status.
+
 8. Comunicação diária e explícita com a família sobre incerteza prognóstica.
 
 Assinatura / CRM`
@@ -355,14 +431,14 @@ Assinatura / CRM`
     nome: "Nota de admissão em observação",
     texto: `ADMISSÃO — OBS __ — __/__/____ ___h
 
-# IDENTIFICAÇÃO
+IDENTIFICAÇÃO
 ___ anos, sexo ___, natural de ____________ , procedente de ____________ , ____________ (profissão).
 Acompanhante/informante: ____________ (confiabilidade ___).
 
-# QUEIXA PRINCIPAL
+QUEIXA PRINCIPAL
 «____________» (sic) há ___ .
 
-# HISTÓRIA DA DOENÇA ATUAL
+HISTÓRIA DA DOENÇA ATUAL
 Paciente previamente ____________ , iniciou há ___ quadro de ____________ .
 Caracterização do sintoma: início [súbito/gradual], localização ____________ , irradiação ____________ ,
 qualidade ____________ , intensidade ___/10, duração ____________ , frequência ____________ ,
@@ -370,7 +446,7 @@ fatores de melhora ____________ , fatores de piora ____________ , sintomas assoc
 Procurou atendimento prévio em __/__ , onde realizou ____________ e recebeu ____________ .
 Nega febre, nega perda ponderal, nega sangramentos.
 
-# ANTECEDENTES PESSOAIS
+ANTECEDENTES PESSOAIS
 Patológicos: HAS (desde ___ ) / DM2 (desde ___ , última HbA1c ___ ) / DLP / DAC (IAM em ___ , ICP em ___ com stent em ___ , CRM em ___ ) / IC (FEVE ___% em __/__ ) / FA / DRC (Cr basal ___ , TFG ___ ) / AVC / DPOC / tireoidopatia / neoplasia.
 Cirúrgicos: ____________ .
 Alergias: ____________ .
@@ -379,36 +455,43 @@ Hábitos: tabagismo ___ maços/ano [ativo/cessado há ___]; etilismo ___________
 Antecedentes familiares: DAC precoce (H<55/M<65) ____________ ; morte súbita ____________ ; miocardiopatia ____________ .
 Social: mora com ____________ , ____________ andares de escada, independente para AVD [sim/não].
 
-# REVISÃO DE SISTEMAS
+REVISÃO DE SISTEMAS
 Cardiovascular: dor torácica ___ , dispneia (NYHA ___), ortopneia ___ , DPN ___ , edema ___ , palpitação ___ , síncope ___ , claudicação ___ .
 Respiratório: tosse ___ , expectoração ___ , hemoptise ___ , sibilância ___ .
 Digestório / Urinário / Neurológico / Osteoarticular: ____________ .
 
-# EXAME FÍSICO NA ADMISSÃO
+EXAME FÍSICO NA ADMISSÃO
 Sinais vitais: PA ___/___ mmHg (MSD) e ___/___ (MSE), FC ___ bpm, FR ___ irpm, Tax ___ °C, SpO2 ___% em ar ambiente, HGT ___ mg/dL. Peso ___ kg, altura ___ m, IMC ___ .
+
 GERAL: BEG, LOTE, corado, hidratado, anictérico, acianótico, afebril, eupneico. Perfusão periférica <3 s.
+
 CABEÇA E PESCOÇO: Mucosas úmidas e coradas. Tireoide não palpável. Sem linfonodomegalias. Carótidas sem sopros.
   Turgência jugular ausente a 45°.
+
 TÓRAX/RESP: Expansibilidade simétrica, FTV normal, som claro pulmonar. MV presente e simétrico, sem ruídos adventícios.
+
 CV: Ictus no 5º EIE na LHC, propulsivo/não propulsivo, ___ polpas digitais. RCR em 2 tempos, bulhas normofonéticas,
   sem sopros, sem B3 ou B4, sem atrito pericárdico. Pulsos radiais, femorais, poplíteos, tibiais posteriores e pediosos
   presentes, simétricos e de amplitude normal. Sem RHJ.
+
 ABD: Plano, RHA presentes, flácido, indolor, sem massas, fígado não palpável, Traube livre, sem ascite.
+
 EXTREMIDADES: Sem edema, sem sinais de TVP, panturrilhas livres, sem úlceras ou lesões tróficas.
+
 NEURO: Vigil, orientado, sem déficit motor ou sensitivo, pares cranianos sem alterações, sem sinais meníngeos.
 
-# EXAMES DA ADMISSÃO
+EXAMES DA ADMISSÃO
 ECG: ritmo ___ , FC ___ , eixo ___ , PR ___ ms, QRS ___ ms, QTc ___ ms. ____________ .
 Laboratório: Hb ___ Ht ___ Leuco ___ Plaq ___ | Ur ___ Cr ___ (TFG ___) | Na ___ K ___ | PCR ___ | Trop ___ | BNP/NT-proBNP ___ | Gaso ____________ | TGO/TGP ___ | INR ___ .
 RX de tórax: ____________ .
 POCUS/Eco: ____________ .
 
-# HIPÓTESES DIAGNÓSTICAS
+HIPÓTESES DIAGNÓSTICAS
 1. ____________
 2. ____________
 3. ____________
 
-# PLANO
+PLANO
 1. Interno em OBS __ para ____________ .
 2. Dieta ____________ . Hidratação ____________ .
 3. Prescrição: ____________ .
@@ -476,17 +559,24 @@ AVALIAÇÃO: IC ___ (FEVE ___%), etiologia ____________ , descompensada por ____
   Internações por IC nos últimos 12 meses: ___ → se ≥2, aplicar modificador FF e considerar IC avançada.
 
 CONDUTA:
+
 1. Furosemida ___ mg EV ___/___ h — [mantenho / dobro por resposta insuficiente / reduzo por euvolemia].
    Meta: BH negativo 1–2 L/dia até euvolemia; perda de 0,5–1,0 kg/dia.
+
 2. Restrição hídrica ___ mL/dia e sódio <2 g/dia. Pesagem diária em jejum, mesma balança.
+
 3. Otimização de TMO (4 pilares) — status atual:
    • iSGLT2: ____________  • ARNI/IECA/BRA: ____________
    • Betabloqueador: ____________  • ARM: ____________
    Próximo passo de titulação: ____________ .
+
 4. Controle de K (meta 4,0–5,0) e Mg (>2,0). Repor conforme necessidade.
+
 5. Investigar/corrigir: anemia e ferropenia (ferro EV se ferritina <100 ou 100–299 com IST <20%), disfunção tireoidiana, FA.
+
 6. Critérios para alta: euvolêmico ao exame, sem O2 suplementar, diurético VO por ≥24 h com função renal estável,
    TMO otimizada e prescrita, orientação de dieta/peso diário, consulta de retorno em 7–14 dias agendada.
+
 7. Profilaxia de TEV mantida.
 
 Assinatura / CRM`
@@ -569,8 +659,11 @@ Escores: Wells TEP ___ | Genebra ___ | CURB-65 ___ | (se aplicável)
 HIPÓTESE PRINCIPAL: ____________ . Diferenciais: ____________ .
 
 CONDUTA / DESTINO:
+
 1. O2 para alvo de SpO2 ≥94% (88–92% se retentor crônico de CO2).
+
 2. Tratamento inicial: ____________ .
+
 3. [ ] Alta com ____________ e retorno em ___ dias; sinais de alarme orientados (piora da dispneia, dispneia em repouso,
        dor torácica, febre persistente, edema progressivo, ganho de peso >2 kg em 3 dias).
    [ ] Internação em OBS/UTI por ____________ .
@@ -739,7 +832,7 @@ Assinatura / CRM`
     nome: "Pós-SCA / IAM — evolução em unidade coronariana",
     texto: `EVOLUÇÃO — PÓS-SCA — D__ de internação / D__ pós-[IAMCSST / IAMSSST / angina instável]
 
-# SÍNTESE
+SÍNTESE
 Paciente ___ anos, admitido em __/__/____ por ____________ .
 Diagnóstico: [IAMCSST de parede ____________ / IAMSSST / angina instável]. Killip na admissão: ___ .
 Pico de troponina: ___ . Tempo porta-balão / porta-agulha: ___ min. GRACE ___ .
@@ -749,47 +842,65 @@ Lesão residual / programação de novo tempo: ____________ .
 FEVE (__/__): ___% . Alteração segmentar: ____________ .
 Antecedentes: HAS / DM / DLP / TBG / DAC prévia / DRC / ____________ .
 
-# SUBJETIVO (24 h)
+SUBJETIVO (24 H)
 Assintomático. Nega dor torácica recorrente, dispneia, palpitação, síncope ou sangramento.
 Deambulando [no leito / no quarto / no corredor], tolerando dieta VO. Sono e diurese preservados.
 Sítio de punção [radial D/E / femoral D/E]: sem dor e sem sangramento.
 
-# EXAME FÍSICO
+EXAME FÍSICO
+
 GERAL: BEG, LOTE, corado, hidratado, acianótico, afebril, eupneico em ar ambiente. Perfusão <3 s.
+
 SSVV: PA ___/___ | FC ___ | FR ___ | Tax ___ °C | SpO2 ___% | diurese ___ mL/24 h | peso ___ kg
+
 ACV: RCR em 2T, BNF, sem sopros, sem B3, sem atrito pericárdico. Sem turgência jugular a 45°.
+
 AR: MV+ bilateralmente, sem estertores → Killip atual ___ .
+
 ABD: plano, flácido, RHA+, indolor.
+
 EXTR: sem edema; pulsos distais presentes e simétricos; panturrilhas livres.
+
 SÍTIO DE PUNÇÃO: sem hematoma, sem sopro, sem massa pulsátil, sem sinais de pseudoaneurisma.
 
-# EXAMES
+EXAMES
 ECG (__/__): ____________ (evolução do supra, ondas Q, inversão de T, arritmias).
 Troponina ___ → ___ → ___ | Hb ___ (admissão ___) | Plaq ___ | Cr ___ (admissão ___) | K ___ | Mg ___
 Glicemias ___ | HbA1c ___ | LDL ___ (colher nas primeiras 24 h) | TGO/TGP ___
 Ecocardiograma (__/__): FEVE ___% , ____________ . Trombo apical [ausente / presente].
 
-# AVALIAÇÃO — COMPLICAÇÕES A VIGIAR
+AVALIAÇÃO — COMPLICAÇÕES A VIGIAR
 Isquemia recorrente ___ | Arritmia (TV/FV, FA, BAV) ___ | IC / congestão ___ |
 Complicação mecânica — CIV, insuficiência mitral aguda, ruptura de parede livre (SOPRO NOVO!) ___ |
 Pericardite pós-IAM ___ | Trombo de VE ___ | Sangramento / queda de Hb ___ | Nefropatia por contraste ___
 → [ausentes / presentes: ____________ ]
 
-# CONDUTA
+CONDUTA
+
 1. DAPT: AAS 100 mg/dia + [ticagrelor 90 mg 12/12 h / clopidogrel 75 mg/dia / prasugrel 10 mg/dia] — D__ .
    Duração programada: ___ meses. Risco de sangramento: ____________ .
+
 2. Anticoagulação: ____________ (suspender após a ICP, salvo indicação: FA, trombo de VE, TEV).
+
 3. Betabloqueador: ____________ — titular conforme FC e PA.
+
 4. IECA/BRA: ____________ — indicado se FEVE ≤40%, HAS, DM ou DRC.
+
 5. ARM: ____________ — se FEVE ≤40% com IC ou DM, sem hipercalemia nem DRC grave.
+
 6. Estatina de alta intensidade: [atorvastatina 80 mg / rosuvastatina 20–40 mg]. Meta LDL <50 mg/dL (redução ≥50%).
+
 7. iSGLT2 se DM2 ou FEVE reduzida: ____________ .
+
 8. Controle glicêmico 140–180 mg/dL. Meta de PA <130/80 mmHg.
+
 9. Mobilização progressiva conforme protocolo. Reabilitação cardiovascular — encaminhado.
+
 10. Cessação do tabagismo: orientado / encaminhado a ____________ .
+
 11. Pendências: [eco / novo tempo de ICP / avaliação para CRM / Holter / teste funcional] ____________ .
 
-# CRITÉRIOS PARA ALTA
+CRITÉRIOS PARA ALTA
 Sem angina há ≥24 h · sem arritmia significativa · sem sinais de IC · deambulando sem sintomas ·
 terapia otimizada e prescrita · orientações de sinais de alarme dadas · retorno em 7–14 dias agendado ·
 reabilitação cardiovascular encaminhada.
@@ -832,16 +943,23 @@ CONCLUSÃO: Paciente de risco cardiovascular perioperatório [baixo / intermedi�
 [ ] Sugiro complementar com ____________ antes do procedimento.
 
 RECOMENDAÇÕES PERIOPERATÓRIAS:
+
 1. MANTER no perioperatório: betabloqueador (não iniciar de novo <1 dia antes), estatina, AAS se stent recente ou alto risco isquêmico.
+
 2. SUSPENDER: IECA/BRA na manhã da cirurgia (risco de hipotensão) — reintroduzir em 24–48 h se euvolêmico;
    iSGLT2 3–4 dias antes (risco de cetoacidose euglicêmica); diurético na manhã da cirurgia.
+
 3. Antiagregação: manter AAS; suspender P2Y12 conforme prazo mínimo de DAPT (ICP eletiva com stent farmacológico ≥1 mês;
    pós-SCA idealmente ≥6–12 meses). Discutir individualmente com a hemodinâmica se cirurgia inadiável.
+
 4. Anticoagulação: suspender varfarina 5 dias antes (alvo INR <1,5) — ponte com HBPM apenas se alto risco tromboembólico
    (prótese mecânica mitral, prótese aórtica de gaiola/disco, AVC <3 meses, CHA2DS2-VA muito alto).
    DOAC: suspender 24–48 h antes conforme risco de sangramento e ClCr.
+
 5. Controle glicêmico alvo 140–180 mg/dL. Manter normotermia e euvolemia.
+
 6. Profilaxia de TEV conforme risco cirúrgico e de sangramento.
+
 7. Reavaliação cardiológica no pós-operatório se: instabilidade hemodinâmica, dor torácica, arritmia nova ou elevação de troponina.
 
 Permaneço à disposição.
@@ -907,15 +1025,15 @@ Assinatura / CRM`
     nome: "Primeiro atendimento ambulatorial — completo",
     texto: `AMBULATÓRIO DE PRIMEIRO ATENDIMENTO — __/__/____
 
-# IDENTIFICAÇÃO
+IDENTIFICAÇÃO
 ___ anos, sexo ___ , cor/raça autodeclarada ____________ , ____________ (profissão), procedente de ____________ .
 Encaminhado por ____________ , motivo do encaminhamento: ____________ .
 Acompanhante/informante: ____________ . Convênio/SUS: ____________ .
 
-# QUEIXA E DURAÇÃO
+QUEIXA E DURAÇÃO
 «____________» (sic) há ___ .
 
-# HISTÓRIA DA DOENÇA ATUAL
+HISTÓRIA DA DOENÇA ATUAL
 ____________ .
 Sintomas cardiovasculares — caracterização:
   • Dor torácica: [ausente / presente] — tipo ___ , desencadeante ___ , alívio ___ , classe CCS ___ .
@@ -926,46 +1044,56 @@ Sintomas cardiovasculares — caracterização:
   • Edema: [ausente / presente] — ___ .
   • Claudicação intermitente: [ausente / presente] a ___ metros.
 
-# ANTECEDENTES
+ANTECEDENTES
+
 HAS: [não / sim desde ___ ] — medicações ____________ ; PA habitual ___/___ ; MAPA/MRPA ____________ .
+
 DM: [não / sim desde ___ ] — última HbA1c ___% em __/__ ; complicações ____________ .
 Dislipidemia: [não / sim] — último perfil: CT ___ , LDL ___ , HDL ___ , TG ___ , não-HDL ___ , Lp(a) ___ .
+
 DAC: [não / sim] — IAM ___ , ICP ___ (data/vaso/stent), CRM ___ , último CATE ____________ .
+
 IC: [não / sim] — FEVE ___% (__/__), etiologia ____________ .
 Outros: FA ___ , valvopatia ___ , DRC (TFG ___) ___ , AVC ___ , DAOP ___ , DPOC ___ , SAOS ___ , tireoide ___ , neoplasia ___ , doença reumatológica ___ .
 Cirurgias: ____________ . Alergias: ____________ .
 MEDICAÇÕES EM USO (nome, dose, posologia, adesão):
   1. ____________  2. ____________  3. ____________  4. ____________
 
-# HÁBITOS E ESTILO DE VIDA
+HÁBITOS E ESTILO DE VIDA
 Tabagismo: [nunca / ativo ___ maços/ano / cessado há ___ ]. Etilismo: ____________ .
 Atividade física: ____________ min/semana de ____________ . Sedentarismo [sim/não].
 Alimentação: ____________ . Sono: ___ h; ronco/apneia presenciada [sim/não]; Epworth ___ .
 Peso ___ kg, altura ___ m, IMC ___ kg/m², circunferência abdominal ___ cm.
 
-# ANTECEDENTES FAMILIARES
+ANTECEDENTES FAMILIARES
 DAC precoce (H<55 anos / M<65 anos): [não / sim — parentesco ___ ]. Morte súbita <50 anos: ____________ .
 Miocardiopatia / canalopatia / dislipidemia familiar / aneurisma de aorta: ____________ .
 
-# EXAME FÍSICO
+EXAME FÍSICO
 PA sentado (média de 2 medidas, MSD) ___/___ mmHg | MSE ___/___ | FC ___ bpm | FR ___ | SpO2 ___% | Peso ___ kg | IMC ___ | CA ___ cm.
+
 GERAL: BEG, LOTE, corado, hidratado, anictérico, acianótico, eupneico. Sem xantelasma, sem arco corneano precoce.
+
 PESCOÇO: Sem turgência jugular a 45°. Carótidas sem sopros. Tireoide não palpável.
+
 PRECÓRDIO: Ictus no 5º EIE na LHC, ___ polpas digitais, não propulsivo. Sem frêmitos.
   RCR em 2 tempos, bulhas normofonéticas, sem sopros, sem B3 ou B4, sem desdobramentos patológicos.
+
 AR: MV presente e simétrico, sem ruídos adventícios.
+
 ABD: Plano, flácido, RHA presentes, indolor, sem visceromegalias, sem sopros abdominais, aorta não palpável/expansível.
+
 EXTREMIDADES: Sem edema. Pulsos radiais, femorais, poplíteos, tibiais posteriores e pediosos presentes e simétricos.
   ITB D ___ / E ___ . Sem lesões tróficas.
 
-# EXAMES TRAZIDOS
+EXAMES TRAZIDOS
 ECG (__/__): ritmo ___ , FC ___ , eixo ___ , PR ___ , QRS ___ , QTc ___ . ____________ .
 Laboratório (__/__): Hb ___ | Cr ___ (TFG-CKD-EPI ___) | Na ___ K ___ | Glicemia ___ | HbA1c ___ | TSH ___ | TGO/TGP ___ | Ac. úrico ___ | EAS/relação albumina-creatinina urinária ___ .
 Perfil lipídico: CT ___ | LDL ___ | HDL ___ | TG ___ | não-HDL ___ | ApoB ___ | Lp(a) ___ .
 Ecocardiograma (__/__): ____________ .
 Outros: ____________ .
 
-# ESTRATIFICAÇÃO DE RISCO CARDIOVASCULAR (SBC 2025)
+ESTRATIFICAÇÃO DE RISCO CARDIOVASCULAR (SBC 2025)
 [ ] Doença aterosclerótica estabelecida → alto / muito alto / extremo risco
 [ ] Sem DCV estabelecida, 30–79 anos → calculadora PREVENT = ___% em 10 anos
 [ ] Escore de cálcio coronário (se risco intermediário, >40 anos e LDL 70–159): ___ UA (percentil ___)
@@ -973,16 +1101,22 @@ Outros: ____________ .
 → CLASSIFICAÇÃO FINAL: ____________ .
 → Metas: LDL <___ mg/dL (e redução ≥___%) | não-HDL <___ mg/dL | PA <130/80 mmHg | HbA1c <___% .
 
-# HIPÓTESES / PROBLEMAS
+HIPÓTESES / PROBLEMAS
 1. ____________  2. ____________  3. ____________
 
-# CONDUTA
+CONDUTA
+
 1. Prescrição: ____________ .
+
 2. Solicito: ____________ .
+
 3. Orientações não farmacológicas: dieta ____________ , atividade física ____________ ,
    cessação do tabagismo ____________ , perda de peso alvo ___ kg (___%).
+
 4. Encaminhamentos: ____________ .
+
 5. Retorno em ___ [semanas/meses] com exames.
+
 6. Orientado sobre sinais de alarme e quando procurar o pronto-socorro.
 
 Assinatura / CRM`
@@ -1041,7 +1175,7 @@ EF: PA ___/___ | FC ___ | Peso ___ kg | IMC ___ | CA ___ cm | SpO2 ___% .
 EXAMES: LDL ___ | não-HDL ___ | HbA1c ___ | Cr ___ (TFG ___) | Hb ___ | K ___ | TGO/TGP ___ | CPK (se sintoma muscular) ___ .
   ECG: ____________ . Eco (__/__): ____________ . Teste funcional/angioTC (__/__): ____________ .
 
-# CHECKLIST DE ANTIAGREGAÇÃO (ACC/AHA 2025)
+CHECKLIST DE ANTIAGREGAÇÃO (ACC/AHA 2025)
 Início da DAPT: __/__/____ → tempo decorrido: ___ meses.
 Esquema atual: AAS 100 mg/dia + [clopidogrel 75 mg/dia / ticagrelor 90 mg 12/12 h / prasugrel 10 mg/dia].
 Risco isquêmico: [alto / não alto] — critérios: ____________ .
@@ -1052,21 +1186,30 @@ DECISÃO:
   [ ] Já completou o período → manter monoterapia antiplaquetária indefinidamente (AAS 100 mg/dia ou clopidogrel 75 mg/dia).
   [ ] Indicação concomitante de anticoagulação → DAPT abreviada (1–4 semanas) e depois DOAC + clopidogrel; ao completar 12 meses, DOAC isolado.
 
-# METAS DE PREVENÇÃO SECUNDÁRIA
+METAS DE PREVENÇÃO SECUNDÁRIA
 LDL <50 mg/dL (muito alto risco) ou <30 mg/dL se risco extremo, com redução ≥50% do basal → atual ___ .
 Não-HDL: alvo correspondente → atual ___ . PA <130/80 → atual ___/___ . HbA1c individualizada → atual ___% .
 IMC alvo ___ . Cessação total do tabagismo. Atividade física ≥150 min/semana.
 
 CONDUTA:
+
 1. Antiagregação: ____________ .
+
 2. Estatina de alta intensidade: [atorvastatina 40–80 mg / rosuvastatina 20–40 mg] à noite. Se fora da meta,
    associar ezetimiba 10 mg/dia; se ainda fora, considerar iPCSK9 ou ácido bempedoico.
+
 3. Betabloqueador: ____________ (indicação mais forte se FEVE reduzida, angina ou arritmia).
+
 4. IECA/BRA: ____________ (indicado se HAS, DM, DRC ou FEVE ≤40%).
+
 5. iSGLT2 / AR GLP-1 se DM2 com DCV estabelecida: ____________ .
+
 6. Antianginoso adicional se sintomático: ____________ .
+
 7. Reabilitação cardiovascular supervisionada — encaminhado.
+
 8. Solicito: ____________ . Retorno em ___ meses.
+
 9. Orientado: procurar PS imediatamente se dor torácica em repouso >20 min, sudorese, dispneia aguda ou síncope;
    NÃO suspender antiagregante por conta própria — qualquer procedimento deve ser discutido com o cardiologista.
 
@@ -1095,7 +1238,7 @@ EF: PA sentado (média de 2 medidas) ___/___ mmHg | FC ___ | Peso ___ kg (anteri
   sensibilidade vibratória preservada; pulsos pediosos e tibiais posteriores presentes.
   Fundoscopia / retinografia (__/__): ____________ .
 
-# PAINEL DE METAS
+PAINEL DE METAS
 | Parâmetro           | Atual        | Meta                                   | Situação |
 | PA                  | ___/___      | <130/80 (idoso robusto <140/80)        | ___      |
 | LDL-c               | ___          | <___ conforme risco (ver abaixo)        | ___      |
@@ -1116,15 +1259,21 @@ EXAMES (__/__): CT ___ | LDL ___ | HDL ___ | TG ___ | não-HDL ___ | ApoB ___ | 
   TGO ___ TGP ___ GGT ___ | TSH ___ | Ácido úrico ___ | Hb ___ | Vit D ___ .
 
 CONDUTA:
+
 1. Anti-hipertensivos: ____________ . (1ª linha: tiazídico, IECA, BRA ou BCC di-hidropiridínico;
    preferir combinação em dose fixa desde o início se PA ≥20/10 mmHg acima da meta.)
+
 2. Hipolipemiante: estatina de alta intensidade ____________ ; associar ezetimiba se fora da meta;
    considerar iPCSK9 / ácido bempedoico se persistir fora da meta em muito alto/extremo risco.
+
 3. Antidiabéticos: metformina ____________ + [iSGLT2 se DCV/IC/DRC] + [AR GLP-1 se DCV estabelecida ou obesidade].
    Semaglutida 2,4 mg/semana se DCV estabelecida com sobrepeso/obesidade (SELECT).
+
 4. Obesidade: déficit de 500–750 kcal/dia + exercício aeróbico e resistido. Meta de perda ___%.
    Farmacoterapia: ____________ . Avaliar cirurgia bariátrica se IMC ≥35 com risco CV moderado/alto.
+
 5. Rastreamentos: retinografia anual, RAC urinária anual, exame dos pés anual, polissonografia se Epworth alto/ronco.
+
 6. Solicito: ____________ . Retorno em ___ meses.
 
 Assinatura / CRM`
@@ -1166,7 +1315,7 @@ EXAMES:
   Teste ergométrico / ergoespirometria: ____________ (VO2 pico ___ , resposta pressórica ____________ ).
   Sorologia para Chagas (se aplicável): ____________ . BNP/NT-proBNP: ___ . Troponina: ___ .
 
-# ESTRATIFICAÇÃO DE MORTE SÚBITA
+ESTRATIFICAÇÃO DE MORTE SÚBITA
 Prevenção secundária (CDI indicado): PCR revertida ___ | TV sustentada com instabilidade ___ .
 Fatores de risco (CMH): septo ≥30 mm ___ | síncope inexplicada recente ___ | HF de morte súbita ___ |
   TVNS ao Holter ___ | resposta pressórica anormal ao esforço ___ | realce tardio extenso à RM ___ |
@@ -1177,15 +1326,20 @@ Miocardiopatia dilatada: FEVE ___% após ≥3 meses de TMO otimizada; NYHA ___ ;
 AVALIAÇÃO: ____________ .
 
 CONDUTA:
+
 1. Terapia medicamentosa: ____________ .
    (CMH obstrutiva: betabloqueador → verapamil/diltiazem → disopiramida; inibidor de miosina cardíaca se disponível;
     EVITAR vasodilatadores, diuréticos em excesso e digoxina.
     CMD: 4 pilares da IC-FEr — ver seção de medicações.
     ATTR-CM: tafamidis se elegível; evitar betabloqueador/BCC em doses altas; cuidado com digoxina.)
+
 2. Anticoagulação: ____________ (indicada em CMH com FA independentemente do CHA2DS2-VA; trombo intracavitário).
+
 3. Restrição de exercício competitivo de alta intensidade: ____________ .
+
 4. Rastreio familiar em parentes de 1º grau: ECG + ecocardiograma [+ teste genético se mutação identificada].
    Periodicidade: a cada 1–2 anos em adolescentes; 3–5 anos em adultos. Familiares orientados: ____________ .
+
 5. Solicito: ____________ . Retorno em ___ meses.
 
 Assinatura / CRM`
@@ -1217,7 +1371,7 @@ EXAMES: NT-proBNP ___ (anterior ___) | Cr ___ (TFG ___) | Ur ___ | Na ___ | K __
   Ferritina ___ | IST ___% | TSH ___ | HbA1c ___ | Ácido úrico ___ | TGO/TGP ___ .
   ECG: ritmo ___ , QRS ___ ms, [BRE presente/ausente]. Eco (__/__): FEVE ___% , DDVE ___ , AE ___ , PSAP ___ , IM ___ , IT ___ .
 
-# STATUS DOS 4 PILARES (IC-FEr)
+STATUS DOS 4 PILARES (IC-FER)
 | Pilar                        | Droga e dose atual      | Dose-alvo               | Ação hoje |
 | 1. ARNI / IECA / BRA         | ____________            | ____________            | ___       |
 | 2. Betabloqueador            | ____________            | ____________            | ___       |
@@ -1232,27 +1386,39 @@ Dispositivos: CDI [indicado/implantado/não indicado] | TRC [indicado se FEVE �
 
 AVALIAÇÃO: IC ___ , NYHA ___ , [compensada / descompensada], [euvolêmica / congesta].
   TMO [otimizada / em titulação — ___% das doses-alvo].
-  Sinais de IC avançada: NYHA III–IV persistente, ≥1 internação em 12 meses, FEVE ≤30%, intolerância a TMO
+
+SINAIS DE IC AVANÇADA
+ : NYHA III–IV persistente, ≥1 internação em 12 meses, FEVE ≤30%, intolerância a TMO
   por hipotensão, disfunção renal progressiva, necessidade de inotrópico, VO2 pico <12–14 mL/kg/min.
   → [ausentes / presentes: ____________ ]
-  PERFIL INTERMACS: ____ + modificador [A arritmia / TCS / FF reinternações frequentes]
+
+PERFIL INTERMACS: ____ + modificador [A arritmia / TCS / FF reinternações frequentes]
     4 = sintomas em repouso sem inotrópico, diurético em dose alta ("frequent flyer")
     5 = restrito ao domicílio; confortável em repouso, incapaz de atividade fora de casa
     6 = fadiga após poucos minutos de atividade significativa ("walking wounded")
     7 = NYHA III avançada, estável, sem instabilidade recente — apenas vigiar
-  → Encaminhamento ao grupo de IC avançada e transplante: [não indicado / indicado — encaminhado em __/__ ].
+
+→ Encaminhamento ao grupo de IC avançada e transplante: [não indicado / indicado — encaminhado em __/__ ].
     Gatilhos para encaminhar: INTERMACS 4–6, ≥2 internações em 12 meses, dependência de inotrópico,
     intolerância a IECA/ARNI/BB por hipotensão, hiponatremia persistente, Cr em ascensão, caquexia.
 
 CONDUTA:
+
 1. Titulação de hoje: ____________ . Reavaliar função renal e K em 1–2 semanas após cada ajuste.
+
 2. Diurético: ____________ (ajustar pelo peso e congestão, não fixar dose alta indefinidamente).
+
 3. Corrigir: ferropenia ___ , anemia ___ , disfunção tireoidiana ___ , FA ___ , SAOS ___ , HAS ___ , DM ___ .
+
 4. Vacinação: influenza anual, pneumocócica, COVID-19 — [em dia / orientada].
+
 5. Reabilitação cardiovascular supervisionada — encaminhado.
+
 6. Educação: pesagem diária, restrição de sódio <2 g/dia, restrição hídrica ___ mL/dia,
    reconhecer sinais de descompensação, não usar AINE, evitar automedicação.
+
 7. Solicito: ____________ . Retorno em ___ [semanas para titulação / meses].
+
 8. Procurar PS se: ganho de peso >2 kg em 3 dias, dispneia em repouso, ortopneia nova, síncope, palpitação sustentada.
 
 Assinatura / CRM`
@@ -1262,12 +1428,12 @@ Assinatura / CRM`
     nome: "Avaliação de IC avançada — INTERMACS e candidatura a transplante/DAV",
     texto: `AVALIAÇÃO DE INSUFICIÊNCIA CARDÍACA AVANÇADA — __/__/____
 
-# IDENTIFICAÇÃO E SÍNTESE
+IDENTIFICAÇÃO E SÍNTESE
 Paciente ___ anos, sexo ___ , com IC-FEr (FEVE ___% em __/__ ), etiologia ____________ ,
 diagnóstico em ___ . NYHA ___ . Estágio ACC/AHA ___ .
 Internações por IC nos últimos 12 meses: ___ | Idas ao PS: ___ | Dias em inotrópico nos últimos 6 meses: ___ .
 
-# CRITÉRIOS DE IC AVANÇADA (checar)
+CRITÉRIOS DE IC AVANÇADA (CHECAR)
 [ ] Sintomas graves e persistentes — NYHA III–IV apesar de TMO otimizada
 [ ] Disfunção ventricular grave: FEVE ≤30%, VD isolado disfuncionante ou valvopatia grave inoperável
 [ ] ≥1 internação não planejada por IC nos últimos 12 meses
@@ -1275,7 +1441,7 @@ Internações por IC nos últimos 12 meses: ___ | Idas ao PS: ___ | Dias em inot
 [ ] Capacidade funcional gravemente reduzida: TC6M <300 m ou VO2 pico <12–14 mL/kg/min
 → [não preenche / preenche ___ critérios]
 
-# CLASSIFICAÇÃO INTERMACS
+CLASSIFICAÇÃO INTERMACS
 PERFIL: ______  Modificador: [ A arritmia | TCS suporte temporário | FF reinternações frequentes | nenhum ]
   1 Choque crítico apesar de inotrópico/vasopressor em dose crescente ...... intervenção em HORAS
   2 Declínio progressivo em inotrópico estável ou crescente ................ intervenção em DIAS
@@ -1286,7 +1452,7 @@ PERFIL: ______  Modificador: [ A arritmia | TCS suporte temporário | FF reinter
   7 NYHA III avançada, estável, sem instabilidade recente .................. não candidato imediato
 Perfil anterior (data ___): ______ → trajetória: [melhorando / estável / deteriorando].
 
-# DADOS QUE SUSTENTAM A CLASSIFICAÇÃO
+DADOS QUE SUSTENTAM A CLASSIFICAÇÃO
 Peso ___ kg (seco ___ ) | PA ___/___ | FC ___ | Perfusão ___ s | Extremidades [quentes/frias]
 Diurético atual: ____________ | Inotrópico: ____________ (desde __/__ )
 Doses de TMO alcançadas: ARNI/IECA ___% do alvo | BB ___% | ARM ___ | iSGLT2 ___
@@ -1299,7 +1465,7 @@ Cateterismo direito (__/__): PAD ___ | PAP ___/___ (média ___) | POAP ___ | IC 
 Eco (__/__): FEVE ___% , DDVE ___ , IM ___ , IT ___ , TAPSE ___ , PSAP ___ , trombo [ausente/presente]
 Dispositivos: CDI [sim/não] | TRC [sim/não] — resposta: ____________
 
-# AVALIAÇÃO DE CANDIDATURA
+AVALIAÇÃO DE CANDIDATURA
 Contraindicações absolutas rastreadas: hipertensão pulmonar fixa irreversível ___ | neoplasia ativa ___ |
   infecção ativa não controlada ___ | disfunção orgânica irreversível (hepática/renal) ___ |
   doença vascular ou cerebrovascular grave ___ | uso ativo de substâncias ___ | não adesão documentada ___ .
@@ -1308,7 +1474,7 @@ Relativas / a otimizar: IMC ___ | DM com lesão de órgão-alvo ___ | DRC (TFG _
 Avaliações complementares pendentes: odontológica ___ | dermatológica ___ | sorologias ___ |
   rastreio oncológico por idade ___ | tipagem e painel de anticorpos (PRA) ___ | psicologia/serviço social ___ .
 
-# CONCLUSÃO E PLANO
+CONCLUSÃO E PLANO
 Paciente classificado como INTERMACS ___ (modificador ___ ).
 [ ] Não é candidato no momento — otimizar TMO e reavaliar em ___ meses.
 [ ] Encaminhado para avaliação formal de transplante cardíaco — iniciada em __/__ .
@@ -1358,20 +1524,28 @@ AVALIAÇÃO: Pós-transplante cardíaco em ___ meses, [sem evidência de rejeiç
   imunossupressão [em nível terapêutico / fora do alvo], [sem / com] complicações: ____________ .
 
 CONDUTA:
+
 1. Imunossupressão: tacrolimo ___ mg 12/12 h + micofenolato ___ mg 12/12 h + prednisona ___ mg/dia.
    [Manter / ajustar para ____________ ] conforme nível e tempo de transplante.
+
 2. Profilaxias conforme fase: ____________ (SMZ-TMP para Pneumocystis; valganciclovir para CMV se indicado;
    antifúngico/nistatina conforme protocolo). Vacinas INATIVADAS em dia; vacinas de vírus vivo CONTRAINDICADAS.
+
 3. Rastreamento de DAVE do enxerto: coronariografia/USIC anual ou conforme protocolo — próximo em ___ .
    Estatina indicada para todos (reduz DAVE e mortalidade, além do efeito lipídico).
+
 4. Controle de comorbidades pós-transplante: HAS ____________ , DM ____________ , DRC ____________ ,
    dislipidemia ____________ , osteoporose ____________ .
+
 5. Rastreamento oncológico: dermatológico anual (uso de filtro solar e fotoproteção reforçados),
    além dos rastreios habituais por idade e sexo.
+
 6. Biópsia endomiocárdica: próxima em ___ , conforme protocolo/suspeita clínica.
+
 7. Orientações: NÃO usar medicação nova sem checar interação (macrolídeos, azóis, diltiazem, verapamil,
    erva-de-são-joão e suco de toranja alteram nível de inibidor de calcineurina). Procurar o serviço se febre,
    dispneia, edema, ganho de peso rápido, diarreia persistente ou síncope.
+
 8. Solicito: ____________ . Retorno em ___ .
 
 Assinatura / CRM`
@@ -1408,21 +1582,25 @@ EF: PA ___/___ | FC ___ | FR ___ | SpO2 ___% | Peso ___ kg | IMC ___ .
 
 EXAMES:
   ECG (__/__): ritmo ___ , [HVE / sobrecarga de AE / FA / bloqueios ____________ ].
-  ECOCARDIOGRAMA (__/__): FEVE ___% , DDVE ___ mm, DSVE ___ mm (indexado ___ mm/m²), AE ___ mL/m² , PSAP ___ mmHg.
-    EAo: Vmáx ___ m/s | Gradiente médio ___ mmHg | AVA ___ cm² (indexada ___ cm²/m²) | fluxo [normal/baixo] | strain ___% .
-    IM: mecanismo ____________ | vena contracta ___ mm | ERO ___ cm² | volume regurgitante ___ mL | fração ___% .
-    IAo: vena contracta ___ | PHT ___ ms | fluxo reverso holodiastólico em aorta descendente [sim/não].
-    EM: área valvar ___ cm² | gradiente médio ___ mmHg | escore de Wilkins ___ .
-    IT: vena contracta ___ | ERO ___ | dilatação do anel ___ | função do VD (TAPSE ___ , S' ___ ).
-    Prótese: gradiente médio ___ mmHg | área efetiva ___ cm² | leak [ausente / peri/intraprotético ___ ].
-  Ecocardiograma de estresse / teste ergométrico (se assintomático "aparente"): ____________ .
-  BNP/NT-proBNP: ___ (elevação desproporcional favorece intervenção).
-  AngioTC de coronárias / coronariografia pré-intervenção: ____________ .
+
+ECOCARDIOGRAMA (__/__)
+Geral: FEVE ___% , DDVE ___ mm, DSVE ___ mm (indexado ___ mm/m²), AE ___ mL/m² , PSAP ___ mmHg.
+EAo: Vmáx ___ m/s | Gradiente médio ___ mmHg | AVA ___ cm² (indexada ___ cm²/m²) | fluxo [normal/baixo] | strain ___% .
+IM: mecanismo ____________ | vena contracta ___ mm | ERO ___ cm² | volume regurgitante ___ mL | fração ___% .
+IAo: vena contracta ___ | PHT ___ ms | fluxo reverso holodiastólico em aorta descendente [sim/não].
+EM: área valvar ___ cm² | gradiente médio ___ mmHg | escore de Wilkins ___ .
+IT: vena contracta ___ | ERO ___ | dilatação do anel ___ | função do VD (TAPSE ___ , S' ___ ).
+Prótese: gradiente médio ___ mmHg | área efetiva ___ cm² | leak [ausente / peri/intraprotético ___ ].
+
+OUTROS EXAMES
+Eco de estresse ou teste ergométrico, se assintomático «aparente»: ____________ .
+BNP/NT-proBNP: ___ (elevação desproporcional favorece intervenção).
+AngioTC de coronárias / coronariografia pré-intervenção: ____________ .
     (ESC/EACTS 2025: angioTC de coronárias é recomendada antes da intervenção valvar em pacientes com
      probabilidade pré-teste de DAC obstrutiva baixa ou moderada.)
-  RM cardíaca / TC para planejamento de TAVI: ____________ .
+RM cardíaca / TC para planejamento de TAVI: ____________ .
 
-# GATILHOS DE INTERVENÇÃO — checar objetivamente
+GATILHOS DE INTERVENÇÃO — CHECAR OBJETIVAMENTE
 Estenose aórtica grave: [ ] sintomática  [ ] FEVE <50%  [ ] sintomas ao teste de esforço
   [ ] assintomática com EAo muito grave (Vmáx >5,5 m/s), progressão rápida ou BNP muito elevado
 Insuficiência mitral primária grave: [ ] sintomática  [ ] FEVE ≤60%  [ ] DSVE ≥40 mm (ou indexado elevado)
@@ -1435,17 +1613,24 @@ Tricúspide: [ ] grave com sintomas ou disfunção progressiva do VD  [ ] concom
 AVALIAÇÃO: ____________ . Risco cirúrgico estimado: STS ___% | EuroSCORE II ___% | fragilidade ____________ .
 
 CONDUTA:
+
 1. [ ] Seguimento clínico e ecocardiográfico — periodicidade: EAo grave assintomática 6 meses / moderada 1 ano /
        leve 2–3 anos; IM grave assintomática 6 meses. Próximo eco em ___ .
+
 2. [ ] Encaminhamento ao HEART TEAM / Centro de Valva para discussão de [SVAo cirúrgica / TAVI / reparo mitral /
        TEER / comissurotomia mitral percutânea / cirurgia combinada]. Justificativa: ____________ .
+
 3. Medicações: ____________ . (Não há terapia que altere a progressão da EAo; tratar HAS e IC associadas com cautela.)
+
 4. Anticoagulação: ____________ . Prótese mecânica → varfarina com INR alvo [aórtica 2,0–3,0 / mitral 2,5–3,5];
    DOAC CONTRAINDICADO em prótese mecânica e em estenose mitral reumática moderada/grave.
+
 5. Profilaxia de endocardite (amoxicilina 2 g VO 30–60 min antes de procedimento dentário com manipulação gengival):
    indicada por [prótese valvar / endocardite prévia / cardiopatia congênita cianótica / transplantado com valvopatia].
    Orientado sobre higiene bucal e avaliação odontológica periódica.
+
 6. Orientações de esforço: ____________ . Procurar PS se dispneia progressiva, síncope, angina ou febre persistente.
+
 7. Solicito: ____________ . Retorno em ___ meses.
 
 Assinatura / CRM`
@@ -1454,44 +1639,47 @@ Assinatura / CRM`
     grupo: "Receitas para o paciente",
     nome: "Receita — Cardiometabolismo (HAS, DM2 e dislipidemia)",
     texto: `RECEITUÁRIO
-Paciente: ______________________________________  Data: __/__/____
+
+Paciente: ______________________________________
+Data: __/__/____
 
 USO ORAL E CONTÍNUO
 
-1) Losartana 50 mg -------------------------------------------
-Tomar 01 comprimido de 12 em 12 horas
+1) Losartana 50 mg
+   Tomar 1 comprimido de 12 em 12 horas.
 
-2) Anlodipino 5 mg -------------------------------------------
-Tomar 01 comprimido ao dia, à noite
+2) Anlodipino 5 mg
+   Tomar 1 comprimido ao dia, à noite.
 
-3) Hidroclorotiazida 25 mg -----------------------------------
-Tomar 01 comprimido ao dia, pela manhã
+3) Hidroclorotiazida 25 mg
+   Tomar 1 comprimido ao dia, pela manhã.
 
-4) Atorvastatina 40 mg ---------------------------------------
-Tomar 01 comprimido ao dia, à noite
+4) Atorvastatina 40 mg
+   Tomar 1 comprimido ao dia, à noite.
 
-5) Ezetimiba 10 mg -------------------------------------------
-Tomar 01 comprimido ao dia, à noite
+5) Ezetimiba 10 mg
+   Tomar 1 comprimido ao dia, à noite.
 
-6) Metformina XR 500 mg --------------------------------------
-Tomar 02 comprimidos ao dia, após o jantar
+6) Metformina XR 500 mg
+   Tomar 2 comprimidos ao dia, após o jantar.
 
-7) Dapagliflozina 10 mg --------------------------------------
-Tomar 01 comprimido ao dia, pela manhã
+7) Dapagliflozina 10 mg
+   Tomar 1 comprimido ao dia, pela manhã.
 
 USO SUBCUTÂNEO
 
-8) Semaglutida 0,25 mg ---------------------------------------
-Aplicar 01 vez por semana, sempre no mesmo dia
-(aumentar para 0,5 mg após 4 semanas, conforme orientação)
+8) Semaglutida 0,25 mg
+   Aplicar 1 vez por semana, sempre no mesmo dia.
+   Aumentar para 0,5 mg após 4 semanas, conforme orientação.
 
 ORIENTAÇÕES
-- Reduzir o sal: no máximo 1 colher de chá rasa por dia, somando tudo.
-- Evitar embutidos, enlatados, temperos prontos e caldos concentrados.
-- Atividade física aeróbica de 150 minutos por semana, divididos em 5 dias.
-- Aferir a pressão em casa 2 vezes por semana, sentado e em repouso, e anotar.
-- Não suspender nenhuma medicação por conta própria.
-- Retornar em ___ meses trazendo os exames solicitados.
+
+Sal: no máximo 1 colher de chá rasa por dia, somando toda a comida.
+Evitar embutidos, enlatados, temperos prontos e caldos concentrados.
+Atividade física: 150 minutos por semana, divididos em 5 dias.
+Medir a pressão em casa 2 vezes por semana, sentado e em repouso, e anotar.
+Não suspender nenhuma medicação por conta própria.
+Retornar em ___ meses trazendo os exames solicitados.
 
 ______________________________________
 Assinatura e carimbo
@@ -1502,45 +1690,51 @@ Assinatura e carimbo
     grupo: "Receitas para o paciente",
     nome: "Receita — Pós-angioplastia / DAC crônica",
     texto: `RECEITUÁRIO
-Paciente: ______________________________________  Data: __/__/____
+
+Paciente: ______________________________________
+Data: __/__/____
 
 USO ORAL E CONTÍNUO
 
-1) AAS 100 mg ------------------------------------------------
-Tomar 01 comprimido ao dia, após o almoço, de uso contínuo
+1) AAS 100 mg
+   Tomar 1 comprimido ao dia, após o almoço. Uso contínuo.
 
-2) Ticagrelor 90 mg ------------------------------------------
-Tomar 01 comprimido de 12 em 12 horas, por ___ meses
-(ou: Clopidogrel 75 mg — tomar 01 comprimido ao dia por ___ meses)
+2) Ticagrelor 90 mg
+   Tomar 1 comprimido de 12 em 12 horas, por ___ meses.
+   Alternativa: clopidogrel 75 mg, 1 comprimido ao dia por ___ meses.
 
-3) Atorvastatina 80 mg ---------------------------------------
-Tomar 01 comprimido ao dia, à noite
+3) Atorvastatina 80 mg
+   Tomar 1 comprimido ao dia, à noite.
 
-4) Succinato de metoprolol 50 mg -----------------------------
-Tomar 01 comprimido ao dia, pela manhã
+4) Succinato de metoprolol 50 mg
+   Tomar 1 comprimido ao dia, pela manhã.
 
-5) Enalapril 10 mg -------------------------------------------
-Tomar 01 comprimido de 12 em 12 horas
+5) Enalapril 10 mg
+   Tomar 1 comprimido de 12 em 12 horas.
 
-6) Omeprazol 20 mg -------------------------------------------
-Tomar 01 comprimido ao dia, em jejum
-(enquanto estiver em uso de dois antiagregantes)
+6) Omeprazol 20 mg
+   Tomar 1 comprimido ao dia, em jejum,
+   enquanto estiver usando dois antiagregantes.
 
 USO ORAL, SE NECESSÁRIO
 
-7) Dinitrato de isossorbida 5 mg (sublingual) ----------------
-Colocar 01 comprimido embaixo da língua em caso de dor no peito.
-Se a dor não passar em 5 minutos, repetir mais 01 comprimido.
-Se após 3 comprimidos a dor continuar, PROCURAR O PRONTO-SOCORRO.
+7) Dinitrato de isossorbida 5 mg, sublingual
+   Colocar 1 comprimido embaixo da língua em caso de dor no peito.
+   Se a dor não passar em 5 minutos, repetir mais 1 comprimido.
+   Se após 3 comprimidos a dor continuar, PROCURAR O PRONTO-SOCORRO.
 
 ORIENTAÇÕES
-- NÃO interromper o AAS nem o segundo antiagregante por conta própria.
-  Antes de qualquer cirurgia ou procedimento dentário, avisar o cardiologista.
-- Procurar o pronto-socorro imediatamente se: dor no peito em repouso por mais
-  de 20 minutos, suor frio, falta de ar súbita ou desmaio.
-- Parar de fumar completamente.
-- Iniciar reabilitação cardiovascular conforme encaminhamento.
-- Retornar em ___ meses trazendo os exames solicitados.
+
+Não interromper o AAS nem o segundo antiagregante por conta própria.
+Antes de qualquer cirurgia ou procedimento dentário, avisar o cardiologista.
+Parar de fumar completamente.
+Iniciar reabilitação cardiovascular conforme encaminhamento.
+Retornar em ___ meses trazendo os exames solicitados.
+
+PROCURAR O PRONTO-SOCORRO SE
+
+Dor no peito em repouso por mais de 20 minutos.
+Suor frio, falta de ar súbita ou desmaio.
 
 ______________________________________
 Assinatura e carimbo
@@ -1551,37 +1745,44 @@ Assinatura e carimbo
     grupo: "Receitas para o paciente",
     nome: "Receita — Insuficiência cardíaca com FE reduzida (4 pilares)",
     texto: `RECEITUÁRIO
-Paciente: ______________________________________  Data: __/__/____
+
+Paciente: ______________________________________
+Data: __/__/____
 
 USO ORAL E CONTÍNUO
 
-1) Sacubitril/Valsartana 49/51 mg ----------------------------
-Tomar 01 comprimido de 12 em 12 horas
-(iniciar com 24/26 mg de 12 em 12 horas se pressão baixa)
+1) Sacubitril/valsartana 49/51 mg
+   Tomar 1 comprimido de 12 em 12 horas.
+   Iniciar com 24/26 mg de 12 em 12 horas se a pressão for baixa.
 
-2) Carvedilol 6,25 mg ----------------------------------------
-Tomar 01 comprimido de 12 em 12 horas, junto com as refeições
+2) Carvedilol 6,25 mg
+   Tomar 1 comprimido de 12 em 12 horas, junto com as refeições.
 
-3) Espironolactona 25 mg -------------------------------------
-Tomar 01 comprimido ao dia, pela manhã
+3) Espironolactona 25 mg
+   Tomar 1 comprimido ao dia, pela manhã.
 
-4) Dapagliflozina 10 mg --------------------------------------
-Tomar 01 comprimido ao dia, pela manhã
+4) Dapagliflozina 10 mg
+   Tomar 1 comprimido ao dia, pela manhã.
 
-5) Furosemida 40 mg ------------------------------------------
-Tomar 01 comprimido ao dia, pela manhã
-(ajustar conforme peso e inchaço, segundo orientação médica)
+5) Furosemida 40 mg
+   Tomar 1 comprimido ao dia, pela manhã.
+   Ajustar conforme peso e inchaço, segundo orientação médica.
 
 ORIENTAÇÕES
-- PESAR-SE TODOS OS DIAS, em jejum, após urinar, com a mesma balança e roupa leve.
-  Anotar o peso. Procurar atendimento se ganhar mais de 2 kg em 3 dias.
-- Restrição de líquidos: ______ ml por dia, contando água, sucos, café, chá e sopa.
-- Restrição de sal: no máximo 1 colher de chá rasa por dia.
-- NÃO usar anti-inflamatórios (diclofenaco, ibuprofeno, nimesulida) — pioram a IC.
-- Procurar o pronto-socorro se: falta de ar em repouso, falta de ar ao deitar,
-  inchaço que piora, desmaio ou palpitação que não para.
-- As doses serão aumentadas aos poucos nas próximas consultas. Não parar sozinho.
-- Retornar em ___ semanas para ajuste, com exames de sangue (ureia, creatinina, potássio).
+
+Pesar-se TODOS OS DIAS, em jejum, após urinar, com a mesma balança e roupa leve.
+Anotar o peso em um caderno e levar nas consultas.
+Restrição de líquidos: ______ ml por dia, contando água, suco, café, chá e sopa.
+Sal: no máximo 1 colher de chá rasa por dia.
+Não usar anti-inflamatórios (diclofenaco, ibuprofeno, nimesulida) — pioram a insuficiência cardíaca.
+As doses serão aumentadas aos poucos nas próximas consultas. Não parar por conta própria.
+Retornar em ___ semanas com ureia, creatinina e potássio.
+
+PROCURAR O PRONTO-SOCORRO SE
+
+Ganhar mais de 2 kg em 3 dias.
+Falta de ar em repouso ou ao deitar.
+Inchaço que piora, desmaio, ou palpitação que não para.
 
 ______________________________________
 Assinatura e carimbo
@@ -1592,33 +1793,40 @@ Assinatura e carimbo
     grupo: "Receitas para o paciente",
     nome: "Receita — Fibrilação atrial (anticoagulação e controle de FC)",
     texto: `RECEITUÁRIO
-Paciente: ______________________________________  Data: __/__/____
+
+Paciente: ______________________________________
+Data: __/__/____
 
 USO ORAL E CONTÍNUO
 
-1) Rivaroxabana 20 mg ----------------------------------------
-Tomar 01 comprimido ao dia, sempre junto com o jantar
-(alternativa: Apixabana 5 mg — tomar 01 comprimido de 12 em 12 horas)
+1) Rivaroxabana 20 mg
+   Tomar 1 comprimido ao dia, sempre junto com o jantar.
+   Alternativa: apixabana 5 mg, 1 comprimido de 12 em 12 horas.
 
-2) Succinato de metoprolol 50 mg -----------------------------
-Tomar 01 comprimido ao dia, pela manhã
+2) Succinato de metoprolol 50 mg
+   Tomar 1 comprimido ao dia, pela manhã.
 
-3) Atorvastatina 20 mg ---------------------------------------
-Tomar 01 comprimido ao dia, à noite
+3) Atorvastatina 20 mg
+   Tomar 1 comprimido ao dia, à noite.
 
-4) Losartana 50 mg -------------------------------------------
-Tomar 01 comprimido de 12 em 12 horas
+4) Losartana 50 mg
+   Tomar 1 comprimido de 12 em 12 horas.
 
 ORIENTAÇÕES
-- O anticoagulante previne AVC. NÃO pode ser esquecido nem interrompido.
-  A rivaroxabana precisa ser tomada junto com comida para ser absorvida.
-- Se esquecer uma dose: tomar assim que lembrar no mesmo dia. NUNCA dobrar a dose.
-- Avisar QUALQUER médico ou dentista de que usa anticoagulante, antes de procedimentos.
-- Procurar atendimento se: sangramento que não para, sangue nas fezes ou na urina,
-  vômito com sangue, dor de cabeça forte e súbita, ou após queda com batida na cabeça.
-- Procurar o pronto-socorro se: palpitação com falta de ar, dor no peito ou desmaio.
-- Evitar excesso de álcool e de cafeína.
-- Retornar em ___ meses com hemograma e função renal.
+
+O anticoagulante previne AVC. Não pode ser esquecido nem interrompido.
+A rivaroxabana precisa ser tomada junto com comida para ser absorvida.
+Se esquecer uma dose, tomar assim que lembrar no mesmo dia. Nunca dobrar a dose.
+Avisar qualquer médico ou dentista de que usa anticoagulante, antes de procedimentos.
+Evitar excesso de álcool e de cafeína.
+Retornar em ___ meses com hemograma e função renal.
+
+PROCURAR ATENDIMENTO SE
+
+Sangramento que não para.
+Sangue nas fezes ou na urina, ou vômito com sangue.
+Dor de cabeça forte e súbita, ou queda com batida na cabeça.
+Palpitação com falta de ar, dor no peito ou desmaio.
 
 ______________________________________
 Assinatura e carimbo
@@ -1629,34 +1837,51 @@ Assinatura e carimbo
     grupo: "Receitas para o paciente",
     nome: "Receita — Prótese valvar mecânica (varfarina)",
     texto: `RECEITUÁRIO
-Paciente: ______________________________________  Data: __/__/____
+
+Paciente: ______________________________________
+Data: __/__/____
 
 USO ORAL E CONTÍNUO
 
-1) Varfarina 5 mg --------------------------------------------
-Tomar ____ comprimido(s) ao dia, sempre no mesmo horário,
-conforme o resultado do INR. Alvo de INR: ______
+1) Varfarina 5 mg
+   Tomar ____ comprimido(s) ao dia, sempre no mesmo horário,
+   conforme o resultado do INR. Alvo de INR: ______
 
-2) Succinato de metoprolol 25 mg -----------------------------
-Tomar 01 comprimido ao dia, pela manhã
+2) Succinato de metoprolol 25 mg
+   Tomar 1 comprimido ao dia, pela manhã.
 
-3) Furosemida 40 mg ------------------------------------------
-Tomar 01 comprimido ao dia, pela manhã
+3) Furosemida 40 mg
+   Tomar 1 comprimido ao dia, pela manhã.
 
-ORIENTAÇÕES
-- O anticoagulante é OBRIGATÓRIO e para o resto da vida. Sem ele, a prótese pode
-  formar coágulo e travar. NÃO usar nenhum outro anticoagulante no lugar da varfarina.
-- Colher INR a cada ______ e trazer TODOS os resultados nas consultas.
-- Manter a alimentação CONSTANTE. Não é proibido comer verdura escura (couve, brócolis,
-  espinafre, alface) — o importante é não variar muito a quantidade de um dia para o outro.
-- Evitar bebida alcoólica em excesso.
-- NÃO tomar anti-inflamatórios nem antibióticos sem avisar o médico: muitos remédios
-  alteram o efeito da varfarina. Para dor ou febre, usar dipirona ou paracetamol.
-- Antes de qualquer procedimento dentário, tomar Amoxicilina 2 g (04 comprimidos de 500 mg)
-  em dose única, 30 a 60 minutos antes — prevenção de endocardite.
-- Manter a higiene bucal em dia e ir ao dentista periodicamente.
-- Procurar atendimento se: sangramento que não para, febre persistente, falta de ar,
-  ou se notar que o barulho da prótese (clique) mudou ou sumiu.
+ANTICOAGULAÇÃO — O MAIS IMPORTANTE
+
+A varfarina é obrigatória e para o resto da vida. Sem ela, a prótese pode formar
+coágulo e travar. Não substituir por nenhum outro anticoagulante.
+Colher INR a cada ______ e trazer TODOS os resultados nas consultas.
+
+ALIMENTAÇÃO
+
+Manter a alimentação constante. Não é proibido comer verdura escura (couve, brócolis,
+espinafre, alface) — o importante é não variar muito a quantidade de um dia para o outro.
+Evitar bebida alcoólica em excesso.
+
+OUTROS REMÉDIOS
+
+Não tomar anti-inflamatório nem antibiótico sem avisar o médico:
+muitos remédios alteram o efeito da varfarina.
+Para dor ou febre, usar dipirona ou paracetamol.
+
+PREVENÇÃO DE ENDOCARDITE
+
+Antes de procedimento dentário com manipulação da gengiva, tomar amoxicilina 2 g
+(4 comprimidos de 500 mg) em dose única, 30 a 60 minutos antes.
+Manter a higiene bucal em dia e ir ao dentista periodicamente.
+
+PROCURAR ATENDIMENTO SE
+
+Sangramento que não para, ou febre persistente.
+Falta de ar.
+Se o clique da prótese mudar de som ou desaparecer.
 
 ______________________________________
 Assinatura e carimbo
@@ -1667,42 +1892,49 @@ Assinatura e carimbo
     grupo: "Receitas para o paciente",
     nome: "Receita — Miocardiopatia / Chagas",
     texto: `RECEITUÁRIO
-Paciente: ______________________________________  Data: __/__/____
+
+Paciente: ______________________________________
+Data: __/__/____
 
 USO ORAL E CONTÍNUO
 
-1) Sacubitril/Valsartana 24/26 mg ----------------------------
-Tomar 01 comprimido de 12 em 12 horas
+1) Sacubitril/valsartana 24/26 mg
+   Tomar 1 comprimido de 12 em 12 horas.
 
-2) Carvedilol 3,125 mg ---------------------------------------
-Tomar 01 comprimido de 12 em 12 horas, junto com as refeições
+2) Carvedilol 3,125 mg
+   Tomar 1 comprimido de 12 em 12 horas, junto com as refeições.
 
-3) Espironolactona 25 mg -------------------------------------
-Tomar 01 comprimido ao dia, pela manhã
+3) Espironolactona 25 mg
+   Tomar 1 comprimido ao dia, pela manhã.
 
-4) Dapagliflozina 10 mg --------------------------------------
-Tomar 01 comprimido ao dia, pela manhã
+4) Dapagliflozina 10 mg
+   Tomar 1 comprimido ao dia, pela manhã.
 
-5) Furosemida 40 mg ------------------------------------------
-Tomar 01 comprimido ao dia, pela manhã
+5) Furosemida 40 mg
+   Tomar 1 comprimido ao dia, pela manhã.
 
-6) Amiodarona 200 mg -----------------------------------------
-Tomar 01 comprimido ao dia
-(apenas se houver arritmia documentada)
+SE HOUVER INDICAÇÃO ESPECÍFICA
 
-7) Varfarina 5 mg --------------------------------------------
-Tomar ____ comprimido(s) ao dia, conforme INR (alvo 2,0 a 3,0)
-(apenas se houver trombo, aneurisma apical ou fibrilação atrial)
+6) Amiodarona 200 mg
+   Tomar 1 comprimido ao dia — apenas se houver arritmia documentada.
+
+7) Varfarina 5 mg
+   Tomar ____ comprimido(s) ao dia conforme INR (alvo 2,0 a 3,0) — apenas se houver
+   trombo, aneurisma apical ou fibrilação atrial.
 
 ORIENTAÇÕES
-- Pesar-se todos os dias em jejum e anotar. Procurar atendimento se ganhar
-  mais de 2 kg em 3 dias.
-- Restrição de sal e de líquidos conforme orientação.
-- Procurar o pronto-socorro se: desmaio, palpitação prolongada, falta de ar em
-  repouso ou choque do desfibrilador (se for portador de CDI).
-- Se usa amiodarona: fazer exames de tireoide, fígado e radiografia de tórax
-  periodicamente, conforme solicitado.
-- Retornar em ___ meses com exames.
+
+Pesar-se todos os dias em jejum e anotar.
+Restrição de sal e de líquidos conforme orientação.
+Em uso de amiodarona: fazer exames de tireoide, fígado e radiografia de tórax
+periodicamente, conforme solicitado.
+Retornar em ___ meses com exames.
+
+PROCURAR O PRONTO-SOCORRO SE
+
+Ganhar mais de 2 kg em 3 dias.
+Desmaio, palpitação prolongada ou falta de ar em repouso.
+Choque do desfibrilador, se for portador de CDI.
 
 ______________________________________
 Assinatura e carimbo
@@ -1713,40 +1945,53 @@ Assinatura e carimbo
     grupo: "Receitas para o paciente",
     nome: "Receita — Pós-transplante cardíaco",
     texto: `RECEITUÁRIO
-Paciente: ______________________________________  Data: __/__/____
+
+Paciente: ______________________________________
+Data: __/__/____
 
 USO ORAL E CONTÍNUO — NÃO INTERROMPER EM HIPÓTESE ALGUMA
 
-1) Tacrolimo ____ mg -----------------------------------------
-Tomar conforme prescrito, de 12 em 12 horas, SEMPRE no mesmo horário
-(em jejum: 1 hora antes ou 2 horas depois das refeições)
+1) Tacrolimo ____ mg
+   Tomar de 12 em 12 horas, sempre no mesmo horário, em jejum
+   (1 hora antes ou 2 horas depois das refeições).
 
-2) Micofenolato de mofetila 500 mg ---------------------------
-Tomar ____ comprimido(s) de 12 em 12 horas
+2) Micofenolato de mofetila 500 mg
+   Tomar ____ comprimido(s) de 12 em 12 horas.
 
-3) Prednisona 5 mg -------------------------------------------
-Tomar ____ comprimido(s) ao dia, pela manhã, após o café
+3) Prednisona 5 mg
+   Tomar ____ comprimido(s) ao dia, pela manhã, após o café.
 
-4) Sulfametoxazol + Trimetoprima 400/80 mg -------------------
-Tomar 01 comprimido ao dia (ou 3 vezes por semana, conforme protocolo)
+4) Sulfametoxazol + trimetoprima 400/80 mg
+   Tomar 1 comprimido ao dia, ou 3 vezes por semana, conforme protocolo.
 
-5) Atorvastatina 20 mg ---------------------------------------
-Tomar 01 comprimido ao dia, à noite
+5) Atorvastatina 20 mg
+   Tomar 1 comprimido ao dia, à noite.
 
-6) Omeprazol 20 mg -------------------------------------------
-Tomar 01 comprimido ao dia, em jejum
+6) Omeprazol 20 mg
+   Tomar 1 comprimido ao dia, em jejum.
 
-ORIENTAÇÕES
-- Os imunossupressores são para a vida toda e nos MESMOS horários todos os dias.
-  Esquecer doses é a principal causa de rejeição.
-- No dia da coleta do nível de tacrolimo, NÃO tomar a dose da manhã antes do exame.
-- NÃO usar nenhum remédio novo, chá ou suplemento sem avisar a equipe do transplante.
-  Antibióticos, antifúngicos e alguns remédios de pressão alteram muito o nível do
-  imunossupressor. Evitar erva-de-são-joão e suco de toranja (grapefruit).
-- Vacinas de vírus VIVO são PROIBIDAS. As demais devem estar em dia.
-- Usar protetor solar diariamente e fazer avaliação com dermatologista uma vez por ano.
-- Procurar a equipe se: febre, falta de ar, inchaço, ganho rápido de peso, diarreia
-  persistente, desmaio ou qualquer infecção.
+HORÁRIOS E EXAMES
+
+Os imunossupressores são para a vida toda e nos mesmos horários todos os dias.
+Esquecer doses é a principal causa de rejeição.
+No dia da coleta do nível de tacrolimo, não tomar a dose da manhã antes do exame.
+
+CUIDADO COM INTERAÇÕES
+
+Não usar nenhum remédio novo, chá ou suplemento sem avisar a equipe do transplante.
+Antibióticos, antifúngicos e alguns remédios de pressão alteram muito o nível do
+imunossupressor. Evitar erva-de-são-joão e suco de toranja (grapefruit).
+
+PREVENÇÃO
+
+Vacinas de vírus vivo são proibidas. As demais devem estar em dia.
+Usar protetor solar diariamente.
+Avaliação com dermatologista uma vez por ano.
+
+PROCURAR A EQUIPE SE
+
+Febre, falta de ar, inchaço ou ganho rápido de peso.
+Diarreia persistente, desmaio ou qualquer sinal de infecção.
 
 ______________________________________
 Assinatura e carimbo
@@ -1757,33 +2002,47 @@ Assinatura e carimbo
     grupo: "Receitas para o paciente",
     nome: "Receita — Prevenção primária / primeiro atendimento",
     texto: `RECEITUÁRIO
-Paciente: ______________________________________  Data: __/__/____
+
+Paciente: ______________________________________
+Data: __/__/____
 
 USO ORAL E CONTÍNUO
 
-1) Rosuvastatina 10 mg ---------------------------------------
-Tomar 01 comprimido ao dia, à noite
+1) Rosuvastatina 10 mg
+   Tomar 1 comprimido ao dia, à noite.
 
-2) Losartana 50 mg -------------------------------------------
-Tomar 01 comprimido ao dia
-(iniciar apenas se houver indicação de tratar a pressão)
+2) Losartana 50 mg
+   Tomar 1 comprimido ao dia.
+   Iniciar apenas se houver indicação de tratar a pressão.
 
-ORIENTAÇÕES NÃO MEDICAMENTOSAS — a base do tratamento
-- Alimentação: preferir comida de verdade, com verduras, legumes, frutas, grãos
-  integrais, peixe e azeite. Reduzir ultraprocessados, frituras e refrigerantes.
-- Sal: no máximo 1 colher de chá rasa por dia, somando toda a comida do dia.
-- Atividade física: 150 minutos por semana de caminhada rápida, bicicleta ou natação,
-  divididos em pelo menos 5 dias, mais 2 dias de exercício de força.
-- Peso: meta de perder ______ kg até a próxima consulta.
-- Tabagismo: parar completamente. Encaminhado para ______________________.
-- Álcool: no máximo ______ dose(s) por dia.
-- Sono: 7 a 8 horas por noite. Investigar apneia do sono se houver ronco alto.
-- Aferir a pressão em casa 2 vezes por semana, em repouso, e anotar.
+ALIMENTAÇÃO
+
+Preferir comida de verdade: verduras, legumes, frutas, grãos integrais, peixe e azeite.
+Reduzir ultraprocessados, frituras e refrigerantes.
+Sal: no máximo 1 colher de chá rasa por dia, somando toda a comida do dia.
+
+ATIVIDADE FÍSICA
+
+150 minutos por semana de caminhada rápida, bicicleta ou natação,
+divididos em pelo menos 5 dias.
+Mais 2 dias por semana de exercício de força.
+
+OUTRAS METAS
+
+Peso: perder ______ kg até a próxima consulta.
+Tabagismo: parar completamente. Encaminhado para ____________________.
+Álcool: no máximo ______ dose(s) por dia.
+Sono: 7 a 8 horas por noite. Investigar apneia do sono se houver ronco alto.
+Medir a pressão em casa 2 vezes por semana, em repouso, e anotar.
 
 EXAMES PARA O RETORNO
-Hemograma, glicemia de jejum, hemoglobina glicada, colesterol total e frações,
-triglicérides, ureia, creatinina, sódio, potássio, TGO, TGP, TSH, ácido úrico,
-urina tipo 1 e relação albumina/creatinina urinária.
+
+Hemograma, glicemia de jejum, hemoglobina glicada.
+Colesterol total e frações, triglicérides.
+Ureia, creatinina, sódio, potássio, ácido úrico.
+
+TGO, TGP, TSH.
+Urina tipo 1 e relação albumina/creatinina urinária.
 
 Retornar em ___ meses trazendo os exames.
 
@@ -1795,100 +2054,221 @@ Assinatura e carimbo
   {
     grupo: "Exame físico — achados alterados",
     nome: "Estado geral, pele e perfusão",
-    texto: `REG, LOTE, hipocorado +/4+, hidratado, anictérico, acianótico, afebril. Perfusão periférica de 3 s.
-MEG, sonolento, hipocorado 3+/4+, desidratado 2+/4+, ictérico 2+/4+, acianótico, febril (Tax 38,4 °C). Perfusão >3 s.
-REG, emagrecido, com sinais de perda de massa muscular temporal e de interósseos (caquexia cardíaca).
-Pele com livedo reticular em MMII e joelhos, moteamento (mottling score ___), extremidades frias e pálidas.
-Cianose central em lábios e língua / cianose periférica em extremidades.
-Icterícia 2+/4+ de escleras. Turgor cutâneo diminuído, mucosas secas, olhos encovados.
-Lesão por pressão em região sacral, estágio ___ , medindo ___ cm, leito ____________ , sem sinais de infecção.
-Anasarca: edema de MMII 4+/4+, edema de parede abdominal, edema escrotal e edema periorbitário.
-Petéquias em MMII / equimoses espontâneas em ____________ . Sangramento em sítio de punção.`
+    texto: `Banco de achados. Substitua a linha correspondente do exame normal.
+
+ESTADO GERAL
+REG, LOTE, hipocorado +/4+, hidratado, anictérico, acianótico, afebril. Perfusão de 3 s.
+MEG, sonolento, hipocorado 3+/4+, desidratado 2+/4+, ictérico 2+/4+, febril (Tax 38,4 °C).
+REG, emagrecido, com perda de massa muscular temporal e de interósseos — caquexia cardíaca.
+
+PERFUSÃO E PELE
+Livedo reticular em MMII e joelhos; moteamento (mottling score ___).
+Extremidades frias e pálidas, perfusão capilar >3 s.
+Cianose central em lábios e língua.
+Cianose periférica em extremidades.
+Turgor cutâneo diminuído, mucosas secas, olhos encovados.
+
+COLORAÇÃO
+Icterícia 2+/4+ de escleras.
+Palidez cutâneo-mucosa 3+/4+.
+
+EDEMA
+Edema de MMII ___/4+, com cacifo, mole e frio, até ____________.
+Anasarca: edema de MMII 4+/4+, de parede abdominal, escrotal e periorbitário.
+
+LESÕES E SANGRAMENTO
+Lesão por pressão em região sacral, estágio ___, medindo ___ cm, leito ____________,
+sem sinais de infecção. Escala de Braden ___.
+Petéquias em MMII. Equimoses espontâneas em ____________.
+Sangramento em sítio de punção de ____________.`
   },
   {
     grupo: "Exame físico — achados alterados",
     nome: "Cardiovascular — inspeção, palpação, ausculta",
-    texto: `Turgência jugular patológica a 45°, com estase até ângulo da mandíbula. Refluxo hepatojugular presente.
-Pulso venoso jugular com onda v proeminente (insuficiência tricúspide) / onda a em canhão (dissociação AV).
-Sinal de Kussmaul presente (aumento da turgência à inspiração) — sugere pericardite constritiva ou disfunção de VD.
-Ictus desviado para a linha axilar anterior, no 6º EIE, difuso, ocupando 3 polpas digitais, propulsivo.
-Frêmito sistólico em foco aórtico / frêmito diastólico em foco mitral.
-Ritmo cardíaco irregularmente irregular, sem onda P audível, com déficit de pulso de ___ bpm.
-Bulhas hipofonéticas e abafadas (considerar derrame pericárdico / obesidade / DPOC).
-B3 audível em foco mitral, em decúbito lateral esquerdo — sugere sobrecarga de volume e disfunção sistólica.
-B4 audível — sugere disfunção diastólica / hipertrofia ventricular.
-Hiperfonese de B2 em foco pulmonar — sugere hipertensão pulmonar.
-Desdobramento fixo de B2 (CIA) / desdobramento paradoxal de B2 (BRE, estenose aórtica grave).
-Atrito pericárdico audível em borda esternal esquerda baixa, trifásico, que aumenta na expiração e com o paciente inclinado à frente.
-SOPRO SISTÓLICO ejetivo em foco aórtico, 3/6, em crescendo-decrescendo, irradiando para carótidas — estenose aórtica.
-SOPRO SISTÓLICO holossistólico em foco mitral, 3/6, irradiando para axila — insuficiência mitral.
-SOPRO SISTÓLICO em foco tricúspide que aumenta à inspiração (sinal de Rivero-Carvallo) — insuficiência tricúspide.
-SOPRO DIASTÓLICO aspirativo em borda esternal esquerda, 2/4, em decrescendo, melhor audível na expiração com o paciente sentado e inclinado — insuficiência aórtica.
-SOPRO DIASTÓLICO em ruflar, com reforço pré-sistólico, precedido de estalido de abertura, em foco mitral — estenose mitral.
-SOPRO CONTÍNUO em maquinaria em região infraclavicular esquerda — persistência do canal arterial.
-Sopro que AUMENTA com Valsalva e ortostatismo e diminui com handgrip — sugere CMH obstrutiva.
-Pulso parvus et tardus (estenose aórtica) / pulso célere e amplo de Corrigan (insuficiência aórtica) / pulso alternante (disfunção sistólica grave) / pulso paradoxal >10 mmHg (tamponamento, asma grave).
-Pulsos periféricos: pedioso e tibial posterior ausentes à direita; femoral presente e reduzido; sopro em femoral direita.
-Assimetria de PA entre membros superiores de ___ mmHg — atenção para dissecção de aorta ou coarctação.`
+    texto: `Banco de achados. Substitua a linha correspondente do exame normal.
+
+PULSO VENOSO JUGULAR
+Turgência jugular patológica a 45°, com estase até o ângulo da mandíbula.
+Refluxo hepatojugular presente.
+Onda v proeminente → insuficiência tricúspide.
+Onda a em canhão → dissociação atrioventricular.
+Sinal de Kussmaul (turgência aumenta na inspiração)
+  → pericardite constritiva ou disfunção de VD.
+
+INSPEÇÃO E PALPAÇÃO DO PRECÓRDIO
+Ictus desviado para a linha axilar anterior, no 6º EIE, difuso, 3 polpas digitais, propulsivo.
+Frêmito sistólico em foco aórtico.
+Frêmito diastólico em foco mitral.
+
+RITMO
+Irregularmente irregular, sem onda P audível, com déficit de pulso de ___ bpm.
+Taquicárdico, regular, com FC ___ bpm.
+Bradicárdico, com FC ___ bpm.
+
+BULHAS
+Bulhas hipofonéticas e abafadas → considerar derrame pericárdico, obesidade ou DPOC.
+B3 audível em foco mitral, em decúbito lateral esquerdo
+  → sobrecarga de volume e disfunção sistólica.
+B4 audível → disfunção diastólica ou hipertrofia ventricular.
+Hiperfonese de B2 em foco pulmonar → hipertensão pulmonar.
+Desdobramento fixo de B2 → comunicação interatrial.
+Desdobramento paradoxal de B2 → BRE ou estenose aórtica grave.
+Estalido de abertura em foco mitral → estenose mitral.
+Atrito pericárdico em borda esternal esquerda baixa, trifásico,
+  que aumenta na expiração e com o paciente inclinado à frente.
+
+SOPROS SISTÓLICOS
+Foco aórtico, 3/6, ejetivo, em crescendo-decrescendo, irradiando para carótidas
+  → estenose aórtica.
+Foco mitral, 3/6, holossistólico, irradiando para axila
+  → insuficiência mitral.
+Foco tricúspide, 2/6, que aumenta à inspiração (sinal de Rivero-Carvallo)
+  → insuficiência tricúspide.
+Foco aórtico, que AUMENTA com Valsalva e ortostatismo e diminui com handgrip
+  → cardiomiopatia hipertrófica obstrutiva.
+
+SOPROS DIASTÓLICOS
+Borda esternal esquerda, 2/4, aspirativo, em decrescendo, melhor audível na expiração
+com o paciente sentado e inclinado à frente
+  → insuficiência aórtica.
+Foco mitral, em ruflar, com reforço pré-sistólico, precedido de estalido de abertura
+  → estenose mitral.
+
+SOPRO CONTÍNUO
+Região infraclavicular esquerda, em maquinaria
+  → persistência do canal arterial.
+
+PULSOS ARTERIAIS
+Parvus et tardus → estenose aórtica.
+Célere e amplo, de Corrigan → insuficiência aórtica.
+Alternante → disfunção sistólica grave.
+Paradoxal, com queda >10 mmHg na inspiração → tamponamento, asma ou DPOC grave.
+Pedioso e tibial posterior ausentes à direita; femoral presente e reduzido;
+sopro audível em femoral direita.
+Assimetria de PA entre membros superiores de ___ mmHg
+  → atenção para dissecção de aorta ou coarctação.`
   },
   {
     grupo: "Exame físico — achados alterados",
     nome: "Respiratório",
-    texto: `Taquipneico (FR ___ irpm), com uso de musculatura acessória, tiragem intercostal e batimento de asa de nariz.
+    texto: `Banco de achados. Substitua a linha correspondente do exame normal.
+
+PADRÃO E ESFORÇO
+Taquipneico (FR ___ irpm), com uso de musculatura acessória, tiragem intercostal
+e batimento de asa de nariz.
 Fala em frases entrecortadas / monossilábica. Dispneia em repouso.
-Expansibilidade diminuída em base direita, com FTV diminuído e macicez à percussão — sugere derrame pleural.
-MV diminuído em base esquerda, abolido a partir do ___ EIC, com egofonia acima do nível do derrame.
-MV presente bilateralmente com estertores crepitantes finos em bases / em terços médios e inferiores / difusos.
+Padrão de Cheyne-Stokes.
+Respiração de Kussmaul.
+
+INSPEÇÃO, PALPAÇÃO E PERCUSSÃO
+Expansibilidade diminuída em base direita, com FTV diminuído e macicez à percussão
+  → sugere derrame pleural.
+Hipertimpanismo em hemitórax direito com desvio de traqueia para a esquerda
+  → PNEUMOTÓRAX HIPERTENSIVO: drenar imediatamente.
+
+AUSCULTA
+MV diminuído em base esquerda, abolido a partir do ___ EIC, com egofonia acima do nível.
+Estertores crepitantes finos em bases.
+Estertores crepitantes em terços médios e inferiores, bilateralmente.
 Estertores subcrepitantes grossos difusos, com roncos de transmissão.
 Sibilos expiratórios difusos, com tempo expiratório prolongado.
-Tórax silencioso, com MV globalmente diminuído — atenção: broncoespasmo grave.
-Hipertimpanismo e MV abolido em hemitórax direito com desvio de traqueia para a esquerda — pneumotórax hipertensivo (drenar imediatamente).
-Secreção traqueal em grande quantidade, aspecto purulento e amarelado, com odor fétido.
-Padrão respiratório de Cheyne-Stokes / respiração de Kussmaul.`
+Tórax silencioso, com MV globalmente diminuído
+  → atenção: broncoespasmo grave.
+
+SECREÇÃO
+Secreção traqueal em grande quantidade, purulenta, amarelada, com odor fétido.
+Secreção traqueal escassa e clara.`
   },
   {
     grupo: "Exame físico — achados alterados",
     nome: "Abdome, extremidades e vascular",
-    texto: `Abdome globoso, à custa de ascite, com macicez móvel de decúbito e piparote presente. Circulação colateral ____________ .
-Fígado palpável a ___ cm do rebordo costal direito, de borda romba, superfície lisa, doloroso à palpação (hepatomegalia congestiva).
-Refluxo hepatojugular presente. Baço palpável a ___ cm do RCE. Traube ocupado.
-Abdome doloroso à palpação em ____________ , com descompressão brusca [negativa/positiva], sem massas palpáveis.
-Massa pulsátil e expansível em região periumbilical — investigar aneurisma de aorta abdominal.
+    texto: `Banco de achados. Substitua a linha correspondente do exame normal.
+
+ABDOME
+Globoso à custa de ascite, com macicez móvel de decúbito e piparote presente.
+Circulação colateral ____________.
+Doloroso à palpação em ____________, com descompressão brusca [negativa / positiva].
+Massa pulsátil e expansível em região periumbilical
+  → investigar aneurisma de aorta abdominal.
 RHA ausentes / hipoativos / hiperativos e metálicos.
-Edema de MMII simétrico, ___/4+, com cacifo, mole e frio, até ___ (joelho / raiz da coxa).
-Edema assimétrico de MIE, com aumento de perimetria de ___ cm, empastamento de panturrilha, dor à dorsiflexão do pé (sinal de Homans) e circulação colateral superficial — investigar TVP.
-Membro inferior direito frio, pálido, com ausência de pulsos poplíteo, tibial posterior e pedioso, parestesia e redução da força — isquemia arterial aguda.
-Lesão ulcerada em maléolo medial esquerdo, medindo ___ × ___ cm, bordas irregulares, fundo com tecido de granulação, exsudato ____________ , com dermatite ocre e lipodermatoesclerose perilesional — úlcera venosa.
-Úlcera em região plantar/calcâneo, com bordas em saca-bocado, fundo necrótico, indolor, sem sangramento — úlcera neuropática/isquêmica.
-Necrose seca de ___ pododáctilos do pé direito, com linha de demarcação em ____________ , sem secreção e sem crepitação.
-Necrose úmida com secreção purulenta, odor fétido, crepitação à palpação e celulite ascendente até ____________ — emergência cirúrgica.
-Panturrilhas livres e indolores à palpação, sem empastamento.`
+
+FÍGADO E BAÇO
+Fígado palpável a ___ cm do rebordo costal direito, borda romba, superfície lisa,
+doloroso à palpação → hepatomegalia congestiva.
+Refluxo hepatojugular presente.
+Baço palpável a ___ cm do rebordo costal esquerdo. Espaço de Traube ocupado.
+
+EDEMA E SINAIS DE TVP
+Edema de MMII simétrico, ___/4+, com cacifo, mole e frio, até [joelho / raiz da coxa].
+Edema assimétrico de MIE, com aumento de perimetria de ___ cm, empastamento de panturrilha,
+dor à dorsiflexão do pé (sinal de Homans) e circulação colateral superficial
+  → investigar trombose venosa profunda.
+
+ISQUEMIA ARTERIAL
+Membro inferior direito frio e pálido, com ausência de pulsos poplíteo, tibial posterior
+e pedioso, associada a parestesia e redução de força
+  → ISQUEMIA ARTERIAL AGUDA: acionar cirurgia vascular.
+
+ÚLCERAS E NECROSE
+Úlcera em maléolo medial esquerdo, ___ × ___ cm, bordas irregulares, fundo com tecido
+de granulação, exsudato ____________, com dermatite ocre e lipodermatoesclerose perilesional
+  → úlcera venosa.
+Úlcera em região plantar ou calcâneo, bordas em saca-bocado, fundo necrótico, indolor
+  → úlcera neuropática ou isquêmica.
+Necrose seca de ___ pododáctilos do pé direito, com linha de demarcação em ____________,
+sem secreção e sem crepitação.
+Necrose úmida com secreção purulenta, odor fétido, crepitação à palpação e celulite
+ascendente até ____________
+  → EMERGÊNCIA CIRÚRGICA.`
   },
   {
     grupo: "Exame físico — achados alterados",
     nome: "Neurológico, sedação e dispositivos",
-    texto: `Vigil, orientado em tempo e espaço, Glasgow 15 (AO4 RV5 RM6), pupilas isocóricas e fotorreagentes, sem déficit motor ou sensitivo, força grau V globalmente, sem sinais meníngeos, sem alterações de pares cranianos.
+    texto: `Banco de achados. Substitua a linha correspondente do exame normal.
+
+NÍVEL DE CONSCIÊNCIA
+Vigil, orientado em tempo e espaço, Glasgow 15 (AO4 RV5 RM6), pupilas isocóricas
+e fotorreagentes, sem déficit motor ou sensitivo, força grau V globalmente,
+sem sinais meníngeos e sem alteração de pares cranianos.
 Sonolento, Glasgow ___ (AO___ RV___ RM___), desperta ao chamado verbal e volta a dormir.
 Torporoso, responde apenas a estímulo doloroso com retirada, pupilas ___ mm, fotorreagentes.
+
+DELIRIUM
 Agitado, tentando remover dispositivos, RASS +2 — CAM-ICU POSITIVO (delirium hiperativo).
-Hipoativo, desatento, com flutuação do nível de consciência — CAM-ICU POSITIVO (delirium hipoativo).
-Sedado, RASS -4 (alvo -2), sob fentanil ___ mcg/kg/h e midazolam ___ mg/kg/h em BIC. Sem despertar diário nas últimas 24 h.
-Sob bloqueio neuromuscular com cisatracúrio ___ mcg/kg/min — TOF ___/4. Sedação profunda garantida.
-Hemiparesia à direita grau ___ , com desvio de rima labial para a esquerda e disartria — NIHSS ___ .
+Hipoativo, desatento, com flutuação do nível de consciência — CAM-ICU POSITIVO (hipoativo).
+
+SEDAÇÃO E BLOQUEIO NEUROMUSCULAR
+Sedado, RASS −4 (alvo −2), sob fentanil ___ mcg/kg/h e midazolam ___ mg/kg/h em BIC.
+Sem despertar diário nas últimas 24 h.
+Sob bloqueio neuromuscular com cisatracúrio ___ mcg/kg/min — TOF ___/4,
+com sedação profunda garantida.
+
+DÉFICIT FOCAL E FORÇA
+Hemiparesia à direita grau ___, com desvio de rima labial para a esquerda e disartria
+  → NIHSS ___.
 Força muscular global reduzida, MRC ___/60 — fraqueza adquirida na UTI.
 
-DISPOSITIVOS:
-Acesso venoso central em veia jugular interna direita, implantado em __/__ (D__), curativo limpo e datado, sem sinais flogísticos no sítio de inserção.
-Acesso venoso periférico em MSE (D__), pérvio, sem sinais de flebite (escala de flebite grau 0).
-PAI em artéria radial esquerda (D__), com curva adequada, sem sinais de isquemia distal.
-Cateter de artéria pulmonar (Swan-Ganz) em D__ — PAPm ___ , POAP ___ , IC ___ L/min/m², RVS ___ , SvO2 ___% .
-TOT nº ___ , fixado a ___ cm da rima labial (D__), cuff com pressão de ___ cmH2O.
-Traqueostomia nº ___ (D__), pérvia, sem sangramento, sem enfisema subcutâneo, óstio sem sinais flogísticos.
-Sonda nasoenteral em posição pós-pilórica confirmada por RX (D__), pérvia, dieta em curso, resíduo ___ mL.
-Sonda vesical de demora (D__), com urina de aspecto claro/citrino, sistema fechado — reavaliada indicação.
-Dreno mediastinal e pleural à esquerda (D__), com débito de ___ mL nas últimas 24 h, aspecto serossanguinolento.
-Marcapasso provisório transvenoso em modo VVI ___ bpm, limiar ___ mA, sensibilidade ___ mV (D__).
-Fios de marcapasso epicárdico presentes, testados, com limiar ___ mA.
+ACESSOS VASCULARES
+Acesso venoso central em veia jugular interna direita (D__), curativo limpo e datado,
+sem sinais flogísticos no sítio de inserção.
+Acesso venoso periférico em MSE (D__), pérvio, sem flebite (escala de flebite grau 0).
+PAI em artéria radial esquerda (D__), com curva adequada, sem isquemia distal.
+Cateter de artéria pulmonar (D__) — PAPm ___, POAP ___, IC ___ L/min/m², RVS ___, SvO2 ___%.
+
+VIA AÉREA E VENTILAÇÃO
+TOT nº ___, fixado a ___ cm da rima labial (D__), cuff com pressão de ___ cmH2O.
+Traqueostomia nº ___ (D__), pérvia, sem sangramento, sem enfisema subcutâneo,
+óstio sem sinais flogísticos.
+
+SONDAS E DRENOS
+Sonda nasoenteral em posição pós-pilórica confirmada por RX (D__), pérvia,
+dieta em curso, resíduo ___ mL.
+Sonda vesical de demora (D__), urina clara e citrina, sistema fechado — indicação reavaliada.
+Dreno mediastinal e pleural à esquerda (D__), débito de ___ mL/24 h, serossanguinolento.
+
+DISPOSITIVOS CARDÍACOS
+Marcapasso provisório transvenoso em VVI ___ bpm, limiar ___ mA, sensibilidade ___ mV (D__).
+Fios de marcapasso epicárdico presentes e testados, com limiar ___ mA.
 Balão intra-aórtico em 1:1, com curva adequada, posicionado, sem isquemia de membro (D__).`
   },
   {
@@ -1896,28 +2276,38 @@ Balão intra-aórtico em 1:1, com curva adequada, posicionado, sem isquemia de m
     nome: "SCA com supra de ST (IAMCSST)",
     texto: `CONDUTA — IAM COM SUPRA DE ST — início dos sintomas às ___h
 
-# TEMPO
+TEMPO
 Início dos sintomas: ___h | Chegada: ___h | ECG diagnóstico: ___h (meta ≤10 min da chegada)
 Estratégia: [ICP primária — hemodinâmica acionada às ___h, meta porta-balão ≤90 min /
              Fibrinólise — meta porta-agulha ≤30 min, quando ICP não disponível em ≤120 min]
 
-# MEDIDAS IMEDIATAS
+MEDIDAS IMEDIATAS
+
 1. Monitorização contínua, desfibrilador à beira-leito, 2 acessos venosos periféricos calibrosos.
+
 2. O2 apenas se SpO2 <90%.
+
 3. AAS 300 mg VO — mastigar e engolir.
+
 4. P2Y12: ticagrelor 180 mg VO (preferencial se ICP primária)
    OU clopidogrel 600 mg VO (300 mg se fibrinólise; SEM ataque se >75 anos com fibrinólise)
    OU prasugrel 60 mg VO (apenas após anatomia; contraindicado se AVC/AIT prévio).
+
 5. Anticoagulação: enoxaparina 30 mg EV em bolus + 1 mg/kg SC 12/12 h (sem bolus e 0,75 mg/kg se >75 anos;
    1 mg/kg 24/24 h se ClCr <30) OU HNF 60 U/kg EV em bolus (máx 4.000 U) + 12 U/kg/h.
+
 6. Analgesia: morfina 2–4 mg EV se dor refratária (usar com parcimônia — retarda absorção de P2Y12).
+
 7. Nitrato: isossorbida 5 mg SL ou nitroglicerina EV se dor/HAS/congestão.
    CONTRAINDICADO se: PAS <90 mmHg, IAM de VD, uso de inibidor de PDE5 nas últimas 24–48 h.
+
 8. Betabloqueador VO nas primeiras 24 h se SEM: IC aguda, baixo débito, risco de choque, BAV avançado, broncoespasmo.
+
 9. Estatina de alta intensidade: atorvastatina 80 mg VO.
+
 10. Se parede inferior: fazer V3R/V4R e V7–V9. Se IAM de VD → volume, EVITAR nitrato e diurético.
 
-# APÓS REPERFUSÃO
+APÓS REPERFUSÃO
 • Monitorização em unidade coronariana por ≥24–48 h.
 • DAPT por 12 meses (individualizar se alto risco de sangramento).
 • IECA/BRA nas primeiras 24 h se FEVE ≤40%, HAS, DM ou DRC.
@@ -1930,7 +2320,7 @@ Estratégia: [ICP primária — hemodinâmica acionada às ___h, meta porta-bal�
     nome: "SCA sem supra de ST (IAMSSST / angina instável)",
     texto: `CONDUTA — SCA SEM SUPRA DE ST
 
-# ESTRATIFICAÇÃO
+ESTRATIFICAÇÃO
 GRACE ___ | TIMI ___ | HEART ___ | Troponina us: T0 ___ → T1h/T2h ___ (Δ ___ )
 Estratégia invasiva:
   • IMEDIATA (<2 h) — instabilidade hemodinâmica ou elétrica, choque, IC aguda, dor refratária,
@@ -1938,19 +2328,28 @@ Estratégia invasiva:
   • PRECOCE (<24 h) — GRACE >140, elevação/queda de troponina compatível com IAM, alterações dinâmicas de ST-T.
   • SELETIVA — baixo risco, sem critérios acima → teste funcional ou angioTC de coronárias.
 
-# CONDUTA
+CONDUTA
+
 1. Monitorização contínua, ECG seriado, acesso venoso, repouso.
+
 2. AAS 300 mg VO ataque → 100 mg/dia.
+
 3. P2Y12: ticagrelor 180 mg → 90 mg 12/12 h. (Prasugrel apenas APÓS conhecer a anatomia — não pré-tratar.
    Clopidogrel 300–600 mg se ticagrelor/prasugrel indisponíveis ou contraindicados, ou se anticoagulado.)
+
 4. Anticoagulação: enoxaparina 1 mg/kg SC 12/12 h OU fondaparinux 2,5 mg SC/dia OU HNF.
+
 5. Betabloqueador VO se sem contraindicação. Nitrato para controle sintomático.
+
 6. Atorvastatina 80 mg/dia (ou rosuvastatina 20–40 mg).
+
 7. IECA/BRA se HAS, DM, DRC ou FEVE ≤40%.
+
 8. Ecocardiograma para avaliar função ventricular e complicações.
+
 9. Se anticoagulação crônica concomitante: manter DOAC + clopidogrel; suspender AAS precocemente (1–4 semanas).
 
-# NÃO ESQUECER
+NÃO ESQUECER
 • Reavaliar diagnóstico diferencial se troponina elevada sem doença coronariana obstrutiva (MINOCA, miocardite,
   TEP, sepse, taquiarritmia, DRC, IC): considerar RM cardíaca.
 • Definir e documentar a estratégia (invasiva x conservadora) e o prazo.`
@@ -1961,22 +2360,30 @@ Estratégia invasiva:
     texto: `CONDUTA — EDEMA AGUDO DE PULMÃO
 
 1. Posição sentada, com pernas pendentes. Monitorização contínua. Acesso venoso.
+
 2. OXIGENAÇÃO: O2 para SpO2 ≥94%.
    → VNI (CPAP 8–10 cmH2O ou BiPAP) precocemente se desconforto respiratório, taquipneia ou hipercapnia.
      Reduz intubação e melhora desfecho. Contraindicada se rebaixamento, instabilidade grave, vômito, trauma de face.
    → Intubação se falha de VNI, rebaixamento, exaustão respiratória ou instabilidade refratária.
+
 3. VASODILATADOR (se PAS >110 mmHg — pilar do tratamento no EAP hipertensivo):
    Nitroglicerina EV 10–20 mcg/min, aumentando 10–20 mcg/min a cada 3–5 min (até 200 mcg/min),
    guiada por PA e sintomas. Alternativa: isossorbida 5 mg SL enquanto prepara a bomba.
    Nitroprussiato se HAS grave refratária ou insuficiência mitral/aórtica aguda.
+
 4. DIURÉTICO: furosemida 20–40 mg EV (ou 1–2,5× a dose oral diária se já usa). Reavaliar em 2 h;
    dobrar se resposta insuficiente. Não é o pilar do EAP hipertensivo (paciente frequentemente é normovolêmico
    com redistribuição de volume) — mas é essencial no paciente congesto.
+
 5. Identificar e tratar o GATILHO: SCA (ECG + troponina), crise hipertensiva, FA de alta resposta,
    insuficiência mitral aguda, endocardite, anemia, infecção, má adesão, disfunção renal.
+
 6. Se hipotensão/hipoperfusão: NÃO usar vasodilatador. Inotrópico (dobutamina) ± noradrenalina.
+
 7. Morfina: NÃO usar de rotina (associada a pior desfecho); reservar para dor ou dispneia muito refratária.
+
 8. Solicitar: ECG, troponina, NT-proBNP, gasometria, eletrólitos, função renal, hemograma, RX de tórax, ecocardiograma.
+
 9. Sondagem vesical para controle de diurese se instabilidade ou necessidade de balanço rigoroso.`
   },
   {
@@ -1995,7 +2402,7 @@ Estratégia invasiva:
        em acesso periférico calibroso enquanto se obtém o central.
 [ ] 6. Controle do FOCO em até 6–12 h: drenagem, retirada de cateter, desbridamento, cirurgia.
 
-# REAVALIAÇÃO CONTINUADA
+REAVALIAÇÃO CONTINUADA
 • Perfusão: lactato, tempo de enchimento capilar, débito urinário, nível de consciência, temperatura de extremidades.
 • Responsividade a fluidos: elevação passiva de pernas, variação de pressão de pulso, VTI ao POCUS, colapso de VCI.
   NÃO usar PVC isolada como guia.
@@ -2011,13 +2418,13 @@ Estratégia invasiva:
     nome: "FA aguda no PS",
     texto: `CONDUTA — FIBRILAÇÃO ATRIAL AGUDA
 
-# 1. O PACIENTE ESTÁ INSTÁVEL?
+1. O PACIENTE ESTÁ INSTÁVEL?
 Hipotensão, dor torácica isquêmica, IC aguda/EAP, rebaixamento do nível de consciência.
 → SIM: CARDIOVERSÃO ELÉTRICA SINCRONIZADA IMEDIATA.
   Sedação: etomidato 0,15–0,3 mg/kg ou propofol 0,5–1 mg/kg + fentanil 1 mcg/kg.
   Energia bifásica: FA 120–200 J | flutter/TSV 50–100 J | TV monomórfica com pulso 100 J.
 
-# 2. ESTÁVEL — DEFINIR TEMPO E RISCO EMBÓLICO (SBC 2025)
+2. ESTÁVEL — DEFINIR TEMPO E RISCO EMBÓLICO (SBC 2025)
 Início dos sintomas: ___ h (janela segura para cardioversão sem anticoagulação prévia: <24 h).
 Alto risco embólico = FA valvar, evento embólico prévio ou CHA2DS2-VA ≥2.
   → Se ALTO RISCO: NÃO cardioverter de imediato, mesmo com <24 h. Anticoagular + controlar FC,
@@ -2026,7 +2433,7 @@ Alto risco embólico = FA valvar, evento embólico prévio ou CHA2DS2-VA ≥2.
   → Se ≥24 h ou início indeterminado: controle de FC + anticoagulação plena por ≥3 semanas antes de
     cardioversão eletiva, OU ETE para excluir trombo.
 
-# 3. CONTROLE DE FREQUÊNCIA (meta <110 bpm em repouso)
+3. CONTROLE DE FREQUÊNCIA (META <110 BPM EM REPOUSO)
 • Metoprolol 2,5–5 mg EV lento, repetir até 3× (máx 15 mg); depois VO 25–100 mg 12/12 h.
 • Diltiazem 0,25 mg/kg EV em 2 min → BIC 5–15 mg/h — se broncoespasmo e FEVE preservada.
   CONTRAINDICADO se IC-FEr.
@@ -2035,14 +2442,14 @@ Alto risco embólico = FA valvar, evento embólico prévio ou CHA2DS2-VA ≥2.
 • ATENÇÃO: se PRÉ-EXCITAÇÃO (WPW) com FA → NÃO usar bloqueador de nó AV (betabloqueador, BCC, digoxina,
   adenosina). Usar procainamida/amiodarona ou cardioverter eletricamente.
 
-# 4. CONTROLE DE RITMO
+4. CONTROLE DE RITMO
 • Cardioversão química: amiodarona 150 mg EV em 10 min → 1 mg/min por 6 h.
   Propafenona 450–600 mg VO em dose única (pill-in-the-pocket) — apenas SEM cardiopatia estrutural e SEM DAC;
   associar bloqueador de nó AV para evitar flutter com condução 1:1.
 • A SBC 2025 recomenda o controle de ritmo como estratégia preferencial na maioria dos pacientes;
   ablação por cateter é opção de 1ª linha na FA sintomática (paroxística ou persistente).
 
-# 5. ANTICOAGULAÇÃO — CHA2DS2-VA (sexo feminino foi REMOVIDO do escore)
+5. ANTICOAGULAÇÃO — CHA2DS2-VA (SEXO FEMININO FOI REMOVIDO DO ESCORE)
 IC 1 | HAS 1 | Idade ≥75 = 2 | DM 1 | AVC/AIT/tromboembolismo = 2 | Doença vascular 1 | Idade 65–74 = 1
 → 0 = não anticoagular | 1 = individualizar | ≥2 = anticoagular.
 Anticoagular independentemente do escore: cardiomiopatia hipertrófica, amiloidose cardíaca, hipertireoidismo,
@@ -2050,7 +2457,7 @@ estenose mitral reumática moderada/grave, prótese mecânica.
 Após cardioversão: anticoagular por ≥4 semanas, independentemente do escore.
 Escolha: DOAC preferencial (exceto prótese mecânica e estenose mitral reumática → varfarina).
 
-# 6. INVESTIGAR CAUSA
+6. INVESTIGAR CAUSA
 TSH, eletrólitos (K, Mg), hemograma, função renal, troponina se dor, ecocardiograma, rastrear SAOS,
 álcool, infecção, TEP, pós-operatório.`
   },
@@ -2059,33 +2466,35 @@ TSH, eletrólitos (K, Mg), hemograma, função renal, troponina se dor, ecocardi
     nome: "Crise hipertensiva — emergência x urgência",
     texto: `CONDUTA — CRISE HIPERTENSIVA
 
-# DEFINIR: HÁ LESÃO AGUDA DE ÓRGÃO-ALVO?
+DEFINIR: HÁ LESÃO AGUDA DE ÓRGÃO-ALVO?
 Procurar ativamente: dor torácica (SCA/dissecção), dispneia (EAP), déficit neurológico (AVC), cefaleia com
 alteração visual ou confusão (encefalopatia), oligúria/elevação de creatinina, hematúria, papiledema,
 eclâmpsia/pré-eclâmpsia grave.
 
-## EMERGÊNCIA HIPERTENSIVA (com lesão de órgão-alvo) — tratamento EV, em unidade monitorizada
+EMERGÊNCIA HIPERTENSIVA (COM LESÃO DE ÓRGÃO-ALVO) — TRATAMENTO EV, EM UNIDADE MONITORIZADA
 Meta geral: reduzir a PAM em ATÉ 25% na 1ª hora, depois para ~160/100 em 2–6 h e normalizar em 24–48 h.
+
 EXCEÇÕES à redução gradual:
   • DISSECÇÃO DE AORTA: PAS <120 mmHg e FC <60 bpm em 20 min. Betabloqueador EV PRIMEIRO (esmolol/metoprolol),
     só depois vasodilatador (nitroprussiato) — para evitar taquicardia reflexa e aumento do dP/dt.
   • AVC ISQUÊMICO: só tratar se PA >220/120 (ou >185/110 se candidato a trombólise). Redução de 15% em 24 h.
   • AVC HEMORRÁGICO: PAS alvo 130–140 mmHg.
   • ECLÂMPSIA: hidralazina ou labetalol + sulfato de magnésio.
-Fármacos EV:
+
+FÁRMACOS EV
   • Nitroprussiato 0,3–10 mcg/kg/min (fotossensível; risco de cianeto)
   • Nitroglicerina 5–200 mcg/min (preferida se SCA ou EAP)
   • Metoprolol 5 mg EV lento, repetir; esmolol 0,5 mg/kg bolus + 50–300 mcg/kg/min
   • Hidralazina 5–10 mg EV a cada 20–30 min (gestação)
 
-## URGÊNCIA HIPERTENSIVA (PA muito elevada SEM lesão aguda de órgão-alvo)
+URGÊNCIA HIPERTENSIVA (PA MUITO ELEVADA SEM LESÃO AGUDA DE ÓRGÃO-ALVO)
 • Repouso em ambiente calmo por 30 min e reaferir — boa parte normaliza.
 • Tratar dor, ansiedade, retenção urinária.
 • Redução ORAL e gradual em 24–48 h. NÃO usar nifedipino sublingual (risco de isquemia por queda abrupta).
 • Reintroduzir/ajustar a medicação de uso habitual; investigar má adesão.
 • Alta com reavaliação ambulatorial precoce (dias), não internação.
 
-## PSEUDOCRISE
+PSEUDOCRISE
 PA elevada secundária a dor, ansiedade, abstinência ou desconforto, sem lesão de órgão-alvo.
 → Tratar a causa, não a pressão.`
   },
@@ -2094,27 +2503,27 @@ PA elevada secundária a dor, ansiedade, abstinência ou desconforto, sem lesão
     nome: "TEP — estratificação e tratamento",
     texto: `CONDUTA — TROMBOEMBOLISMO PULMONAR
 
-# 1. PROBABILIDADE PRÉ-TESTE
+1. PROBABILIDADE PRÉ-TESTE
 Wells: TVP clínica 3 | TEP mais provável que alternativa 3 | FC >100 = 1,5 | imobilização/cirurgia recente 1,5 |
 TEP/TVP prévio 1,5 | hemoptise 1 | câncer 1. → ≤4 improvável | >4 provável.
 • Improvável → D-dímero (ajustado pela idade se >50 anos: idade × 10 ng/mL). Negativo exclui.
 • Provável ou D-dímero positivo → angio-TC de tórax.
 • Instável demais para TC → ecocardiograma à beira-leito (disfunção de VD) autoriza tratamento empírico.
 
-# 2. ESTRATIFICAÇÃO DE GRAVIDADE
+2. ESTRATIFICAÇÃO DE GRAVIDADE
 • ALTO RISCO (maciço): hipotensão (PAS <90 mmHg por >15 min), choque ou PCR.
 • RISCO INTERMEDIÁRIO: disfunção de VD (TC/eco) e/ou troponina elevada, sem hipotensão.
     Alto-intermediário = ambos positivos. Baixo-intermediário = apenas um.
 • BAIXO RISCO: PESI classe I–II ou sPESI 0, sem disfunção de VD nem biomarcador alterado.
 
-# 3. TRATAMENTO
+3. TRATAMENTO
 • ALTO RISCO → TROMBÓLISE sistêmica: alteplase 100 mg EV em 2 h (ou 0,6 mg/kg em 15 min se PCR iminente).
   Se contraindicada ou falha → trombectomia (cateter ou cirúrgica), considerar ECMO. Anticoagular com HNF.
 • INTERMEDIÁRIO-ALTO → anticoagulação plena + MONITORIZAÇÃO em unidade fechada;
   trombólise de resgate se deterioração hemodinâmica. Considerar dose reduzida/cateter em centros com experiência.
 • BAIXO RISCO / INTERMEDIÁRIO-BAIXO → anticoagulação plena. Baixo risco selecionado pode ser tratado ambulatorialmente.
 
-# 4. ANTICOAGULAÇÃO
+4. ANTICOAGULAÇÃO
 • Início: enoxaparina 1 mg/kg SC 12/12 h; ou HNF (preferida se instabilidade, obesidade extrema, ClCr <30
   ou possibilidade de trombólise/procedimento).
 • DOAC: rivaroxabana 15 mg 12/12 h por 21 dias → 20 mg/dia; OU apixabana 10 mg 12/12 h por 7 dias → 5 mg 12/12 h.
@@ -2124,7 +2533,7 @@ TEP/TVP prévio 1,5 | hemoptise 1 | câncer 1. → ≤4 improvável | >4 prováv
 • Duração: 3 meses se fator provocador transitório e reversível; indefinida se não provocado com baixo risco
   de sangramento, TEP recorrente, câncer ativo ou trombofilia de alto risco.
 
-# 5. SUPORTE
+5. SUPORTE
 O2 para SpO2 ≥94%. Cautela com volume (VD já sobrecarregado — no máximo 500 mL).
 Se hipotensão: noradrenalina (mantém pressão de perfusão coronariana do VD); dobutamina se baixo débito com VD dilatado.
 Investigar TVP com Doppler de MMII. Filtro de veia cava apenas se contraindicação absoluta à anticoagulação.`
@@ -2231,25 +2640,33 @@ Sítio de punção: sem sangramento, hematoma ou sinais flogísticos.`
   {
     grupo: "Hemodinâmica (Dante Pazzanese)",
     nome: "Receita básica",
-    texto: `USO ORAL E CONTÍNUO
+    texto: `RECEITUÁRIO
 
-1) Losartana 50 mg --------------------------------------------
-Tomar 01 comprimido de 12 em 12 horas
+Paciente: ______________________________________
+Data: __/__/____
 
-2) Atorvastatina 80 mg ---------------------------------------
-Tomar 01 comprimido à noite
+USO ORAL E CONTÍNUO
 
-3) Anlodipino 10 mg ------------------------------------------
-Tomar 01 comprimido à noite
+1) Losartana 50 mg
+   Tomar 1 comprimido de 12 em 12 horas.
 
-4) AAS 100 mg -----------------------------------------------
-Tomar 01 comprimido no almoço
+2) Atorvastatina 80 mg
+   Tomar 1 comprimido ao dia, à noite.
 
-5) Clopidogrel 75 mg ----------------------------------------
-Tomar 01 comprimido ao dia por ____
+3) Anlodipino 10 mg
+   Tomar 1 comprimido ao dia, à noite.
 
-6) Succinato de Metoprolol 25 mg ----------------------------
-Tomar 01 comprimido ao dia
+4) AAS 100 mg
+   Tomar 1 comprimido ao dia, no almoço.
+
+5) Clopidogrel 75 mg
+   Tomar 1 comprimido ao dia, por ______.
+
+6) Succinato de metoprolol 25 mg
+   Tomar 1 comprimido ao dia, pela manhã.
+
+______________________________________
+Assinatura e carimbo
 
 [Ajustar fármacos e doses conforme cada paciente.]`
   }
