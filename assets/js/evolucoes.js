@@ -86,4 +86,18 @@
   // Seleciona o primeiro por padrão
   const first = menu.querySelector('.evol-item');
   if (first) select(parseInt(first.dataset.i, 10), first);
+
+  // Mede o cabeçalho fixo e expõe como --stick-top, para o menu e o editor
+  // grudarem logo abaixo dele. Recalcula em resize porque a barra de hubs quebra
+  // em mais linhas em telas estreitas.
+  const topbar = document.querySelector('.topbar');
+  function medirTopo() {
+    if (!topbar) return;
+    const h = Math.round(topbar.getBoundingClientRect().height);
+    if (h > 0) document.documentElement.style.setProperty('--stick-top', h + 'px');
+  }
+  medirTopo();
+  window.addEventListener('resize', medirTopo);
+  window.addEventListener('load', medirTopo);
+  if (window.ResizeObserver && topbar) new ResizeObserver(medirTopo).observe(topbar);
 })();

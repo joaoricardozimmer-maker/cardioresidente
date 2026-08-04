@@ -1,7 +1,7 @@
-// Modelos de evolução editáveis. Use [colchetes] ou ___ para campos a preencher.
-// Atualizado em 03/08/2026 — modelos por setor (ROP, UTI do PS, OBS, triagem, enfermaria, ambulatórios),
-// banco de exame físico alterado e pacotes de conduta.
-// Backup da versão anterior: assets/js/data-evolucoes.ORIGINAL-2026-08-03.js.bak
+// Modelos de evolução e receitas editáveis. Use [colchetes] ou ___ para campos a preencher.
+// Atualizado em 04/08/2026 — modelos por setor, banco de exame físico alterado,
+// pacotes de conduta e receitas prontas por ambulatório.
+// Backup da versão original: assets/js/data-evolucoes.ORIGINAL-2026-08-03.js.bak
 window.EVOLUCOES = [
   {
     grupo: "Plantão — ROP Crônicos",
@@ -1449,6 +1449,348 @@ CONDUTA:
 7. Solicito: ____________ . Retorno em ___ meses.
 
 Assinatura / CRM`
+  },
+  {
+    grupo: "Receitas para o paciente",
+    nome: "Receita — Cardiometabolismo (HAS, DM2 e dislipidemia)",
+    texto: `RECEITUÁRIO
+Paciente: ______________________________________  Data: __/__/____
+
+USO ORAL E CONTÍNUO
+
+1) Losartana 50 mg -------------------------------------------
+Tomar 01 comprimido de 12 em 12 horas
+
+2) Anlodipino 5 mg -------------------------------------------
+Tomar 01 comprimido ao dia, à noite
+
+3) Hidroclorotiazida 25 mg -----------------------------------
+Tomar 01 comprimido ao dia, pela manhã
+
+4) Atorvastatina 40 mg ---------------------------------------
+Tomar 01 comprimido ao dia, à noite
+
+5) Ezetimiba 10 mg -------------------------------------------
+Tomar 01 comprimido ao dia, à noite
+
+6) Metformina XR 500 mg --------------------------------------
+Tomar 02 comprimidos ao dia, após o jantar
+
+7) Dapagliflozina 10 mg --------------------------------------
+Tomar 01 comprimido ao dia, pela manhã
+
+USO SUBCUTÂNEO
+
+8) Semaglutida 0,25 mg ---------------------------------------
+Aplicar 01 vez por semana, sempre no mesmo dia
+(aumentar para 0,5 mg após 4 semanas, conforme orientação)
+
+ORIENTAÇÕES
+- Reduzir o sal: no máximo 1 colher de chá rasa por dia, somando tudo.
+- Evitar embutidos, enlatados, temperos prontos e caldos concentrados.
+- Atividade física aeróbica de 150 minutos por semana, divididos em 5 dias.
+- Aferir a pressão em casa 2 vezes por semana, sentado e em repouso, e anotar.
+- Não suspender nenhuma medicação por conta própria.
+- Retornar em ___ meses trazendo os exames solicitados.
+
+______________________________________
+Assinatura e carimbo
+
+[Ajustar fármacos e doses conforme cada paciente.]`
+  },
+  {
+    grupo: "Receitas para o paciente",
+    nome: "Receita — Pós-angioplastia / DAC crônica",
+    texto: `RECEITUÁRIO
+Paciente: ______________________________________  Data: __/__/____
+
+USO ORAL E CONTÍNUO
+
+1) AAS 100 mg ------------------------------------------------
+Tomar 01 comprimido ao dia, após o almoço, de uso contínuo
+
+2) Ticagrelor 90 mg ------------------------------------------
+Tomar 01 comprimido de 12 em 12 horas, por ___ meses
+(ou: Clopidogrel 75 mg — tomar 01 comprimido ao dia por ___ meses)
+
+3) Atorvastatina 80 mg ---------------------------------------
+Tomar 01 comprimido ao dia, à noite
+
+4) Succinato de metoprolol 50 mg -----------------------------
+Tomar 01 comprimido ao dia, pela manhã
+
+5) Enalapril 10 mg -------------------------------------------
+Tomar 01 comprimido de 12 em 12 horas
+
+6) Omeprazol 20 mg -------------------------------------------
+Tomar 01 comprimido ao dia, em jejum
+(enquanto estiver em uso de dois antiagregantes)
+
+USO ORAL, SE NECESSÁRIO
+
+7) Dinitrato de isossorbida 5 mg (sublingual) ----------------
+Colocar 01 comprimido embaixo da língua em caso de dor no peito.
+Se a dor não passar em 5 minutos, repetir mais 01 comprimido.
+Se após 3 comprimidos a dor continuar, PROCURAR O PRONTO-SOCORRO.
+
+ORIENTAÇÕES
+- NÃO interromper o AAS nem o segundo antiagregante por conta própria.
+  Antes de qualquer cirurgia ou procedimento dentário, avisar o cardiologista.
+- Procurar o pronto-socorro imediatamente se: dor no peito em repouso por mais
+  de 20 minutos, suor frio, falta de ar súbita ou desmaio.
+- Parar de fumar completamente.
+- Iniciar reabilitação cardiovascular conforme encaminhamento.
+- Retornar em ___ meses trazendo os exames solicitados.
+
+______________________________________
+Assinatura e carimbo
+
+[Ajustar fármacos e doses conforme cada paciente.]`
+  },
+  {
+    grupo: "Receitas para o paciente",
+    nome: "Receita — Insuficiência cardíaca com FE reduzida (4 pilares)",
+    texto: `RECEITUÁRIO
+Paciente: ______________________________________  Data: __/__/____
+
+USO ORAL E CONTÍNUO
+
+1) Sacubitril/Valsartana 49/51 mg ----------------------------
+Tomar 01 comprimido de 12 em 12 horas
+(iniciar com 24/26 mg de 12 em 12 horas se pressão baixa)
+
+2) Carvedilol 6,25 mg ----------------------------------------
+Tomar 01 comprimido de 12 em 12 horas, junto com as refeições
+
+3) Espironolactona 25 mg -------------------------------------
+Tomar 01 comprimido ao dia, pela manhã
+
+4) Dapagliflozina 10 mg --------------------------------------
+Tomar 01 comprimido ao dia, pela manhã
+
+5) Furosemida 40 mg ------------------------------------------
+Tomar 01 comprimido ao dia, pela manhã
+(ajustar conforme peso e inchaço, segundo orientação médica)
+
+ORIENTAÇÕES
+- PESAR-SE TODOS OS DIAS, em jejum, após urinar, com a mesma balança e roupa leve.
+  Anotar o peso. Procurar atendimento se ganhar mais de 2 kg em 3 dias.
+- Restrição de líquidos: ______ ml por dia, contando água, sucos, café, chá e sopa.
+- Restrição de sal: no máximo 1 colher de chá rasa por dia.
+- NÃO usar anti-inflamatórios (diclofenaco, ibuprofeno, nimesulida) — pioram a IC.
+- Procurar o pronto-socorro se: falta de ar em repouso, falta de ar ao deitar,
+  inchaço que piora, desmaio ou palpitação que não para.
+- As doses serão aumentadas aos poucos nas próximas consultas. Não parar sozinho.
+- Retornar em ___ semanas para ajuste, com exames de sangue (ureia, creatinina, potássio).
+
+______________________________________
+Assinatura e carimbo
+
+[Ajustar fármacos e doses conforme cada paciente.]`
+  },
+  {
+    grupo: "Receitas para o paciente",
+    nome: "Receita — Fibrilação atrial (anticoagulação e controle de FC)",
+    texto: `RECEITUÁRIO
+Paciente: ______________________________________  Data: __/__/____
+
+USO ORAL E CONTÍNUO
+
+1) Rivaroxabana 20 mg ----------------------------------------
+Tomar 01 comprimido ao dia, sempre junto com o jantar
+(alternativa: Apixabana 5 mg — tomar 01 comprimido de 12 em 12 horas)
+
+2) Succinato de metoprolol 50 mg -----------------------------
+Tomar 01 comprimido ao dia, pela manhã
+
+3) Atorvastatina 20 mg ---------------------------------------
+Tomar 01 comprimido ao dia, à noite
+
+4) Losartana 50 mg -------------------------------------------
+Tomar 01 comprimido de 12 em 12 horas
+
+ORIENTAÇÕES
+- O anticoagulante previne AVC. NÃO pode ser esquecido nem interrompido.
+  A rivaroxabana precisa ser tomada junto com comida para ser absorvida.
+- Se esquecer uma dose: tomar assim que lembrar no mesmo dia. NUNCA dobrar a dose.
+- Avisar QUALQUER médico ou dentista de que usa anticoagulante, antes de procedimentos.
+- Procurar atendimento se: sangramento que não para, sangue nas fezes ou na urina,
+  vômito com sangue, dor de cabeça forte e súbita, ou após queda com batida na cabeça.
+- Procurar o pronto-socorro se: palpitação com falta de ar, dor no peito ou desmaio.
+- Evitar excesso de álcool e de cafeína.
+- Retornar em ___ meses com hemograma e função renal.
+
+______________________________________
+Assinatura e carimbo
+
+[Ajustar fármacos e doses conforme cada paciente.]`
+  },
+  {
+    grupo: "Receitas para o paciente",
+    nome: "Receita — Prótese valvar mecânica (varfarina)",
+    texto: `RECEITUÁRIO
+Paciente: ______________________________________  Data: __/__/____
+
+USO ORAL E CONTÍNUO
+
+1) Varfarina 5 mg --------------------------------------------
+Tomar ____ comprimido(s) ao dia, sempre no mesmo horário,
+conforme o resultado do INR. Alvo de INR: ______
+
+2) Succinato de metoprolol 25 mg -----------------------------
+Tomar 01 comprimido ao dia, pela manhã
+
+3) Furosemida 40 mg ------------------------------------------
+Tomar 01 comprimido ao dia, pela manhã
+
+ORIENTAÇÕES
+- O anticoagulante é OBRIGATÓRIO e para o resto da vida. Sem ele, a prótese pode
+  formar coágulo e travar. NÃO usar nenhum outro anticoagulante no lugar da varfarina.
+- Colher INR a cada ______ e trazer TODOS os resultados nas consultas.
+- Manter a alimentação CONSTANTE. Não é proibido comer verdura escura (couve, brócolis,
+  espinafre, alface) — o importante é não variar muito a quantidade de um dia para o outro.
+- Evitar bebida alcoólica em excesso.
+- NÃO tomar anti-inflamatórios nem antibióticos sem avisar o médico: muitos remédios
+  alteram o efeito da varfarina. Para dor ou febre, usar dipirona ou paracetamol.
+- Antes de qualquer procedimento dentário, tomar Amoxicilina 2 g (04 comprimidos de 500 mg)
+  em dose única, 30 a 60 minutos antes — prevenção de endocardite.
+- Manter a higiene bucal em dia e ir ao dentista periodicamente.
+- Procurar atendimento se: sangramento que não para, febre persistente, falta de ar,
+  ou se notar que o barulho da prótese (clique) mudou ou sumiu.
+
+______________________________________
+Assinatura e carimbo
+
+[Ajustar fármacos e doses conforme cada paciente.]`
+  },
+  {
+    grupo: "Receitas para o paciente",
+    nome: "Receita — Miocardiopatia / Chagas",
+    texto: `RECEITUÁRIO
+Paciente: ______________________________________  Data: __/__/____
+
+USO ORAL E CONTÍNUO
+
+1) Sacubitril/Valsartana 24/26 mg ----------------------------
+Tomar 01 comprimido de 12 em 12 horas
+
+2) Carvedilol 3,125 mg ---------------------------------------
+Tomar 01 comprimido de 12 em 12 horas, junto com as refeições
+
+3) Espironolactona 25 mg -------------------------------------
+Tomar 01 comprimido ao dia, pela manhã
+
+4) Dapagliflozina 10 mg --------------------------------------
+Tomar 01 comprimido ao dia, pela manhã
+
+5) Furosemida 40 mg ------------------------------------------
+Tomar 01 comprimido ao dia, pela manhã
+
+6) Amiodarona 200 mg -----------------------------------------
+Tomar 01 comprimido ao dia
+(apenas se houver arritmia documentada)
+
+7) Varfarina 5 mg --------------------------------------------
+Tomar ____ comprimido(s) ao dia, conforme INR (alvo 2,0 a 3,0)
+(apenas se houver trombo, aneurisma apical ou fibrilação atrial)
+
+ORIENTAÇÕES
+- Pesar-se todos os dias em jejum e anotar. Procurar atendimento se ganhar
+  mais de 2 kg em 3 dias.
+- Restrição de sal e de líquidos conforme orientação.
+- Procurar o pronto-socorro se: desmaio, palpitação prolongada, falta de ar em
+  repouso ou choque do desfibrilador (se for portador de CDI).
+- Se usa amiodarona: fazer exames de tireoide, fígado e radiografia de tórax
+  periodicamente, conforme solicitado.
+- Retornar em ___ meses com exames.
+
+______________________________________
+Assinatura e carimbo
+
+[Ajustar fármacos e doses conforme cada paciente.]`
+  },
+  {
+    grupo: "Receitas para o paciente",
+    nome: "Receita — Pós-transplante cardíaco",
+    texto: `RECEITUÁRIO
+Paciente: ______________________________________  Data: __/__/____
+
+USO ORAL E CONTÍNUO — NÃO INTERROMPER EM HIPÓTESE ALGUMA
+
+1) Tacrolimo ____ mg -----------------------------------------
+Tomar conforme prescrito, de 12 em 12 horas, SEMPRE no mesmo horário
+(em jejum: 1 hora antes ou 2 horas depois das refeições)
+
+2) Micofenolato de mofetila 500 mg ---------------------------
+Tomar ____ comprimido(s) de 12 em 12 horas
+
+3) Prednisona 5 mg -------------------------------------------
+Tomar ____ comprimido(s) ao dia, pela manhã, após o café
+
+4) Sulfametoxazol + Trimetoprima 400/80 mg -------------------
+Tomar 01 comprimido ao dia (ou 3 vezes por semana, conforme protocolo)
+
+5) Atorvastatina 20 mg ---------------------------------------
+Tomar 01 comprimido ao dia, à noite
+
+6) Omeprazol 20 mg -------------------------------------------
+Tomar 01 comprimido ao dia, em jejum
+
+ORIENTAÇÕES
+- Os imunossupressores são para a vida toda e nos MESMOS horários todos os dias.
+  Esquecer doses é a principal causa de rejeição.
+- No dia da coleta do nível de tacrolimo, NÃO tomar a dose da manhã antes do exame.
+- NÃO usar nenhum remédio novo, chá ou suplemento sem avisar a equipe do transplante.
+  Antibióticos, antifúngicos e alguns remédios de pressão alteram muito o nível do
+  imunossupressor. Evitar erva-de-são-joão e suco de toranja (grapefruit).
+- Vacinas de vírus VIVO são PROIBIDAS. As demais devem estar em dia.
+- Usar protetor solar diariamente e fazer avaliação com dermatologista uma vez por ano.
+- Procurar a equipe se: febre, falta de ar, inchaço, ganho rápido de peso, diarreia
+  persistente, desmaio ou qualquer infecção.
+
+______________________________________
+Assinatura e carimbo
+
+[Ajustar fármacos e doses conforme cada paciente.]`
+  },
+  {
+    grupo: "Receitas para o paciente",
+    nome: "Receita — Prevenção primária / primeiro atendimento",
+    texto: `RECEITUÁRIO
+Paciente: ______________________________________  Data: __/__/____
+
+USO ORAL E CONTÍNUO
+
+1) Rosuvastatina 10 mg ---------------------------------------
+Tomar 01 comprimido ao dia, à noite
+
+2) Losartana 50 mg -------------------------------------------
+Tomar 01 comprimido ao dia
+(iniciar apenas se houver indicação de tratar a pressão)
+
+ORIENTAÇÕES NÃO MEDICAMENTOSAS — a base do tratamento
+- Alimentação: preferir comida de verdade, com verduras, legumes, frutas, grãos
+  integrais, peixe e azeite. Reduzir ultraprocessados, frituras e refrigerantes.
+- Sal: no máximo 1 colher de chá rasa por dia, somando toda a comida do dia.
+- Atividade física: 150 minutos por semana de caminhada rápida, bicicleta ou natação,
+  divididos em pelo menos 5 dias, mais 2 dias de exercício de força.
+- Peso: meta de perder ______ kg até a próxima consulta.
+- Tabagismo: parar completamente. Encaminhado para ______________________.
+- Álcool: no máximo ______ dose(s) por dia.
+- Sono: 7 a 8 horas por noite. Investigar apneia do sono se houver ronco alto.
+- Aferir a pressão em casa 2 vezes por semana, em repouso, e anotar.
+
+EXAMES PARA O RETORNO
+Hemograma, glicemia de jejum, hemoglobina glicada, colesterol total e frações,
+triglicérides, ureia, creatinina, sódio, potássio, TGO, TGP, TSH, ácido úrico,
+urina tipo 1 e relação albumina/creatinina urinária.
+
+Retornar em ___ meses trazendo os exames.
+
+______________________________________
+Assinatura e carimbo
+
+[Ajustar fármacos e doses conforme cada paciente.]`
   },
   {
     grupo: "Exame físico — achados alterados",
