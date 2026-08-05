@@ -118,13 +118,38 @@ window.PROTOCOLOS = [
     ]
   },
   {
-    id: 'tep', nome: 'TEP de alto risco (instável)', area: 'Tromboembolismo',
+    id: 'tep', nome: 'TEP — categorias A–E (AHA/ACC 2026)', area: 'Tromboembolismo',
     passos: [
-      { t: 'passo', x: 'Instabilidade hemodinâmica (PAS < 90 ou queda ≥ 40 mmHg por > 15 min) com suspeita de TEP → emergência.' },
-      { t: 'passo', x: 'Suporte: O₂, cautela na volemia (VD sobrecarregado), noradrenalina se choque; angio-TC se possível ou eco à beira-leito (disfunção/sobrecarga de VD).' },
-      { t: 'dose', x: 'Anticoagulação imediata com HNF (bólus 80 U/kg + infusão).' },
-      { t: 'dose', x: 'TROMBÓLISE sistêmica (alteplase 100 mg EV em 2 h), salvo contraindicação. Alternativas: embolectomia cirúrgica ou por cateter.' },
-      { t: 'nota', x: 'Risco intermediário-alto (VD disfuncional + troponina, sem choque): anticoagular e monitorar; trombólise de resgate se deteriorar.' }
+      { t: 'alerta', x: 'A diretriz AHA/ACC 2026 aposentou "maciço", "submaciço" e "baixo risco". No lugar entraram cinco categorias clínicas (A a E) com subcategorias. A categoria é definida pelo achado MAIS GRAVE — clínico, laboratorial ou de imagem — e o paciente pode mudar de categoria ao longo da internação.' },
+      { t: 'passo', x: 'PASSO 1 — Probabilidade pré-teste. Wells (≤ 4 improvável / > 4 provável), Genebra ou YEARS. Pré-teste baixa ou intermediária (< 50%) → D-dímero com corte ajustado pela idade (idade × 10 µg/L acima de 50 anos). Suspeita alta (> 50%) → angio-TC direto, sem D-dímero.' },
+      { t: 'nota', x: 'Angio-TC de tórax é o exame de escolha, inclusive na gestação. Cintilografia V/Q apenas se houver contraindicação ao contraste. O ecocardiograma NÃO confirma nem exclui TEP — ele serve para estratificar. Exceção: paciente instável demais para ir à TC, em que disfunção de VD ao eco à beira-leito autoriza tratamento empírico.' },
+      { t: 'passo', x: 'PASSO 2 — Classifique. Em todo TEP confirmado sintomático de gravidade elevada, peça troponina, BNP/NT-proBNP e LACTATO (Classe 1 nas categorias C a E) e avalie o VD — eco preferível à angio-TC para estratificação.' },
+      { t: 'decisao', x: 'CATEGORIAS AHA/ACC 2026 — do mais leve ao mais grave:' },
+      { t: 'sub', items: [
+        'A — Subclínico: achado incidental, assintomático. Alta do PS, sem internação.',
+        'B — Sintomático com gravidade clínica BAIXA: PESI I–II, sPESI 0 ou Hestia 0.',
+        'C — Sintomático com gravidade clínica ELEVADA (PESI III–V, sPESI ≥ 1, Hestia ≥ 1), pressão preservada. C1 = VD e biomarcadores normais · C2 = VD OU biomarcador alterado · C3 = ambos alterados.',
+        'D — Falência cardiopulmonar incipiente. D1 = hipotensão transitória/recorrente que responde a volume, sem hipoperfusão · D2 = hipotensão transitória COM hipoperfusão ou lesão de órgão (lactato alto, injúria renal) = "choque normotenso".',
+        'E — Falência cardiopulmonar estabelecida. E1 = hipotensão persistente com choque cardiogênico · E2 = choque refratário ou parada cardiorrespiratória.',
+        'Modificador R+ (acrescente a qualquer subcategoria) — C: SpO₂ < 90%, FR ≥ 30 ou necessidade de O₂ · D: > 6 L/min ou máscara não reinalante · E: insuficiência respiratória hipoxêmica ou ventilatória.'
+      ] },
+      { t: 'passo', x: 'PASSO 3 — Anticoagule. HBPM é preferida à HNF quando é preciso via parenteral (Classe 1, B-R): enoxaparina 1 mg/kg SC 12/12 h. HNF fica reservada a instabilidade, ClCr < 30, obesidade extrema ou previsão de procedimento/trombólise. Na via oral, DOAC antes de varfarina (Classe 1, B-R).' },
+      { t: 'dose', x: 'Rivaroxabana 15 mg 12/12 h por 21 dias, depois 20 mg/dia · Apixabana 10 mg 12/12 h por 7 dias, depois 5 mg 12/12 h · Dabigatrana e edoxabana exigem 5 dias de parenteral antes. Gestação: HBPM ou HNF (DOAC e varfarina são Classe 3: Dano). SAF trombótica: varfarina.' },
+      { t: 'decisao', x: 'PASSO 4 — Destino e terapia por categoria:' },
+      { t: 'sub', items: [
+        'A e B → alta do PS ou alta precoce é razoável (Classe 2a), desde que o paciente consiga retirar o DOAC no mesmo dia e tenha seguimento confiável. Trombólise é DANOSA aqui (Classe 3).',
+        'C1 → internar e anticoagular. Sem terapia avançada: trombólise é danosa (Classe 3) e cateter/trombectomia não trazem benefício (Classe 3).',
+        'C2 e C3 → internar com monitorização e acionar o PERT (Classe 1, B-NR). Benefício de trombólise, cateter e trombectomia é INCERTO (Classe 2b) — decidir caso a caso. Vigiar deterioração de perto.',
+        'D1 e D2 → unidade fechada, PERT, noradrenalina. Terapias avançadas PODEM ser consideradas (Classe 2b): trombólise sistêmica, trombólise por cateter ou trombectomia mecânica.',
+        'E1 → reperfusão é RAZOÁVEL (Classe 2a): trombólise sistêmica, trombólise por cateter, trombectomia mecânica ou embolectomia cirúrgica — as quatro com a mesma classe. VA-ECMO razoável no choque refratário.',
+        'E2 → trombólise sistêmica é razoável (Classe 2a). Embolectomia cirúrgica NÃO é recomendada em preferência a outras opções, como a VA-ECMO.'
+      ] },
+      { t: 'dose', x: 'Trombólise sistêmica: alteplase 100 mg EV em 2 h. Em parada iminente ou instalada: 0,6 mg/kg (máx. 50 mg) em 15 min. Suspender a HNF durante a infusão e retomar quando o TTPa cair abaixo de 2× o controle.' },
+      { t: 'alerta', x: 'NÃO sede profundamente nem intube o paciente das categorias C a E salvo necessidade absoluta (Classe 3: Dano). Séries documentam 19–28% de parada cardíaca após indução anestésica em TEP com disfunção de VD, mesmo em quem parecia estável — a sedação abole a resposta simpática que sustenta o VD. Se intubar, tenha vasopressor, inotrópico e ECMO prontos à beira do leito.' },
+      { t: 'nota', x: 'Suporte: cateter nasal de ALTO FLUXO em vez de cateter comum na hipoxemia moderada a grave. Cautela com volume — o VD já está sobrecarregado; no máximo 500 mL. Noradrenalina é o vasopressor de escolha (mantém a pressão de perfusão coronariana do VD); dobutamina se baixo débito com VD dilatado.' },
+      { t: 'nota', x: 'Filtro de veia cava: NÃO usar de rotina em quem está anticoagulado (Classe 3: Dano, nível A — PREPIC2). Só na contraindicação absoluta à anticoagulação; preferir o retirável e programar a retirada em 29–54 dias.' },
+      { t: 'passo', x: 'PASSO 5 — Depois da alta. Contato ou consulta na primeira semana; consulta em até 3 meses para decidir a duração da anticoagulação. Estimular deambulação precoce. Perguntar sobre dispneia e limitação funcional em TODA consulta por pelo menos 1 ano — rastreio de doença tromboembólica pulmonar crônica (~3% dos TEP).' },
+      { t: 'nota', x: 'Duração: 3–6 meses se fator de risco maior reversível. Estendida se primeiro TEP sem fator reversível maior, fator persistente, TEP recorrente, câncer ativo ou trombofilia de alto risco. Na fase estendida, preferir DOSE REDUZIDA — apixabana 2,5 mg 12/12 h ou rivaroxabana 10 mg/dia (RENOVE, API-CAT).' }
     ]
   },
   {

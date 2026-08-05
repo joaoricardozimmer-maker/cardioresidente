@@ -167,13 +167,53 @@ window.DIRETRIZES = [
   // ---------------- TROMBOEMBOLISMO ----------------
   {
     cat: "Tromboembolismo pulmonar",
-    title: "Estratificação e anticoagulação no TEP",
-    keywords: ["tep", "embolia pulmonar", "tromboembolismo", "anticoagulação", "trombólise", "psi"],
-    bottom: "Estratificar risco precoce (instabilidade hemodinâmica, VD, biomarcadores). Anticoagulação imediata; DOAC preferido na maioria. TEP de alto risco (choque): trombólise sistêmica. Risco intermediário-alto: monitorar e considerar reperfusão de resgate.",
+    title: "Estratificação do TEP — categorias clínicas A–E",
+    keywords: ["tep", "embolia pulmonar", "tromboembolismo", "categoria", "estratificação", "maciço", "submaciço", "pesi", "spesi", "hestia", "pert"],
+    bottom: "A AHA/ACC 2026 substituiu maciço/submaciço/baixo risco por cinco categorias clínicas: A subclínico · B sintomático com gravidade baixa (PESI I–II, sPESI 0, Hestia 0) · C sintomático com gravidade elevada (C1 VD e biomarcador normais, C2 um alterado, C3 ambos) · D falência incipiente (D1 hipotensão transitória, D2 choque normotenso) · E falência estabelecida (E1 choque cardiogênico, E2 refratário/PCR). Modificador R+ para comprometimento respiratório. A categoria segue o achado mais grave e é reavaliada ao longo da internação. Nas categorias C–E: dosar lactato e acionar o PERT (Classe 1).",
+    classe: "I", nivel: "B",
+    trials: "HOME-PE, PEITHO",
+    src: "Diretriz AHA/ACC/ACCP/ACEP/CHEST/SCAI/SHM/SIR/SVM/SVN TEP 2026",
+    pubmedQuery: "2026 AHA ACC guideline acute pulmonary embolism clinical categories"
+  },
+  {
+    cat: "Tromboembolismo pulmonar",
+    title: "Anticoagulação no TEP — HBPM e DOAC",
+    keywords: ["tep", "anticoagulação", "doac", "hbpm", "enoxaparina", "rivaroxabana", "apixabana", "varfarina", "heparina"],
+    bottom: "Quando é preciso anticoagulação parenteral, HBPM é recomendada sobre HNF (menos TEV recorrente, sem aumento de sangramento, sem monitorização e menor risco de HIT). Na via oral, DOAC sobre antagonista da vitamina K, salvo contraindicação. Exceções: gestação e amamentação (HBPM ou HNF; DOAC e varfarina são Classe 3: Dano), SAF trombótica (varfarina), Child-Pugh C (evitar DOAC). Obesidade grave e DRC estágios 2–3 não contraindicam DOAC.",
+    classe: "I", nivel: "B",
+    trials: "EINSTEIN-PE, AMPLIFY, Hokusai-VTE",
+    src: "Diretriz AHA/ACC TEP 2026",
+    pubmedQuery: "pulmonary embolism direct oral anticoagulant low molecular weight heparin guideline"
+  },
+  {
+    cat: "Tromboembolismo pulmonar",
+    title: "Reperfusão no TEP — trombólise, cateter e trombectomia",
+    keywords: ["tep", "trombólise", "alteplase", "trombectomia", "cateter", "embolectomia", "ecmo", "reperfusão"],
+    bottom: "Categorias A a C1: trombólise sistêmica é danosa (Classe 3) e terapia por cateter não traz benefício. C2–C3: benefício incerto (Classe 2b). D1–D2: trombólise sistêmica, trombólise por cateter ou trombectomia mecânica podem ser consideradas (Classe 2b). E1: reperfusão é razoável (Classe 2a) — trombólise sistêmica, por cateter, trombectomia mecânica e embolectomia cirúrgica com a mesma classe. E2: trombólise sistêmica razoável; embolectomia cirúrgica não é preferida à VA-ECMO. Alteplase 100 mg EV em 2 h (0,6 mg/kg em 15 min se parada iminente).",
+    classe: "IIa", nivel: "B",
+    trials: "PEITHO, PEERLESS, HI-PEITHO, FLAME",
+    src: "Diretriz AHA/ACC TEP 2026",
+    pubmedQuery: "pulmonary embolism systemic thrombolysis catheter directed mechanical thrombectomy guideline"
+  },
+  {
+    cat: "Tromboembolismo pulmonar",
+    title: "Duração da anticoagulação e seguimento pós-TEP",
+    keywords: ["tep", "duração", "anticoagulação estendida", "dose reduzida", "recorrência", "dtepc", "ctepd", "seguimento"],
+    bottom: "Fator de risco maior reversível: suspender ao fim da fase inicial (3–6 meses). Primeiro TEP sem fator reversível maior, ou fator persistente: manter na fase estendida. Nesta fase, preferir dose reduzida — apixabana 2,5 mg 12/12 h ou rivaroxabana 10 mg/dia. Seguimento: contato na 1ª semana, consulta em até 3 meses para decidir a duração e pergunta ativa sobre dispneia e limitação funcional em toda consulta por pelo menos 1 ano (rastreio de doença tromboembólica pulmonar crônica, ~3% dos casos).",
     classe: "I", nivel: "A",
-    trials: "PEITHO, Hokusai-VTE, EINSTEIN-PE",
-    src: "Diretriz ESC TEP 2019",
-    pubmedQuery: "pulmonary embolism risk stratification anticoagulation guideline"
+    trials: "RENOVE, API-CAT, EINSTEIN-CHOICE",
+    src: "Diretriz AHA/ACC TEP 2026",
+    pubmedQuery: "extended anticoagulation pulmonary embolism reduced dose apixaban rivaroxaban"
+  },
+  {
+    cat: "Tromboembolismo pulmonar",
+    title: "Suporte hemodinâmico e ventilatório no TEP grave",
+    keywords: ["tep", "choque", "noradrenalina", "sedação", "intubação", "ventilação", "ecmo", "filtro de veia cava"],
+    bottom: "Noradrenalina é o vasopressor de escolha (mantém a pressão de perfusão coronariana do VD); dobutamina se baixo débito com VD dilatado. Volume com cautela — no máximo ~500 mL, pois o VD já está sobrecarregado. Cateter nasal de alto fluxo sobre cateter comum na hipoxemia moderada a grave. Evitar sedação profunda e ventilação mecânica nas categorias C–E salvo necessidade absoluta (Classe 3: Dano — 19 a 28% de parada após indução em séries de TEP com disfunção de VD). VA-ECMO razoável no choque refratário. Filtro de veia cava não deve ser usado em paciente anticoagulado (Classe 3: Dano).",
+    classe: "III", nivel: "B",
+    trials: "PREPIC2",
+    src: "Diretriz AHA/ACC TEP 2026",
+    pubmedQuery: "pulmonary embolism right ventricular failure vasopressor sedation intubation cardiac arrest"
   },
 
   // ---------------- PERICARDITE ----------------

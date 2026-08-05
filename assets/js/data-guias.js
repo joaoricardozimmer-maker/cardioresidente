@@ -63,7 +63,7 @@ window.GUIAS = [
   {
     t: "Tromboembolismo venoso / TEP",
     esc: { t: "ESC 2019 — TEP (PDF)", u: "https://academic.oup.com/eurheartj/article-pdf/41/4/543/34306708/ehz405.pdf" },
-    aha: { t: "ACC/AHA — hub", u: "https://www.acc.org/guidelines" },
+    aha: { t: "AHA/ACC 2026 — TEP agudo", u: "https://www.ahajournals.org/doi/10.1161/CIR.0000000000001415" },
     sbc: { t: "SBC 2022 — Tromboembolismo Venoso", u: "https://abccardiol.org/wp-content/uploads/articles_xml/0066-782X-abc-118-04-0797/0066-782X-abc-118-04-0797.x27815.pdf" }
   },
   {

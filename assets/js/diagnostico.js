@@ -149,7 +149,7 @@
     },
     {
       id: 'tep', nome: 'Suspeita de embolia pulmonar (TEP)', contextos: ['agudo'],
-      alerta: 'Em pré-teste <b>baixa</b>, aplique a regra <b>PERC</b> (8 critérios): se todos negativos, exclui TEP sem D-dímero. Use <b>D-dímero ajustado por idade</b> (idade × 10 µg/L se > 50 a). <b>Não use D-dímero em pré-teste alta</b> — vá direto à angio-TC.',
+      alerta: 'Em pré-teste <b>baixa</b>, aplique a regra <b>PERC</b> (8 critérios): se todos negativos, exclui TEP sem D-dímero. Use <b>D-dímero ajustado por idade</b> (idade × 10 µg/L se > 50 a); o algoritmo <b>YEARS</b> também é aceito pela AHA/ACC 2026, inclusive na gestação. <b>Não use D-dímero em pré-teste alta</b> (> 50%) — vá direto à angio-TC. O <b>ecocardiograma não confirma nem exclui TEP</b>: ele estratifica. Confirmado o diagnóstico, classifique em A–E (aba Scores → Categoria clínica do TEP).',
       thresholds: { test: 1.85, vTest: '≤ ~1,85% — TEP excluído (limiar de teste, Kline).' },
       inputs: `
         <div class="diag-sub">Critérios de Wells (TEP)</div>

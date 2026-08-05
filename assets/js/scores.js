@@ -378,8 +378,8 @@
       calc(v){
         const pts=somaChk(v,this.campos);
         let nivel,cond;
-        if(pts<=4){ nivel='ok'; cond='<b>TEP improvável</b> (≤4). Dosar D-dímero; se negativo, exclui TEP (com idade ajustada quando aplicável).'; }
-        else { nivel='warn'; cond='<b>TEP provável</b> (>4). Prosseguir direto para angio-TC de tórax (ou cintilografia V/Q).'; }
+        if(pts<=4){ nivel='ok'; cond='<b>TEP improvável</b> (≤4). Probabilidade pré-teste baixa ou intermediária (&lt; 50%) → dosar D-dímero com corte ajustado pela idade (idade × 10 µg/L acima de 50 anos); se negativo, exclui TEP. O algoritmo YEARS também é aceito pela AHA/ACC 2026, inclusive na gestação.'; }
+        else { nivel='warn'; cond='<b>TEP provável</b> (&gt;4). Suspeita clínica alta (&gt; 50%) → angio-TC de tórax direto, sem D-dímero. Cintilografia V/Q apenas se houver contraindicação ao contraste. <b>Não use o ecocardiograma para confirmar ou excluir TEP</b> — ele serve para estratificar, não para diagnosticar.'; }
         return { valor: (Math.round(pts*10)/10)+' pontos', nivel, conduta: cond };
       }
     },
@@ -420,9 +420,129 @@
       calc(v){
         const pts=somaChk(v,this.campos);
         let nivel,cond;
-        if(pts===0){ nivel='ok'; cond='<b>Baixo risco</b> (mortalidade 30d ~1%). Considerar tratamento ambulatorial/alta precoce se sem disfunção de VD e contexto favorável.'; }
-        else { nivel='warn'; cond='<b>Não baixo risco</b> (≥1). Internar; avaliar VD (eco/TC) e biomarcadores para definir risco intermediário-alto.'; }
+        if(pts===0){ nivel='ok'; cond='<b>Baixo risco</b> (mortalidade 30d ~1%). Na diretriz AHA/ACC 2026 corresponde à <b>categoria B</b> (se sintomático) — alta precoce ou tratamento ambulatorial é razoável, com DOAC e seguimento garantido.'; }
+        else { nivel='warn'; cond='<b>Não baixo risco</b> (≥1). Na AHA/ACC 2026 é <b>categoria C ou pior</b>: internar, dosar lactato e biomarcadores e avaliar o VD (eco preferível à TC) para separar C1, C2 e C3.'; }
         return { valor: pts+' ponto'+(pts===1?'':'s'), nivel, conduta: cond };
+      }
+    },
+    {
+      id:'pesi', grupo:'Tromboembolismo', nome:'PESI (original)',
+      desc:'Índice de gravidade do TEP em 11 variáveis — define as classes I a V usadas pela categoria clínica AHA/ACC 2026.',
+      campos:[
+        {id:'idade', tipo:'num', label:'Idade', un:'anos'},
+        {id:'sexo', tipo:'sel', label:'Sexo', opts:[{v:'F',t:'Feminino (0)'},{v:'M',t:'Masculino (+10)'}]},
+        {id:'ca', tipo:'chk', label:'Câncer', p:30},
+        {id:'ic', tipo:'chk', label:'Insuficiência cardíaca', p:10},
+        {id:'dpoc', tipo:'chk', label:'Doença pulmonar crônica', p:10},
+        {id:'fc', tipo:'chk', label:'FC ≥ 110 bpm', p:20},
+        {id:'pas', tipo:'chk', label:'PAS < 100 mmHg', p:30},
+        {id:'fr', tipo:'chk', label:'FR ≥ 30 irpm', p:20},
+        {id:'temp', tipo:'chk', label:'Temperatura < 36 °C', p:20},
+        {id:'ment', tipo:'chk', label:'Alteração do estado mental', p:60},
+        {id:'sat', tipo:'chk', label:'SatO₂ < 90%', p:20}
+      ],
+      calc(v){
+        const id=n(v.idade);
+        if(id===null) return { valor:'—', nivel:'info', conduta:'Informe a idade — ela entra no escore em pontos (1 ponto por ano).' };
+        const pts = id + (v.sexo==='M'?10:0) + somaChk(v,this.campos);
+        let cls,mort,nivel;
+        if(pts<=65){ cls='I — risco muito baixo'; mort='0–1,6%'; nivel='ok'; }
+        else if(pts<=85){ cls='II — risco baixo'; mort='1,7–3,5%'; nivel='ok'; }
+        else if(pts<=105){ cls='III — risco intermediário'; mort='3,2–7,1%'; nivel='warn'; }
+        else if(pts<=125){ cls='IV — risco alto'; mort='4,0–11,4%'; nivel='bad'; }
+        else { cls='V — risco muito alto'; mort='10,0–24,5%'; nivel='bad'; }
+        const cond = pts<=85
+          ? 'Mortalidade em 30 dias '+mort+'. Classe I–II = gravidade clínica baixa → <b>categoria B</b> da AHA/ACC 2026 se sintomático: alta precoce ou manejo ambulatorial é razoável (Classe 2a), desde que haja DOAC disponível e seguimento confiável.'
+          : 'Mortalidade em 30 dias '+mort+'. Classe III–V = gravidade clínica elevada → <b>categoria C ou pior</b>: internar, dosar lactato, troponina e BNP e avaliar o VD para definir C1, C2 ou C3.';
+        return { valor: pts+' pts · classe '+cls, nivel, conduta: cond };
+      }
+    },
+    {
+      id:'hestia', grupo:'Tromboembolismo', nome:'Critérios de Hestia',
+      desc:'Seleção de candidatos ao tratamento ambulatorial do TEP. Qualquer resposta "sim" contraindica a alta. Validado contra o sPESI no HOME-PE.',
+      campos:[
+        {id:'instavel', tipo:'chk', label:'Instabilidade hemodinâmica (PAS < 100 mmHg com FC > 100 bpm, ou necessidade de UTI)'},
+        {id:'reperf', tipo:'chk', label:'Necessidade de trombólise ou embolectomia'},
+        {id:'sangra', tipo:'chk', label:'Sangramento ativo ou alto risco de sangramento'},
+        {id:'o2', tipo:'chk', label:'Necessidade de O₂ por mais de 24 h para manter SpO₂ > 90%'},
+        {id:'emaco', tipo:'chk', label:'TEP diagnosticado durante anticoagulação em dose plena'},
+        {id:'dor', tipo:'chk', label:'Dor intensa exigindo analgesia endovenosa por mais de 24 h'},
+        {id:'social', tipo:'chk', label:'Razão médica ou social para internação por mais de 24 h'},
+        {id:'renal', tipo:'chk', label:'Clearance de creatinina < 30 mL/min'},
+        {id:'hepat', tipo:'chk', label:'Insuficiência hepática grave'},
+        {id:'gesta', tipo:'chk', label:'Gestação'},
+        {id:'hit', tipo:'chk', label:'História documentada de trombocitopenia induzida por heparina'}
+      ],
+      calc(v){
+        const pts=somaChk(v,this.campos);
+        if(pts===0) return { valor:'0 critério — elegível', nivel:'ok', conduta:'<b>Hestia 0.</b> Candidato ao tratamento ambulatorial (AHA/ACC 2026, Classe 2a) — <b>categoria B</b>. Prescrever DOAC, garantir que o paciente consiga retirar a medicação no mesmo dia e agendar contato em até 1 semana e consulta em até 3 meses. Orientar sinais de alarme por escrito.' };
+        return { valor: pts+' critério'+(pts===1?'':'s')+' presente'+(pts===1?'':'s'), nivel:'warn', conduta:'<b>Hestia ≥ 1.</b> Não elegível para alta imediata — internar. Reclassificar pela categoria clínica AHA/ACC 2026 (C, D ou E) para definir monitorização e necessidade de terapia avançada.' };
+      }
+    },
+    {
+      id:'pe_categoria', grupo:'Tromboembolismo', nome:'Categoria clínica do TEP (AHA/ACC 2026)',
+      desc:'A classificação A–E que aposentou "maciço / submaciço / baixo risco". A categoria é definida pelo indicador MAIS GRAVE — por isso responda de cima para baixo. O paciente pode mudar de categoria ao longo da internação.',
+      campos:[
+        {id:'sint', tipo:'sel', label:'1. Há sintomas atribuíveis ao TEP?', opts:[
+          {v:'sim', t:'Sim — dispneia, dor torácica, síncope, taquicardia'},
+          {v:'nao', t:'Não — achado incidental, assintomático'}
+        ]},
+        {id:'hemo', tipo:'sel', label:'2. Situação hemodinâmica', opts:[
+          {v:'estavel', t:'Normotenso e estável, sem sinais de hipoperfusão'},
+          {v:'d1', t:'Hipotensão transitória ou recorrente que responde a volume, SEM hipoperfusão'},
+          {v:'d2', t:'Hipotensão transitória COM hipoperfusão ou lesão de órgão (lactato alto, injúria renal) — "choque normotenso"'},
+          {v:'e1', t:'Hipotensão persistente com choque cardiogênico'},
+          {v:'e2', t:'Choque refratário ou parada cardiorrespiratória'}
+        ]},
+        {id:'grav', tipo:'sel', label:'3. Escore de gravidade clínica (se normotenso)', opts:[
+          {v:'baixo', t:'Baixo — PESI I–II, sPESI 0 ou Hestia 0'},
+          {v:'alto', t:'Elevado — PESI III–V, sPESI ≥ 1 ou Hestia ≥ 1'}
+        ]},
+        {id:'vd', tipo:'chk', label:'Disfunção de VD na imagem (VD/VE ≥ 1,0, hipocinesia, sinal de McConnell, septo retificado)'},
+        {id:'bio', tipo:'chk', label:'Biomarcador elevado (troponina e/ou BNP / NT-proBNP)'},
+        {id:'resp', tipo:'chk', label:'Modificador respiratório R+ — C: SpO₂ < 90%, FR ≥ 30 ou necessidade de O₂ · D: > 6 L/min ou máscara não reinalante · E: insuficiência respiratória hipoxêmica ou ventilatória'}
+      ],
+      calc(v){
+        const vd=!!v.vd, bio=!!v.bio;
+        let cat, nome, nivel, cond;
+        if(v.hemo==='e2') cat='E2';
+        else if(v.hemo==='e1') cat='E1';
+        else if(v.hemo==='d2') cat='D2';
+        else if(v.hemo==='d1') cat='D1';
+        else if(v.sint==='nao') cat='A';
+        else if(v.grav==='baixo') cat='B';
+        else cat = (vd&&bio) ? 'C3' : ((vd||bio) ? 'C2' : 'C1');
+
+        const base = '<div class="sc-extra">Comum a todas as categorias: <b>HBPM antes de HNF</b> quando é preciso anticoagulação parenteral (Classe 1, B-R) e <b>DOAC antes de varfarina</b> na via oral (Classe 1, B-R). Não colocar filtro de veia cava em quem está anticoagulado (Classe 3: Dano, nível A).</div>';
+
+        if(cat==='A'){
+          nome='Subclínico'; nivel='ok';
+          cond='<b>Categoria A — TEP incidental, assintomático.</b> Anticoagular e dar alta direto do pronto-socorro: não há necessidade de internação, desde que o paciente consiga iniciar o DOAC de imediato e tenha seguimento confiável. Trombólise sistêmica é danosa (Classe 3) e terapias por cateter não estão indicadas.';
+        } else if(cat==='B'){
+          nome='Sintomático com gravidade clínica baixa'; nivel='ok';
+          cond='<b>Categoria B.</b> Alta precoce ou tratamento ambulatorial é razoável (Classe 2a) quando o escore é baixo e isso está alinhado com o desejo do paciente — o HOME-PE mostrou desempenho equivalente entre Hestia e sPESI. Exigências: acesso imediato ao anticoagulante (preferir DOAC) e seguimento rápido e confiável. Sem indicação de trombólise ou terapia por cateter.';
+        } else if(cat==='C1'){
+          nome='Gravidade elevada, VD e biomarcadores normais'; nivel='warn';
+          cond='<b>Categoria C1.</b> Internar e anticoagular com HBPM. Dosar lactato (Classe 1) e avaliar o VD — o eco é preferível à TC para estratificação. Terapias avançadas <b>não</b> estão indicadas: trombólise sistêmica é danosa (Classe 3) e cateter/trombectomia não trazem benefício (Classe 3).';
+        } else if(cat==='C2'||cat==='C3'){
+          nome = cat==='C3' ? 'Gravidade elevada com disfunção de VD E biomarcador alterado' : 'Gravidade elevada com disfunção de VD OU biomarcador alterado';
+          nivel='warn';
+          cond='<b>Categoria '+cat+'.</b> Internar com monitorização, HBPM e lactato seriado (Classe 1). Acionar o <b>PERT</b> (equipe de resposta ao TEP) — recomendação Classe 1, B-NR na diretriz de 2026. O benefício de trombólise sistêmica, trombólise por cateter e trombectomia mecânica aqui é <b>incerto</b> (Classe 2b): decidir caso a caso, pesando risco de sangramento e trajetória clínica. Vigiar deterioração — é a transição para D que muda a conduta.'
+            + (cat==='C3' ? ' O C3 é o antigo "risco intermediário-alto" e é o subgrupo que mais deteriora: reavaliar a cada poucas horas.' : '');
+        } else if(cat==='D1'||cat==='D2'){
+          nome = cat==='D1' ? 'Falência cardiopulmonar incipiente — hipotensão transitória' : 'Falência cardiopulmonar incipiente — choque normotenso';
+          nivel='bad';
+          cond='<b>Categoria '+cat+'.</b> Unidade fechada, PERT acionado, anticoagulação plena e suporte hemodinâmico com <b>noradrenalina</b> (preserva a pressão de perfusão coronariana do VD). Cautela com volume — no máximo 500 mL. Terapias avançadas <b>podem ser consideradas</b> (Classe 2b): trombólise sistêmica, trombólise dirigida por cateter ou trombectomia mecânica. <b>Evitar sedação profunda e intubação</b> salvo necessidade absoluta (Classe 3: Dano) — há séries com 19–28% de parada após indução, mesmo em pacientes que pareciam estáveis. Se intubar, ter vasopressor, inotrópico e ECMO à beira do leito.';
+        } else if(cat==='E1'){
+          nome='Falência cardiopulmonar — hipotensão persistente com choque cardiogênico'; nivel='bad';
+          cond='<b>Categoria E1.</b> Terapia de reperfusão é razoável (Classe 2a) — e pela primeira vez trombólise sistêmica, trombólise por cateter, trombectomia mecânica e embolectomia cirúrgica receberam a <b>mesma</b> classe. Trombólise sistêmica: alteplase 100 mg EV em 2 h. Se o risco de sangramento pesar, a via por cateter é uma alternativa aceitável (o PEERLESS não mostrou diferença entre trombólise por cateter e trombectomia em mortalidade ou sangramento em 30 dias). Noradrenalina para sustentar a PAM; VA-ECMO é razoável no choque refratário. Evitar sedação profunda e VM.';
+        } else {
+          nome='Falência cardiopulmonar refratária ou parada cardiorrespiratória'; nivel='bad';
+          cond='<b>Categoria E2.</b> Trombólise sistêmica é razoável (Classe 2a) — alteplase 100 mg em 2 h, ou 0,6 mg/kg em 15 min (máx. 50 mg) se parada iminente ou instalada. VA-ECMO como ponte. <b>Embolectomia cirúrgica não é recomendada em preferência</b> a outras opções como a ECMO. Se o paciente está muito instável para a angio-TC, o eco à beira-leito com disfunção de VD já autoriza tratamento empírico.';
+        }
+
+        const r = v.resp ? '<div class="sc-extra"><b>Modificador R+</b> — comprometimento respiratório presente. Use cateter nasal de alto fluxo em vez de cateter comum na hipoxemia moderada a grave; a intubação é o momento de maior risco nesses pacientes.</div>' : '';
+        return { valor: 'Categoria '+cat+(v.resp?' R+':'')+' — '+nome, nivel, conduta: cond + r + base };
       }
     },
     {

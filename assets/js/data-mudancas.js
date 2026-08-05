@@ -1,6 +1,24 @@
 // Changelog de diretrizes — "o que mudou" recentemente. Curado a partir das publicações oficiais.
 window.MUDANCAS = [
   {
+    ano: '2026', area: 'Tromboembolismo pulmonar',
+    fonte: 'AHA/ACC/ACCP/ACEP/CHEST/SCAI/SHM/SIR/SVM/SVN — 1ª diretriz americana dedicada ao TEP agudo (Circulation/JACC, fev/2026)',
+    itens: [
+      'Acabaram os termos "maciço", "submaciço" e "baixo risco". Entrou a classificação AHA/ACC Acute PE Clinical Categories, de A a E, com subcategorias — a categoria é definida pelo achado mais grave e é reavaliada ao longo da internação.',
+      'A — subclínico (incidental, assintomático): alta direto do pronto-socorro, sem internação. B — sintomático com gravidade clínica baixa (PESI I–II, sPESI 0 ou Hestia 0): alta precoce ou tratamento ambulatorial é razoável (Classe 2a).',
+      'C — sintomático com gravidade elevada e pressão preservada, subdividido pelo VD e pelos biomarcadores: C1 ambos normais · C2 um alterado · C3 os dois alterados (o antigo "intermediário-alto").',
+      'D — falência cardiopulmonar incipiente: D1 hipotensão transitória que responde a volume, sem hipoperfusão · D2 hipotensão transitória com hipoperfusão ou lesão de órgão ("choque normotenso"). E — falência estabelecida: E1 hipotensão persistente com choque cardiogênico · E2 choque refratário ou parada.',
+      'Modificador respiratório R+, acrescentado a qualquer subcategoria: em C, SpO₂ < 90%, FR ≥ 30 ou necessidade de O₂; em D, mais de 6 L/min ou máscara não reinalante; em E, insuficiência respiratória hipoxêmica ou ventilatória.',
+      'HBPM passa a ser recomendada sobre HNF na anticoagulação parenteral (Classe 1, B-R) e DOAC sobre varfarina na via oral (Classe 1, B-R). Gestação continua com HBPM/HNF — DOAC e varfarina são Classe 3: Dano.',
+      'Reperfusão por categoria: danosa em A–C1 · incerta em C2–C3 (2b) · pode ser considerada em D1–D2 (2b) · razoável em E1 (2a), com trombólise sistêmica, trombólise por cateter, trombectomia mecânica e embolectomia cirúrgica recebendo a MESMA classe pela primeira vez.',
+      'PERT (equipe de resposta ao TEP) sobe a Classe 1 (B-NR) nas categorias C a E. Lactato passa a ser Classe 1 nessas mesmas categorias.',
+      'Nova recomendação Classe 3 (Dano) contra sedação profunda e ventilação mecânica sem necessidade absoluta em C–E: séries mostram 19 a 28% de parada cardíaca após indução em TEP com disfunção de VD, mesmo em pacientes que pareciam estáveis.',
+      'Na fase estendida da anticoagulação, dose reduzida (apixabana 2,5 mg 12/12 h ou rivaroxabana 10 mg/dia) passa a ser preferida à dose plena (RENOVE, API-CAT).',
+      'Seguimento estruturado: contato na 1ª semana, consulta em até 3 meses para definir duração e pergunta ativa sobre dispneia e limitação funcional em toda consulta por pelo menos 1 ano (rastreio de doença tromboembólica pulmonar crônica).',
+      'No site: nova calculadora "Categoria clínica do TEP (AHA/ACC 2026)", além de PESI original e critérios de Hestia; protocolo de plantão, tema e pacote de conduta reescritos.'
+    ]
+  },
+  {
     ano: '2025', area: 'Dor torácica na emergência',
     fonte: 'SBC/GECETI/FLAME — Diretriz Brasileira de Atendimento à Dor Torácica na Unidade de Emergência 2025',
     itens: [

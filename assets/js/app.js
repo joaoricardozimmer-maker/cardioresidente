@@ -7,7 +7,7 @@
     { id: 'ferramentas', label: '🧮 Ferramentas', views: [['scores', '🧮 Scores'], ['pretest', '🎯 Pré-teste'], ['doses', '💊 Doses']] },
     { id: 'mbe', label: '📐 MBE', views: [['mbe', '📐 MBE']] },
     { id: 'plantao', label: '🚨 Plantão', views: [['protocolos', '🚨 Protocolos']] },
-    { id: 'prontuario', label: '📝 Prontuário', views: [['transcricao', '📝 Transcrever laudo'], ['evolucoes', '🗂️ Evoluções']] },
+    { id: 'prontuario', label: '📝 Prontuário', views: [['transcricao', '📝 Transcrever laudo'], ['evolucoes', '🗂️ Evoluções'], ['orientacoes', '💬 Orientações']] },
     { id: 'sobre', label: 'ℹ️ Sobre', views: [['novidades', '🆕 Atualizações'], ['sobre', 'ℹ️ Sobre']] }
   ];
   const viewHub = {};
@@ -69,6 +69,11 @@
       label: g.t, sub: 'Diretriz por tema', type: 'Diretriz', kw: '',
       run: () => { showView('guias'); const i = document.getElementById('guias-busca'); if (i) { i.value = g.t; i.dispatchEvent(new Event('input')); } }
     }));
+    (window.ORIENTACOES || []).forEach(o => IDX.push({
+      label: o.nome, sub: 'Orientação ao paciente', type: 'Orientação',
+      kw: (o.resumo || '') + ' ' + (o.paciente || '') + ' ' + (o.evidencia || []).map(e => e.t).join(' '),
+      run: () => { showView('orientacoes'); if (window.cardioAbrirOrientacao) window.cardioAbrirOrientacao(o.id); }
+    }));
     (window.PROTOCOLOS || []).forEach(p => IDX.push({
       label: p.nome, sub: 'Protocolo de plantão', type: 'Protocolo', kw: (p.area || ''),
       run: () => { showView('protocolos'); const b = document.querySelector('#protocolos-menu .evol-item[data-id="' + p.id + '"]'); if (b) b.click(); }
@@ -82,7 +87,7 @@
     });
     built = true;
   }
-  function badgeClass(t) { return 'gs-' + ({ 'Conduta': 'cond', 'Score': 'score', 'Dose': 'dose', 'Diretriz': 'guia', 'Ensaio': 'ens', 'Protocolo': 'prot' }[t] || 'cond'); }
+  function badgeClass(t) { return 'gs-' + ({ 'Conduta': 'cond', 'Score': 'score', 'Dose': 'dose', 'Diretriz': 'guia', 'Ensaio': 'ens', 'Protocolo': 'prot', 'Orientação': 'orient' }[t] || 'cond'); }
 
   if (gi && gr) {
     const run = () => {
