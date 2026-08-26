@@ -80,17 +80,27 @@ ACE E: placa heterogênea, estenose 50–69% (VPS 170 cm/s). Demais segmentos p�
 Vertebrais: fluxo normal bilateral, sem dominância.
 Conclusão: estenose carotídea 50–69% em ACE esquerda; demais <50%.`,
 
-  laboratorio: `Você organiza resultados de exames laboratoriais em formato compacto para o prontuário. A entrada costuma vir BAGUNÇADA (cópia de tela do AFIP/sistema), com lista de pedidos, nomes de solicitantes, datas/horas, "Liberado por", valores históricos e gráficos. IGNORE todo esse ruído e extraia APENAS os RESULTADOS ATUAIS de cada exame (o valor mais recente quando houver vários).
-Regras:
-- Agrupe: Hemograma (Hb, Ht, Leuco com diferencial absoluto se houver, Plaq), Coagulação (TAP/AP/RNI, TTPA/relação, Fibrinogênio), Bioquímica/renal (Ur, Cr, Na, K, Mg), Glicídico (Glicose, HbA1c), Lipídico, Hepático, Marcadores, Tireoide, etc. — só os que existirem.
-- Formato: sigla valor unidade, separados por " / "; uma linha por grupo OU tudo corrido.
-- Ao final, linha "Alterações:" destacando o que está fora da referência.
-- NÃO inclua nome do paciente, médico, datas de coleta nem valores históricos. Não invente valores.
-Português, conciso.
-EXEMPLO de saída:
-Hb 12,8 / Ht 36% / Leuco 9.060 (Neutrófilos 4.240, Eosinófilos 1.290, Linfócitos 2.840) / Plaq 325 mil
-TAP 11,3s (AP 109%, RNI 0,95) / TTPA 25s (rel 0,93) / Fibrinogênio 356 mg/dL / Glicose 224 mg/dL
-Alterações: anemia leve, eosinofilia, hiperglicemia.`,
+  laboratorio: `Você transcreve resultados de exames laboratoriais para o prontuário em UMA ÚNICA LINHA. A entrada é uma cópia de tela BAGUNÇADA (AFIP/Shift): lista de ordens de serviço, solicitantes, "Liberado por", valores de referência, notas e as séries históricas dos mini-gráficos. IGNORE todo esse ruído.
+
+REGRAS OBRIGATÓRIAS
+1. Use SOMENTE os resultados da coleta MAIS RECENTE. Os números soltos em sequência depois das notas (seguidos de datas coladas como "25/04/2214:15:24") são histórico de gráfico — NUNCA use.
+2. Comece a linha com "- DD/MM/AAAA (HHhMM): " (data e hora da coleta).
+3. Separe os itens por " | ". SEM unidades, exceto "%" na HbA1c (e na AP, quando houver).
+4. Mantenha a vírgula decimal do laudo (13,6 e não 13.6).
+5. Leucócitos e plaquetas em valor ABSOLUTO com ponto de milhar: 8,80 Mil/mm3 -> 8.800; 151 Mil/mm3 -> 151.000.
+6. NÃO inclua: nome/registro do paciente, médicos, "Glicemia média estimada", diferencial do leucograma, VCM/HCM/CHCM/RDW/eritrócitos, nem linha de "Alterações".
+7. NÃO invente valores — só o que está no laudo.
+
+ORDEM FIXA (pule o que não existir):
+Hb | Ht | Leuco | Plaq | TAP (AP, RNI) | TTPA (rel) | TSH | T4L | VitD-25OH | Glic | HbA1c | Trigl | CT | HDL | LDL | VLDL | CPK | CKMB | Trop | NTproBNP | TGO | TGP | GGT | FA | BT | BD | BI | AUr | Creat | TFGe | Ur | Na | K | Mg | Ca | P | PCR | Microalbuminuria | U1
+
+FORMATOS ESPECIAIS
+- Microalbuminuria Alb <v> - Cr <v> - A/C <v>
+- U1 pH <v> - Dens <v> - Nit Neg/Pos - Leuco <v> - Hem <v>  (acrescente Prot/Glic/Cet/Sangue/Cilindros/Bact SOMENTE se alterados)
+- Formas imaturas (blastos, promielócitos, mielócitos, metamielócitos, bastonetes) SÓ aparecem se forem > 0, entre parênteses após o Leuco.
+
+EXEMPLO EXATO DE SAÍDA (uma linha só, sem comentários, sem markdown):
+- 06/08/2026 (09h20): Hb 13,6 | Ht 40,5 | Leuco 8.800 | Plaq 151.000 | TSH 4,56 | T4L 1,21 | VitD-25OH 17 | Glic 114 | HbA1c 9,6% | Trigl 104 | CT 81 | HDL 33 | LDL 27 | VLDL 21 | CPK 200 | NTproBNP 160 | TGO 30 | TGP 41 | BT 0,45 | BD 0,22 | BI 0,23 | AUr 4,6 | Creat 1,21 | TFGe 62 | Ur 27 | Na 142 | K 4,8 | Mg 1,8 | Microalbuminuria Alb 3,00 - Cr 52,66 - A/C 5,70 | U1 pH 5,5 - Dens 1010 - Nit Neg - Leuco 1.000 - Hem 1.000`,
 
   balanco: `Você resume uma planilha de Balanço Hídrico (UTI/enfermaria) para o prontuário. A entrada traz ganhos e perdas hora a hora; você deve TOTALIZAR o período.
 Saída em UMA a duas linhas, com: Ganhos totais (mL), Perdas totais (mL), Diurese total (mL) e débito urinário (mL/kg/h se houver peso), drenos (mediastino/pleural, mL) e Balanço hídrico final (com sinal + ou −).
@@ -137,16 +147,17 @@ module.exports = async function handler(req, res) {
     if (typeof body === 'string') body = JSON.parse(body);
     const tipo = (body && body.tipo) || 'generico';
     const texto = (body && body.texto) || '';
-    const imagem = (body && body.imagem) || null;
+    const imagem = (body && body.imagem) || null; // { mimeType, data(base64) }
 
     if (!texto.trim() && !imagem) {
       return res.status(400).json({ error: 'Envie o texto e/ou a imagem.' });
     }
-    if (texto.length > 20000) return res.status(400).json({ error: 'Texto muito longo (limite 20.000 caracteres).' });
+    if (texto.length > 120000) return res.status(400).json({ error: 'Texto muito longo (limite 120.000 caracteres).' });
 
     const sistema = (PROMPTS[tipo] || PROMPTS.generico)
       + '\n\nIMPORTANTE: NÃO inclua dados que identifiquem o paciente (nome, registro, CPF). Responda APENAS com o resultado pedido, sem comentários, sem markdown.';
 
+    // Monta as partes da mensagem (texto + imagem opcional para visão)
     const parts = [];
     const instrucao = tipo === 'controles'
       ? 'Processe os sinais vitais a seguir conforme as regras.'
