@@ -5,19 +5,6 @@
 const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
 const PROMPTS = {
-  ecocardiograma: `Você resume laudos de ecocardiograma transtorácico para o prontuário (padrão Instituto Dante Pazzanese).
-Estrutura da saída:
-1) UMA linha de medidas em siglas, na ordem (só o que constar): Ao (raiz), AoAsc, AEi (vol. indexado ml/m²), DDVE, DSVE, Septo, PP, IMVEi, ERP, FEVE (com método entre parênteses), FAC (VD). Separe por " / ". Use as unidades do laudo.
-2) Linha de contratilidade: função global do VE (e grau de disfunção) + alterações segmentares (acinesia/hipocinesia e paredes); função do VD.
-3) Linha das valvas: para cada valva, estenose/insuficiência e grau (mín/discreta/moderada/importante). Inclua PSAP e presença/ausência de HP; VCI e colapso; derrame pericárdico.
-4) Linha "Conclusão:" objetiva.
-Não invente valores ausentes; inclua só o que está no laudo.
-EXEMPLO de saída:
-Ao 34 / AoAsc 32 / AEi 34 ml/m² / DDVE 66 / Septo 7 / PP 8 / IMVEi 126 g/m² / ERP 0,24 / FEVE 25% (Simpson) / FAC 40%
-Contratilidade: aumento moderado do VE com HVE excêntrica; acinesia de parede inferior, septo e toda região apical, hipocinesia das demais — disfunção sistólica importante do VE. Disfunção diastólica grau I. Função sistólica do VD preservada.
-Valvas: IM discreta, IAo mínima, IT discreta; valva pulmonar normal. PSAP 32 mmHg (sem HP). Sem derrame pericárdico. VCI 12 mm com colapso >50%.
-Conclusão: disfunção sistólica importante do VE de padrão isquêmico.`,
-
   ressonancia: `Você resume laudos de ressonância magnética cardíaca para o prontuário (padrão Instituto Dante Pazzanese).
 Estrutura da saída:
 1) UMA linha de medidas em siglas (só o que constar): FEVE, DDVE, DSVE, VDF, iVDF, VSF, Massa VE (e indexada), FEVD, AEi/AE. Separe por " / ".
@@ -127,9 +114,13 @@ module.exports = async function handler(req, res) {
     const texto = (body && body.texto) || '';
     const imagem = (body && body.imagem) || null; // { mimeType, data(base64) }
 
-    // Laboratoriais são lidos SÓ no navegador (assets/js/lab-parser.js). Nunca por IA.
+    // Laboratoriais e ecocardiograma são lidos SÓ no navegador
+    // (assets/js/lab-parser.js e eco-parser.js). Nunca por IA.
     if (tipo === 'laboratorio' || tipo === 'lab' || tipo === 'laboratoriais') {
       return res.status(400).json({ error: 'Exames laboratoriais são lidos só no navegador, sem IA. Recarregue a página e use "Extrair laboratoriais".' });
+    }
+    if (tipo === 'ecocardiograma' || tipo === 'eco') {
+      return res.status(400).json({ error: 'Ecocardiogramas são lidos só no navegador, sem IA. Recarregue a página e use "Extrair ecocardiograma".' });
     }
 
     if (!texto.trim() && !imagem) {
