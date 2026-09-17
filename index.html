@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta name="cardio-build" content="2026-09-16 22:11" />
+  <meta name="cardio-build" content="2026-09-16 22:27" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CardioResidente — Ferramentas para o residente de cardiologia</title>
@@ -847,7 +847,7 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
     <section class="view" id="view-transcricao">
       <div class="hero">
         <h2>Transcrição de laudos por IA</h2>
-        <p>Cole o laudo completo, escolha o tipo de exame e receba um resumo padronizado pronto para colar no prontuário. <strong>Laboratoriais do AFIP são lidos só no seu navegador — nunca passam por IA.</strong> O ecocardiograma também é lido localmente.</p>
+        <p>Cole o laudo completo, escolha o tipo de exame e receba um resumo padronizado pronto para colar no prontuário. <strong>Laboratoriais do AFIP e ecocardiogramas são lidos só no seu navegador — nunca passam por IA.</strong></p>
       </div>
 
       <div class="transc-grid">
@@ -1045,7 +1045,7 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
           <li>A aba <strong>Evidências</strong> traz a Classe de recomendação e o Nível de evidência de cada conduta segundo a diretriz mais atual de cada sociedade (ESC, AHA/ACC, SBC). Os valores foram conferidos nas fontes citadas, mas <strong>confirme sempre no documento original</strong> (aba Diretrizes), pois as diretrizes são atualizadas periodicamente.</li>
           <li>A aba <strong>Orientações</strong> traz, ao lado de cada recomendação, o ensaio que a sustenta e o tamanho do efeito — inclusive quando o resultado foi neutro (Look AHEAD, SODIUM-HF, SAVE). O objetivo é que você saiba o que pode prometer ao paciente e o que não pode.</li>
         </ul>
-        <p class="muted small">Esta ferramenta não armazena os textos digitados em servidores além da chamada necessária à IA para a transcrição dos laudos de imagem. Os laboratoriais do AFIP não saem do navegador.</p>
+        <p class="muted small">Esta ferramenta não armazena os textos digitados em servidores além da chamada necessária à IA para a transcrição dos demais laudos (ressonância, ergometria, cintilografia etc.). Laboratoriais do AFIP e ecocardiogramas não saem do navegador.</p>
         <h3>Criador</h3>
         <p><strong>Dr. João Ricardo Cambruzzi Zimmer</strong><br>
         Instagram: <a href="https://instagram.com/joaozimmer_" target="_blank" rel="noopener">@joaozimmer_</a></p>
@@ -8557,7 +8557,7 @@ window.GUIAS = [
 
    API pública:
      window.parseEcoLaudo(texto, { extras:false })
-       -> null                     (não reconheceu -> quem chama cai para a IA)
+       -> null                     (não reconheceu -> a tela mostra um aviso; NÃO há IA)
        -> { saida, linha, contratilidade, valvas, conclusao,
             data, n, faltando, avisos }
    ========================================================================== */
@@ -8581,11 +8581,9 @@ window.GUIAS = [
 
   function limpaTexto(s) {
     return String(s || '')
-      .replace(/ /g, ' ')
+      .replace(/\u00a0/g, ' ')
       .replace(/\s*\n\s*/g, ' ')
-      .replace(/\s{2,}/g, ' ')
-      .replace(/\s+([,;.])/g, '$1')
-      .replace(/[.;\s]+$/, '')
+      .replace(/[ \t]{2,}/g, ' ')
       .trim();
   }
 
@@ -8855,35 +8853,60 @@ window.GUIAS = [
   /* Trabalha sempre na linha NORMALIZADA: tirar acento/caixa não mexe em
      dígitos nem na vírgula decimal, e evita ter que remapear posições.      */
 
-  var RE_VALOR = /-?\d+(?:[.,]\d+)?/;
-  // o que pode aparecer ENTRE o rótulo e o número (pontilhado, unidade, método)
-  var RE_ANTES_OK = /^[\s:=.•·–—()\[\]\/a-zà-ÿ²³%'’+-]*$/;
+  /* Só vale o número que o laudo dá COMO RESULTADO. Tudo o que pode ser
+     referência da tabela vira "não informado" (com aviso), nunca valor:
+       "(mm): 49 27 - 38 30 - 40"  -> 49
+       "(mm): 27 - 38 30 - 40"     -> sem valor (só a referência)
+       "(mm): <=36 <=40"           -> sem valor (só a referência)
+       "(%): >55" (FEVE/PSAP)      -> >55     (comparador sozinho na linha)
+       "(%): 55-60"                -> ambíguo (faixa): n/i + aviso           */
+  var RE_NUM_CMP = /(<=|>=|\u2264|\u2265|<|>)?\s*(-?\d+(?:[.,]\d+)?)/;
+  var PALAVRA_OK = /^(de|do|da|em|a|o|e|pelo|pela|posterior|septal|parietal|relativa|ve|metodo|modo|m|bidimensional|biplanar|simpson|teicholz|estimada|estimado|calculada|calculado|medida|medido|mede|igual|valor|final|indexado|indexada|mm|cm|ml|g|mmhg|m2|m²|%)$/;
+  var ACEITA_CMP = { feve: 1, psap: 1 };
 
-  function valorDe(resto) {
+  function valorDe(resto, ent) {
     var t = String(resto || '');
     if (!t) return null;
-    var m = t.match(RE_VALOR);
+    var m = t.match(RE_NUM_CMP);
     if (!m) return null;
     var antes = t.slice(0, m.index);
-    if (!RE_ANTES_OK.test(antes)) return null;
-    // marcador de faixa de referência antes do número: não é o valor do exame
-    if (/referen|normal|\bvr\b|\bate\b|\bentre\b|limite|previsto/.test(antes)) return null;
-    return { valor: m[1] !== undefined ? m[0] : m[0], depois: t.slice(m.index + m[0].length) };
+    var palavras = antes.replace(/\([^)]*\)/g, ' ')
+                        .replace(/[\s:=.•·\u2013\u2014\[\]\/'\u2019+-]+/g, ' ').trim();
+    if (palavras && !palavras.split(' ').every(function (w) { return PALAVRA_OK.test(w); })) return null;
+    if (/referen|normal|\bvr\b|\bate\b|\bentre\b|limite|previsto|\bnao\b/.test(antes)) return null;
+
+    var cmp = m[1] || '', valor = m[2];
+    var depois = t.slice(m.index + m[0].length);
+    var semPar = depois.replace(/\([^)]*\)/g, ' ');
+    var fx = depois.match(/^\s*(?:-|\u2013|a)\s*(-?\d+(?:[.,]\d+)?)/);
+    if (fx) {
+      if (/\d/.test(depois.slice(fx[0].length).replace(/\([^)]*\)/g, ' '))) return null;  // só referência
+      return { ambiguo: valor + '-' + fx[1] };
+    }
+    if (cmp) {
+      if (/\d/.test(semPar)) return null;                     // "<=36 <=40": referência
+      if (!ent || !ACEITA_CMP[ent.key]) return { ambiguo: cmp + valor };
+      return { valor: cmp.replace('<=', '\u2264').replace('>=', '\u2265') + valor, depois: depois };
+    }
+    return { valor: valor, depois: depois };
   }
 
   /* laudo em cm -> converte para mm (só quando o cm está escrito na linha) */
   function converteUnidade(v, ent, ln) {
     if (ent.un !== 'mm') return v;
-    if (!/\bcm\b/.test(ln)) return v;
-    var n = parseFloat(String(v).replace(',', '.'));
+    if (!/\bcm(?![\u00b22\/])/.test(ln)) return v;
+    var pre = String(v).match(/^[<>\u2264\u2265]?/)[0];
+    var n = parseFloat(String(v).slice(pre.length).replace(',', '.'));
     if (!isFinite(n)) return v;
     var s = (Math.round(n * 100) / 10).toString().replace('.', ',');
-    return s.replace(/,0$/, '');
+    return pre + s.replace(/,0$/, '');
   }
 
   function contexto(T, i) {
     return T.slice(Math.max(0, i - 1), Math.min(T.length, i + 3)).join(' ');
   }
+
+  function escRe(x) { return String(x).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
   /* ------------------------------- parser -------------------------------- */
 
@@ -8899,6 +8922,7 @@ window.GUIAS = [
     var achados = {};     // key -> { valor, ln }
     var feveCand = [];    // todas as FEVE achadas (para escolher o método)
     var avisos = [];
+    var ambiguos = {};    // key -> texto do laudo que pode ser só a referência
 
     /* ------------------------- 1) medidas ------------------------- */
     for (var i = 0; i < T.length; i++) {
@@ -8913,59 +8937,80 @@ window.GUIAS = [
         if (prox && /[a-zà-ÿ0-9]/.test(prox)) continue;   // rótulo parou no meio de outra palavra
         if (ent.evitar && ent.evitar.some(function (re) { return re.test(ln); })) continue;
 
-        var v = valorDe(ln.slice(lbl.length));
-        var lnValor = ln;
+        var v = valorDe(ln.slice(lbl.length), ent);
+        var lnValor = ln, jValor = i;
         if (!v) {                                    // valor na linha de baixo (estilo AFIP)
           var j = i + 1;
           while (j < T.length && T[j] === '') j++;
-          if (j < T.length && /^-?\d+(?:[.,]\d+)?\s*[a-z\/²³%]*$/i.test(norm(T[j]))) {
-            v = valorDe(norm(T[j]));
-            lnValor = norm(T[j]);
+          if (j < T.length && /^(?:<=|>=|≤|≥|<|>)?\s*-?\d+(?:[.,]\d+)?(?:\s*(?:-|a)\s*\d+(?:[.,]\d+)?)?\s*[a-z\/²³%]*$/i.test(norm(T[j]))) {
+            v = valorDe(norm(T[j]), ent);
+            lnValor = norm(T[j]); jValor = j;
           }
         }
         if (!v) break;
+        if (v.ambiguo) { if (!ambiguos[ent.key]) ambiguos[ent.key] = v.ambiguo; break; }
 
-        var val = converteUnidade(v.valor, ent, lnValor);
-        if (ent.key === 'feve') feveCand.push({ valor: val, linha: ln, ctx: contexto(T, i) });
+        var val = converteUnidade(v.valor, ent, lnValor + ' ' + ln);
+        if (ent.key === 'feve') feveCand.push({ valor: val, linha: ln, i: i, j: jValor });
         else if (!achados[ent.key]) achados[ent.key] = { valor: val, ln: lnValor };
         break;                                        // o rótulo mais longo já venceu
       }
     }
 
-    /* FEVE: com duas medidas, Simpson ganha de Teicholz; senão fica a 1ª */
+    var TUDO = norm(bruto);
+
+    /* FEVE: o método vem do PRÓPRIO laudo — da linha da medida, de um
+       "Método: ..." logo abaixo, ou da frase do descritivo com o MESMO valor
+       ("FEVE = 38%, pelo método de Simpson"). Nunca de outra medida vizinha. */
     var metodo = '';
-    if (feveCand.length) {
-      /* o método vale pela PRÓPRIA linha da medida; o contexto só desempata
-         quando a linha não diz nada (senão o Teicholz herda o Simpson de baixo) */
-      var com = function (re, campo) {
-        return feveCand.filter(function (c) { return re.test(norm(c[campo])); })[0];
-      };
-      var esc = com(/simpson/, 'linha') || com(/teicholz/, 'linha')
-             || com(/simpson/, 'ctx')   || feveCand[0];
-      achados.feve = { valor: esc.valor };
-      var alvo = norm(esc.linha), ctxn = norm(esc.ctx);
-      if (/simpson/.test(alvo)) metodo = 'Simpson';
-      else if (/teicholz/.test(alvo)) metodo = 'Teicholz';
-      else if (/simpson/.test(ctxn) && !/teicholz/.test(ctxn)) metodo = 'Simpson';
-      else if (/teicholz/.test(ctxn) && !/simpson/.test(ctxn)) metodo = 'Teicholz';
-      else {
-        var todo = norm(bruto);
-        var temS = /simpson/.test(todo), temT = /teicholz/.test(todo);
-        if (temS && !temT) metodo = 'Simpson';
-        else if (temT && !temS) metodo = 'Teicholz';
-        else metodo = 'método n/i';
+    function metodoEm(txt) {
+      var n = norm(txt);
+      if (/simpson/.test(n)) return 'Simpson';
+      if (/teicholz/.test(n)) return 'Teicholz';
+      return '';
+    }
+    feveCand.forEach(function (c) {
+      c.metodo = metodoEm(c.linha) || (c.j !== c.i ? metodoEm(T[c.j]) : '');
+      if (!c.metodo) {
+        for (var q = c.j + 1, vistas = 0; q < T.length && vistas < 3; q++) {
+          if (!T[q]) continue;
+          vistas++;
+          if (/^metodo\b/.test(norm(T[q]))) { c.metodo = metodoEm(T[q]); break; }
+        }
       }
-      if (metodo === 'método n/i') avisos.push('a FEVE não declara o método (Simpson/Teicholz)');
+      if (!c.metodo) {
+        var num = String(c.valor).replace(/^[<>≤≥]/, '');
+        var re = new RegExp('(?:feve|fracao de ejecao)[^.;\\d]{0,30}' + escRe(num) +
+                            '\\s*%[^.;]{0,40}?metodo de (simpson|teicholz)');
+        var mm = TUDO.match(re);
+        if (mm) c.metodo = mm[1] === 'simpson' ? 'Simpson' : 'Teicholz';
+      }
+    });
+    if (feveCand.length) {
+      var esc = feveCand.filter(function (c) { return c.metodo === 'Simpson'; })[0] || feveCand[0];
+      achados.feve = { valor: esc.valor };
+      metodo = esc.metodo || 'método n/i';
+      if (!esc.metodo) avisos.push('a FEVE não declara o método (Simpson/Teicholz)');
+      var ditas = {};
+      feveCand.forEach(function (c) {
+        if (c === esc || (c.valor === esc.valor && c.metodo === esc.metodo)) return;
+        var chave = c.valor + '|' + c.metodo;
+        if (ditas[chave]) return;
+        ditas[chave] = 1;
+        avisos.push('o laudo também traz FEVE ' + c.valor + '%' + (c.metodo ? ' (' + c.metodo + ')' : '') +
+                    ' — na linha ficou a ' + (esc.metodo ? 'do ' + esc.metodo : 'primeira'));
+      });
     }
 
-
-    /* --------- 1b) extras que só existem no texto descritivo --------- */
+    /* --------- 1b) medidas que só existem no texto descritivo ---------
+       Exigem a unidade logo depois do número: "PSAP não estimada (refluxo
+       2,1 m/s)" nunca vira PSAP 2,1.                                      */
     var NARR = [
-      { key:'psap', re:/pressao sistolica (?:da|de|em) arteria pulmonar\s*[:=]?\s*(\d+(?:[.,]\d+)?)/ },
-      { key:'vdfi', re:/volume diastolico final (?:do ve )?indexado\s*[:=]?\s*(\d+(?:[.,]\d+)?)/ },
-      { key:'tapse', re:/tapse\s*[:=]?\s*(\d+(?:[.,]\d+)?)/ }
+      { key:'psap', re:/pressao sistolica (?:da|de|em|na) arteria pulmonar\s*(?:estimada\s*)?(?:em|de)?\s*[:=]?\s*(\d+(?:[.,]\d+)?)\s*mm\s*hg/ },
+      { key:'psap', re:/\bpsap\b\s*(?:estimada\s*)?(?:em|de)?\s*[:=]?\s*(\d+(?:[.,]\d+)?)\s*mm\s*hg/ },
+      { key:'vdfi', re:/volume diastolico final (?:do ve )?indexado\s*[:=]?\s*(\d+(?:[.,]\d+)?)\s*ml/ },
+      { key:'tapse', re:/\btapse\b\s*(?:de|[:=])?\s*(\d+(?:[.,]\d+)?)\s*mm/ }
     ];
-    var TUDO = norm(bruto);
     NARR.forEach(function (e) {
       if (achados[e.key]) return;
       var m = TUDO.match(e.re);
@@ -9021,8 +9066,10 @@ window.GUIAS = [
     /* --------------------- 4) reconhecimento ---------------------- */
     var canon = MEDIDAS.filter(function (m) { return !m.grupo; });
     var achadosCanon = canon.filter(function (m) { return achados[m.key]; });
-    var temTopico = !!(top.ve || top.conclusao || top.contrat || top.vm);
-    if (achadosCanon.length < 3 && !(achadosCanon.length >= 1 && temTopico)) return null;
+    var temTopico = ['ve', 'vd', 'contrat', 'vm', 'vao', 'vt', 'vp', 'conclusao'].some(function (k) {
+      return top[k] && limpaTexto(top[k].join(' '));
+    });
+    if (!achadosCanon.length && !temTopico) return null;
 
     /* ---------------------- 5) montagem da saída ------------------- */
     var partes = [], faltando = [];
@@ -9030,6 +9077,10 @@ window.GUIAS = [
       if (m.grupo === 'extras' && !incExtras) return;
       var a = achados[m.key];
       if (!a) {
+        if (ambiguos[m.key]) {
+          avisos.push(m.sigla + ': o laudo traz "' + ambiguos[m.key] + '", que pode ser só a faixa de referência — ' +
+                      (m.grupo ? 'ficou fora da linha' : 'saiu n/i') + '; confira no laudo');
+        }
         if (m.grupo) return;          // 'auto'/'extras' ausente não vira n/i
         faltando.push(m.sigla);
         partes.push(m.sigla + ' n/i');
@@ -9041,7 +9092,8 @@ window.GUIAS = [
     });
 
     function txt(k) { return top[k] ? limpaTexto(top[k].join(' ')) : ''; }
-    function ponto(s) { return /[.!?]$/.test(s) ? s : s + '.'; }
+    function ponto(s) { return /[.!?]$/.test(s) ? s : s.replace(/[;,:]+$/, '') + '.'; }
+    function semFinal(s) { return s.replace(/[.;,]+$/, ''); }
 
     var linhas = ['ECO (' + (data || '__/__/____') + '): ' + partes.join(' | ')];
 
@@ -9051,7 +9103,7 @@ window.GUIAS = [
 
     var valvas = [];
     ['vm', 'vao', 'vt', 'vp', 'prot'].forEach(function (k) {
-      if (txt(k)) valvas.push(rotuloTopico(k) + ' ' + txt(k));
+      if (txt(k)) valvas.push(rotuloTopico(k) + ' ' + semFinal(txt(k)));
     });
     if (valvas.length) linhas.push('Valvas: ' + valvas.join('; ') + '.');
     else avisos.push('não achei a descrição das valvas');
@@ -9085,7 +9137,7 @@ window.GUIAS = [
     };
   }
 
-  window.parseEcoLaudo = parse;
+  if (typeof window !== 'undefined') window.parseEcoLaudo = parse;
   parse._quebrar = quebrar;
   if (typeof module !== 'undefined' && module.exports) module.exports = parse;
 })();
@@ -9093,8 +9145,8 @@ window.GUIAS = [
 </script>
   <script>
 // Módulo de transcrição de laudos.
-// Laboratoriais (AFIP): SÓ leitura local (lab-parser.js) — nunca vão para a IA.
-// Ecocardiograma: leitura local (eco-parser.js); a IA só entra se o formato não for reconhecido.
+// Laboratoriais (AFIP) e ecocardiograma: SÓ leitura local (lab-parser.js / eco-parser.js).
+// Nunca vão para a IA — formato não reconhecido = aviso na tela.
 // Demais laudos: IA via /api/transcrever.
 (function () {
   const tipoSel = document.getElementById('transc-tipo');
@@ -9113,7 +9165,7 @@ window.GUIAS = [
   let ultimoLocal = null;   // último texto processado localmente (para re-render instantâneo)
 
   const dicas = {
-    ecocardiograma: "Cole o laudo inteiro (com ou sem quebras de linha). A leitura é local e instantânea: sai 1 linha de medidas em siglas (+ PSAP, FAC e VDFi quando o laudo traz) e as linhas de VE, VD, valvas e conclusão transcritas do próprio laudo.",
+    ecocardiograma: "Cole o laudo inteiro (com ou sem quebras de linha). A leitura é 100% local, sem IA: sai 1 linha de medidas em siglas com os valores do laudo (+ PSAP, FAC e VDFi quando o laudo traz) e as linhas de VE, VD, valvas e conclusão copiadas do próprio laudo, sem reescrever.",
     ressonancia: "Resume função biventricular, volumes, realce tardio (fibrose/isquemia) e conclusão.",
     ergometria: "Resume protocolo, METs, FC/PA, motivo de interrupção, alterações de ST/sintomas e conclusão (Duke se possível).",
     cintilografia: "Resume perfusão (isquemia/fibrose por território), FEVE de repouso/estresse e conclusão.",
@@ -9210,12 +9262,24 @@ window.GUIAS = [
     return { texto: r.linha, msg: msg };
   }
 
-  // eco: { texto, msg } ou null (null = formato não reconhecido)
+  // eco: { texto, msg } | { erro } — nunca cai para a IA
   function lerEco(texto) {
-    if (typeof window.parseEcoLaudo !== 'function') return null;
-    try {
-      const r = window.parseEcoLaudo(texto, opcoes());
-      if (!r) return null;
+    if (typeof window.parseEcoLaudo !== 'function') {
+      return { erro: '⚠️ O leitor de ecocardiograma não carregou. Recarregue a página (Cmd+Shift+R) e tente de novo.' };
+    }
+    let r;
+    try { r = window.parseEcoLaudo(texto, opcoes()); }
+    catch (e) {
+      console.error('eco-parser:', e);
+      return { erro: '⚠️ Erro no leitor de ecocardiograma: ' + esc(e.message) + '. Nada foi enviado para a IA.' };
+    }
+    if (!r) {
+      return { erro: '⚠️ Não reconheci um laudo de ecocardiograma nesse texto.\n\n'
+        + 'Copie o laudo inteiro (medidas e texto descritivo) e cole aqui — o leitor procura rótulos como '
+        + '"Raiz da Aorta", "Diâmetro Diastólico Final do VE", "Fração de Ejeção", "Ventrículo esquerdo:" e "Conclusão:".\n\n'
+        + 'O ecocardiograma é lido só no seu navegador: nada foi enviado para a IA.' };
+    }
+    {
       let msg = '⚡ Lido localmente, sem IA — ' + r.n + ' medidas'
         + (r.data ? ' do exame de ' + r.data : '') + '.';
       if (r.faltando && r.faltando.length) {
@@ -9228,8 +9292,7 @@ window.GUIAS = [
         msg += ' <strong>Atenção:</strong> ' + r.avisos.map(esc).join('; ') + '.';
       }
       return { texto: r.saida, msg: msg };
-    } catch (e) { console.error('eco-parser:', e); }
-    return null;
+    }
   }
 
   function mostrarLocal(r) {
@@ -9267,10 +9330,17 @@ window.GUIAS = [
       return;
     }
 
-    // 2) eco: tenta o leitor local antes de gastar IA
+    // 2) eco: SEMPRE local, sem nenhuma chamada de rede
     if (ehEco()) {
       const r = lerEco(texto);
-      if (r) { ultimoLocal = texto; mostrarLocal(r); return; }
+      if (r.erro) {
+        aviso(r.erro);
+        setFonte('🔒 O ecocardiograma é lido só no navegador — nunca vai para a IA.');
+        return;
+      }
+      ultimoLocal = texto;
+      mostrarLocal(r);
+      return;
     }
 
     // 3) demais laudos: IA
@@ -9295,9 +9365,7 @@ window.GUIAS = [
       if (!resumo) throw new Error('Resposta vazia da IA.');
       out.textContent = resumo;
       copyBtn.disabled = false;
-      setFonte(ehEco()
-        ? '🤖 O formato colado não foi reconhecido pelo leitor local — resumo gerado por IA. Confira os valores.'
-        : '🤖 Resumo gerado por IA. Confira os valores antes de colar no prontuário.');
+      setFonte('🤖 Resumo gerado por IA. Confira os valores antes de colar no prontuário.');
     } catch (err) {
       console.error(err);
       aviso('⚠️ Não foi possível gerar o resumo.\n\n'
