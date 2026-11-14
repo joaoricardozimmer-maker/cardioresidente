@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta name="cardio-build" content="2026-10-31 22:44" />
+  <meta name="cardio-build" content="2026-11-14 16:42" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CardioResidente — Ferramentas para o residente de cardiologia</title>
@@ -788,6 +788,87 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .rec-cert { font-weight: 600; }
 .rec-obs { background: #eef5fb; border-color: #c7dcef; }
 
+
+/* ---------- Evoluções por cenário (montador) — Fase 1, 14/11/2026 ---------- */
+.mt-top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 14px; }
+.mt-ctx { display: flex; flex-wrap: wrap; gap: 6px; }
+.mt-pill {
+  background: var(--card); border: 1px solid var(--line); color: var(--text);
+  padding: 8px 14px; border-radius: 20px; font-size: 14px; font-weight: 500; cursor: pointer; transition: .15s;
+}
+.mt-pill:hover { border-color: var(--blue); }
+.mt-pill[aria-pressed="true"] { background: #fdecee; border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.mt-sexo { margin-left: auto; display: inline-flex; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; }
+.mt-sexo button {
+  background: var(--card); border: 0; padding: 8px 16px; font-size: 16px; line-height: 1; cursor: pointer; color: var(--muted);
+}
+.mt-sexo button + button { border-left: 1px solid var(--line); }
+.mt-sexo button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+
+.mt-grid { display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: start; }
+.mt-cen { display: flex; flex-direction: column; gap: 8px; }
+.mt-cen button {
+  text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+  padding: 12px 14px; font-size: 14px; font-weight: 500; color: var(--text); cursor: pointer; transition: .15s;
+}
+.mt-cen button:hover { border-color: var(--blue); }
+.mt-cen button[aria-pressed="true"] { border-color: var(--accent); background: #fdecee; font-weight: 600; }
+
+.mt-panel { scroll-margin-top: calc(var(--stick-top, 0px) + 8px); }
+.mt-panel h3 { margin: 0 0 10px; font-size: 18px; }
+.mt-vit {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;
+  background: var(--bg-soft); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px;
+}
+.mt-vit label { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+.mt-vit input {
+  width: 62px; padding: 7px 8px; border: 1px solid var(--line); border-radius: 8px;
+  font-size: 16px; /* 16px evita o zoom automático do iOS */ color: var(--text); background: var(--card);
+}
+.mt-vit input:focus { outline: none; border-color: var(--blue); }
+.mt-calc { font-size: 12.5px; color: var(--muted); }
+.mt-calc.alerta { color: var(--accent); font-weight: 600; }
+.mt-novo { margin-left: auto; }
+
+.mt-grp { margin: 0 0 10px; }
+.mt-grp-t { font-size: 11.5px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin: 0 0 5px; }
+.mt-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.mt-chip {
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+  padding: 6px 12px; font-size: 13px; color: var(--text); cursor: pointer; transition: .15s;
+}
+.mt-chip:hover { border-color: var(--blue); }
+.mt-chip[aria-pressed="true"] { background: #e8f1f8; border-color: var(--blue); color: var(--blue); font-weight: 600; }
+
+.mt-info { margin: 6px 0 14px; font-size: 13px; color: var(--muted); }
+.mt-info summary { cursor: pointer; color: var(--blue); font-weight: 500; }
+.mt-info p { margin: 8px 0 0; }
+
+.mt-bloco { border: 1px solid var(--line); border-radius: 10px; margin-bottom: 10px; background: var(--card); }
+.mt-bloco-h {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  padding: 6px 8px 6px 12px; border-bottom: 1px solid var(--line); background: var(--card-2); border-radius: 10px 10px 0 0;
+}
+.mt-bloco-h strong { font-size: 13px; }
+.mt-bloco pre {
+  margin: 0; padding: 10px 12px; white-space: pre-wrap; word-break: break-word;
+  font-family: inherit; font-size: 13.5px; line-height: 1.55; color: var(--text);
+}
+.mt-tudo {
+  position: sticky; bottom: 12px; z-index: 5; width: 100%; margin-top: 4px;
+  background: var(--accent); color: #fff; border: 0; border-radius: 12px; padding: 14px;
+  font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 6px 18px rgba(193, 14, 33, .25);
+}
+.mt-tudo:active { transform: translateY(1px); }
+
+@media (max-width: 860px) {
+  .mt-grid { grid-template-columns: 1fr; gap: 14px; }
+  .mt-cen { display: grid; grid-template-columns: 1fr 1fr; }
+  .mt-cen button { text-align: center; padding: 12px 8px; font-size: 13.5px; }
+  .mt-sexo { margin-left: 0; }
+  .mt-novo { margin-left: 0; }
+}
+
 </style>
 </head>
 <body>
@@ -920,10 +1001,20 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
       </div>
     </section>
 
+    <!-- ============ EVOLUÇÕES POR CENÁRIO (montador) ============ -->
+    <section class="view" id="view-montador">
+      <div class="hero">
+        <h2>Evoluções por cenário</h2>
+        <p>Escolha o contexto e o cenário, ajuste e copie. Números ficam como <code>___</code> até você preencher; o conteúdo do ⓘ não entra na cópia.</p>
+      </div>
+      <div id="montador-root"></div>
+    </section>
+
     <!-- ============ EVOLUÇÕES ============ -->
     <section class="view" id="view-evolucoes">
       <div class="hero">
-        <h2>Modelos de evolução</h2>
+        <h2>Biblioteca anterior</h2>
+        <p><strong>Para o plantão, use a aba Evoluções</strong> (montador por cenário). Esta biblioteca fica disponível até a revisão completa.</p>
         <p>Modelos escritos como texto pronto para colar: já vêm na forma afirmativa, sem colchetes de alternativa nem linhas de traços — o único campo é <code>___</code>. Organizados por setor (plantão, enfermaria, ambulatório e hemodinâmica), com <strong>exame físico normal por cenário e por sistema</strong>, banco de achados alterados, pacotes de conduta e receitas.</p>
       </div>
 
@@ -14288,6 +14379,1095 @@ window.PROTOCOLOS = [
 
 </script>
   <script>
+// Evoluções por cenário (montador) — Fase 1, 14/11/2026.
+//
+// Cada cenário = contexto + blocos de texto prontos para colar. O texto final é
+// montado em tempo real a partir das escolhas da tela.
+//
+// Linguagem dos modelos:
+//   {o|a}              concordância com o sexo (♂ usa o primeiro, ♀ o segundo)
+//   {id} / {id.chave}  texto da opção escolhida (opcoes) ou da lista marcada (listas)
+//   {?cond:sim|não}    trecho condicional; cond = chip, !chip, opcao=valor ou opcao=v1,v2,
+//                      vários unidos por &. O "não" é opcional. Sem chaves dentro.
+//   {data}             data de hoje
+//   {PAS} {PAD} {FC} {FR} {SpO2} {Tax} {HGT}  sinais vitais digitados (vazio vira ___)
+//   {PAM} {PPP}        calculados a partir de PAS e PAD (PPP = pressão de pulso proporcional)
+//   Linha ['cond', 'texto'] só entra quando cond é verdadeira.
+//
+// Convenção do site (04/08/2026), mantida: o único campo é ___ (datas __/__/____),
+// sem colchetes de alternativa, sem bullets, nenhum número plausível pré-escrito.
+// O campo "info" aparece no ⓘ da tela e NUNCA entra na cópia.
+(function () {
+  const TCLE = {
+    id: 'tcle', label: 'Consentimento', padrao: 'pac', valores: [
+      ['pac', 'Paciente', 'Consentimento obtido com {o|a} paciente.'],
+      ['fam', 'Familiar', 'Consentimento obtido com familiar (___).'],
+      ['urg', 'Urgência', 'Consentimento dispensado por urgência.']
+    ]
+  };
+
+  const FR = {
+    id: 'fr', label: 'Fatores de risco', vazio: '___', itens: [
+      ['has', 'HAS', 'HAS'],
+      ['dm', 'DM', 'DM'],
+      ['dlp', 'DLP', 'DLP'],
+      ['tab', 'Tabagismo', 'tabagismo'],
+      ['dac', 'DAC prévia', 'DAC prévia'],
+      ['obes', 'Obesidade', 'obesidade'],
+      ['hf', 'HF de DAC precoce', 'história familiar de DAC precoce']
+    ]
+  };
+
+  const TIPO_PUNCAO = {
+    id: 'tipo', label: 'Finalidade', padrao: 'ambas', valores: [
+      ['ambas', 'Diagnóstica e alívio', 'diagnóstica e de alívio'],
+      ['diag', 'Diagnóstica', 'diagnóstica'],
+      ['alivio', 'Alívio', 'de alívio']
+    ]
+  };
+
+  const SCAI = {
+    id: 'scai', label: 'Estágio SCAI', padrao: 'c', valores: [
+      ['c', 'C', 'C'], ['d', 'D', 'D'], ['e', 'E', 'E']
+    ]
+  };
+
+  window.PRONT = {
+    versao: '2026-11-14',
+    contextos: [
+      { id: 'triagem', label: 'Triagem' },
+      { id: 'ps', label: 'PS' },
+      { id: 'uti', label: 'UTI' },
+      { id: 'proc', label: 'Procedimentos' }
+    ],
+    cenarios: [
+
+      // ======================= TRIAGEM =======================
+      {
+        id: 'dt-fria', ctx: 'triagem', titulo: 'Dor torácica fria',
+        sin: 'dor toracica baixa probabilidade atipica nao anginosa pontada fria',
+        opcoes: [
+          { id: 'carater', label: 'Característica', padrao: 'pontada', valores: [
+            ['pontada', 'Pontada', 'em pontada'],
+            ['queim', 'Queimação', 'em queimação'],
+            ['vent', 'Ventilatório-dependente', 'ventilatório-dependente'],
+            ['vaga', 'Mal caracterizada', 'mal caracterizada']
+          ] }
+        ],
+        listas: [FR],
+        chips: [{ id: 'parede', label: 'Dor à palpação da parede', on: false }],
+        blocos: [
+          { id: 'hda', titulo: 'Identificação e história', linhas: [
+            'TRIAGEM — {data} ___h',
+            'Paciente de ___ anos, com dor torácica há ___, {carater}, sem irradiação e sem relação com esforço. Nega dispneia, sudorese e síncope.',
+            'Fatores de risco: {fr}.'
+          ] },
+          { id: 'ef', titulo: 'Exame físico', linhas: [
+            'BEG, LOC, MUC, eupneic{o|a} em AA.',
+            'PA {PAS} x {PAD} mmHg | FC {FC} bpm | FR {FR} irpm | SpO2 {SpO2}% em AA',
+            'ACV: RCR 2T BNF, sem sopros. Pulsos simétricos.',
+            'AR: MV+ bilateralmente, sem RA.',
+            ['parede', 'Dor reproduzível à palpação da parede torácica.']
+          ] },
+          { id: 'ecg', titulo: 'ECG', linhas: [
+            'ECG (___h, ___ min da chegada): ritmo sinusal, sem alterações isquêmicas agudas.'
+          ] },
+          { id: 'cd', titulo: 'Impressão e conduta', linhas: [
+            'Impressão: dor torácica com baixa probabilidade de SCA.',
+            'Conduta: abro ficha para o PS, com troponina ultrassensível seriada e HEART. Orientad{o|a} a avisar a equipe se a dor voltar ou piorar.'
+          ] }
+        ],
+        info: 'Fria = baixa probabilidade de SCA, paciente estável. SBC 2025: toda dor atual entre a mandíbula e a cicatriz umbilical, ou com mais de 10 min, abre o protocolo de dor torácica, com ECG em até 10 min; com ECG não diagnóstico, troponina ultrassensível seriada e HEART.'
+      },
+
+      {
+        id: 'dt-quente', ctx: 'triagem', titulo: 'Dor torácica quente',
+        sin: 'dor toracica alta probabilidade tipica anginosa em curso sca iam supra quente sala hemodinamica',
+        opcoes: [
+          { id: 'inicio', label: 'Início', padrao: 'rep', valores: [
+            ['rep', 'Em repouso', 'em repouso'],
+            ['esf', 'Aos esforços', 'aos esforços']
+          ] },
+          { id: 'agora', label: 'Na chegada', padrao: 'persiste', valores: [
+            ['persiste', 'Ainda com dor', 'Ainda presente na chegada.'],
+            ['aliviou', 'Aliviou', 'Melhora espontânea há ___ min.']
+          ] }
+        ],
+        listas: [FR],
+        chips: [{ id: 'supra', label: 'Supra de ST ou equivalente', on: false }],
+        blocos: [
+          { id: 'hda', titulo: 'Identificação e história', linhas: [
+            'TRIAGEM — {data} ___h',
+            'Paciente de ___ anos, com dor retroesternal em aperto há ___, iniciada {inicio}, com irradiação para ___. {agora} Associada a sudorese e náuseas.',
+            'Fatores de risco: {fr}.'
+          ] },
+          { id: 'ef', titulo: 'Exame físico', linhas: [
+            'REG, LOC, MUC, sudoreic{o|a}.',
+            'PA {PAS} x {PAD} mmHg (MSD) e ___ x ___ mmHg (MSE) | FC {FC} bpm | FR {FR} irpm | SpO2 {SpO2}% em AA',
+            'ACV: RCR 2T BNF, sem sopros. Sem B3. Pulsos simétricos.',
+            'AR: MV+ bilateralmente, sem RA.'
+          ] },
+          { id: 'ecg', titulo: 'ECG', linhas: [
+            ['!supra', 'ECG (___h, ___ min da chegada): ___, sem supradesnivelamento de ST.'],
+            ['supra', 'ECG (___h, ___ min da chegada): supradesnivelamento de ST em ___.']
+          ] },
+          { id: 'cd', titulo: 'Impressão e conduta', linhas: [
+            ['!supra', 'Impressão: dor torácica com alta probabilidade de SCA.'],
+            ['supra', 'Impressão: IAM com supradesnivelamento de ST.'],
+            ['!supra', 'Conduta: encaminho à sala de emergência para monitorização, acesso venoso, ECG seriado e troponina ultrassensível. Caso discutido com ___.'],
+            ['supra', 'Conduta: encaminho à sala de emergência e aciono a hemodinâmica às ___h. Caso discutido com ___.']
+          ] }
+        ],
+        info: 'Quente = sugestiva de isquemia, em curso ou recente, ou com instabilidade. PA nos dois braços e pulsos simétricos rastreiam síndrome aórtica. Equivalentes de supra (OCA/OMI): De Winter, Wellens, IAM posterior, infra difuso com supra em aVR e Sgarbossa modificado no BRE ou no ritmo de marcapasso.'
+      },
+
+      {
+        id: 'cong-leve', ctx: 'triagem', titulo: 'Congesto leve',
+        sin: 'ic descompensada perfil b leve congestao dispneia esforcos edema congesto',
+        opcoes: [
+          { id: 'esforco', label: 'Dispneia', padrao: 'mod', valores: [
+            ['mod', 'Moderados esforços', 'aos moderados esforços'],
+            ['peq', 'Pequenos esforços', 'aos pequenos esforços']
+          ] }
+        ],
+        chips: [
+          { id: 'ortop', label: 'Ortopneia', on: true },
+          { id: 'dpn', label: 'DPN', on: false },
+          { id: 'peso', label: 'Ganho de peso', on: false },
+          { id: 'transg', label: 'Má adesão', on: false },
+          { id: 'b3', label: 'B3', on: false }
+        ],
+        blocos: [
+          { id: 'hda', titulo: 'Identificação e história', linhas: [
+            'TRIAGEM — {data} ___h',
+            'Paciente de ___ anos, com IC (FEVE ___%), refere piora da dispneia há ___, agora {esforco}.{?ortop: Ortopneia com ___ travesseiros.}{?dpn: Episódios de dispneia paroxística noturna.}{?peso: Ganho de ___ kg.} Edema de MMII em piora.{?transg: Refere má adesão às medicações e à restrição de sal.}'
+          ] },
+          { id: 'ef', titulo: 'Exame físico', linhas: [
+            'BEG, LOC, MUC, eupneic{o|a} em repouso.',
+            'PA {PAS} x {PAD} mmHg | FC {FC} bpm | FR {FR} irpm | SpO2 {SpO2}% em AA',
+            'ACV: {?b3:RCR 3T (B3)|RCR 2T BNF}, sem sopros. Sem TJP a 45°, RHJ presente.',
+            'AR: MV+ com crepitantes em bases.',
+            'EXT: edema 1+/4+ em MMII, quentes, TEC < 3 s.'
+          ] },
+          { id: 'cd', titulo: 'Impressão e conduta', linhas: [
+            'Impressão: IC descompensada, perfil B (quente e úmido), congestão leve.',
+            'Conduta: abro ficha para o PS.'
+          ] }
+        ],
+        info: 'Perfil B = congestão sem hipoperfusão (Nohria, JACC 2003). Estertores, edema e turgência podem faltar mesmo com capilar pulmonar ≥ 22 mmHg (Stevenson, JAMA 1989): RHJ e ortopneia ajudam a reconhecer o congesto leve.'
+      },
+
+      {
+        id: 'cong-imp', ctx: 'triagem', titulo: 'Congesto importante / EAP', botao: 'Congesto importante',
+        sin: 'edema agudo de pulmao eap congestao importante dispneia repouso perfil b grave hipertensivo',
+        opcoes: [
+          { id: 'crep', label: 'Crepitantes', padrao: 'apice', valores: [
+            ['medio', 'Até terço médio', 'até terço médio'],
+            ['apice', 'Até ápices', 'até ápices']
+          ] }
+        ],
+        chips: [
+          { id: 'has', label: 'EAP hipertensivo', on: false },
+          { id: 'b3', label: 'B3', on: false }
+        ],
+        blocos: [
+          { id: 'hda', titulo: 'Identificação e história', linhas: [
+            'TRIAGEM — {data} ___h',
+            'Paciente de ___ anos, com dispneia em repouso há ___, de início ___, com ortopneia e tosse. Antecedentes: ___.'
+          ] },
+          { id: 'ef', titulo: 'Exame físico', linhas: [
+            'REG, LOC, MUC, taquipneic{o|a}, com uso de musculatura acessória, falando frases curtas. Sudoreic{o|a}.',
+            'PA {PAS} x {PAD} mmHg | FC {FC} bpm | FR {FR} irpm | SpO2 {SpO2}% em AA',
+            'ACV: {?b3:RCR 3T (B3)|RCR 2T BNF}. TJP a 45°, RHJ presente.',
+            'AR: MV+ com crepitantes {crep} bilateralmente.',
+            'EXT: edema ___/4+ em MMII, quentes, TEC < 3 s.'
+          ] },
+          { id: 'cd', titulo: 'Impressão e conduta', linhas: [
+            'Impressão: edema agudo de pulmão{?has: hipertensivo}.',
+            'Conduta: encaminho à sala de emergência para monitorização, suporte ventilatório e tratamento da congestão. Caso discutido com ___.'
+          ] }
+        ],
+        info: 'Na sala: VNI se desconforto ou hipoxemia; nitrato se PAS > 110 mmHg; diurético de alça EV. Extremidades frias ou PAS baixa: use o cenário Hipoperfusão.'
+      },
+
+      {
+        id: 'hipoperf', ctx: 'triagem', titulo: 'Hipoperfusão / suspeita de choque', botao: 'Hipoperfusão',
+        sin: 'perfil c perfil l frio umido seco baixo debito choque cardiogenico hipotensao hipoperfusao',
+        opcoes: [
+          { id: 'perfil', label: 'Perfil', padrao: 'c', valores: [
+            ['c', 'C (frio e úmido)', 'C'],
+            ['l', 'L (frio e seco)', 'L']
+          ] }
+        ],
+        chips: [
+          { id: 'sono', label: 'Sonolência', on: true },
+          { id: 'livedo', label: 'Livedo', on: false },
+          { id: 'choque', label: 'Suspeita de choque', on: true }
+        ],
+        blocos: [
+          { id: 'hda', titulo: 'Identificação e história', linhas: [
+            'TRIAGEM — {data} ___h',
+            'Paciente de ___ anos, com IC (FEVE ___%), com piora do estado geral há ___, fadiga intensa{?sono:, sonolência} e redução da diurese.'
+          ] },
+          { id: 'ef', titulo: 'Exame físico', linhas: [
+            'REG, {?sono:sonolent{o|a}, porém orientad{o|a}|LOC}, pálid{o|a}, sudoreic{o|a}.',
+            'PA {PAS} x {PAD} mmHg (PP proporcional {PPP}%) | FC {FC} bpm | FR {FR} irpm | SpO2 {SpO2}% em AA',
+            ['perfil=c', 'ACV: RCR 3T (B3). TJP a 45°, RHJ presente.'],
+            ['perfil=l', 'ACV: RCR 2T BNF, sem sopros. Sem TJP a 45°.'],
+            ['perfil=c', 'AR: MV+ com crepitantes em bases.'],
+            ['perfil=l', 'AR: MV+ bilateralmente, sem RA.'],
+            'EXT: frias e pegajosas, TEC ___ s, pulsos finos{?livedo:, livedo em joelhos}.{?perfil=c: Edema ___/4+ em MMII.}'
+          ] },
+          { id: 'cd', titulo: 'Impressão e conduta', linhas: [
+            ['perfil=c', 'Impressão: IC descompensada, perfil C (frio e úmido), com sinais de hipoperfusão.{?choque: Suspeita de choque cardiogênico.}'],
+            ['perfil=l', 'Impressão: baixo débito, perfil L (frio e seco).{?choque: Suspeita de choque cardiogênico.}'],
+            'Conduta: encaminho à sala de emergência para monitorização, lactato e avaliação de suporte hemodinâmico. Caso discutido com ___.'
+          ] }
+        ],
+        info: 'Hipoperfusão (Nohria, JACC 2003): extremidades frias ou sudorese, pulso fino ou alternante, alteração do nível de consciência e pressão de pulso proporcional < 25%. PP proporcional < 25% teve sensibilidade de 91% e especificidade de 83% para índice cardíaco < 2,2 L/min/m² (Stevenson, JAMA 1989).'
+      },
+
+      {
+        id: 'palpit', ctx: 'triagem', titulo: 'Palpitação / taquiarritmia', botao: 'Palpitação',
+        sin: 'taquicardia taquiarritmia fa flutter tsv palpitacao arritmia',
+        opcoes: [
+          { id: 'estab', label: 'Estabilidade', padrao: 'est', valores: [
+            ['est', 'Estável', 'est'],
+            ['inst', 'Instável', 'inst']
+          ] },
+          { id: 'ritmo', label: 'Ritmo ao exame', padrao: 'irreg', valores: [
+            ['irreg', 'Irregular', 'irregular'],
+            ['reg', 'Regular', 'regular']
+          ] }
+        ],
+        listas: [
+          { id: 'assoc', label: 'Sintomas associados', vazio: '', antes: ' Associadas a ', depois: '.', itens: [
+            ['dor', 'Dor torácica', 'dor torácica'],
+            ['disp', 'Dispneia', 'dispneia'],
+            ['pre', 'Pré-síncope', 'pré-síncope']
+          ] }
+        ],
+        blocos: [
+          { id: 'hda', titulo: 'Identificação e história', linhas: [
+            'TRIAGEM — {data} ___h',
+            'Paciente de ___ anos, com palpitações taquicárdicas há ___, de início súbito.{assoc}',
+            'Antecedentes: ___. Em uso de ___.'
+          ] },
+          { id: 'ef', titulo: 'Exame físico', linhas: [
+            ['estab=est', 'BEG, LOC, MUC, eupneic{o|a} em AA.'],
+            ['estab=inst', 'REG, sudoreic{o|a}, pálid{o|a}.'],
+            'PA {PAS} x {PAD} mmHg | FC {FC} bpm | FR {FR} irpm | SpO2 {SpO2}% em AA',
+            'ACV: ritmo cardíaco {ritmo}, taquicárdico, sem sopros.',
+            'AR: MV+ bilateralmente, sem RA.'
+          ] },
+          { id: 'ecg', titulo: 'ECG', linhas: [
+            'ECG (___h): ___, FC ___ bpm.'
+          ] },
+          { id: 'cd', titulo: 'Impressão e conduta', linhas: [
+            ['estab=est', 'Impressão: taquiarritmia sem critérios de instabilidade.'],
+            ['estab=inst', 'Impressão: taquiarritmia com instabilidade (___).'],
+            ['estab=est', 'Conduta: abro ficha para o PS, com monitorização.'],
+            ['estab=inst', 'Conduta: encaminho imediatamente à sala de emergência. Caso discutido com ___.']
+          ] }
+        ],
+        info: 'Instabilidade: hipotensão, dor torácica isquêmica, IC aguda, rebaixamento do nível de consciência ou síncope. Taquicardia irregular de QRS largo: pensar em FA pré-excitada e não usar bloqueador do nó AV.'
+      },
+
+      {
+        id: 'ef-normal-tri', ctx: 'triagem', titulo: 'Exame normal (triagem)', botao: 'Exame normal',
+        sin: 'exame fisico normal triagem',
+        blocos: [
+          { id: 'ef', titulo: 'Exame físico', linhas: [
+            'BEG, LOC, MUC, eupneic{o|a} em AA.',
+            'PA {PAS} x {PAD} mmHg | FC {FC} bpm | FR {FR} irpm | SpO2 {SpO2}% em AA',
+            'ACV: RCR 2T BNF, sem sopros.',
+            'AR: MV+ bilateralmente, sem RA.',
+            'EXT: sem edemas, panturrilhas livres.'
+          ] }
+        ]
+      },
+
+      // ======================= PS =======================
+      {
+        id: 'ic-b', ctx: 'ps', titulo: 'IC aguda perfil B',
+        sin: 'ic descompensada congesto perfil b quente umido admissao ps diuretico furosemida',
+        opcoes: [
+          { id: 'grau', label: 'Congestão', padrao: 'mod', valores: [
+            ['leve', 'Leve', { t: 'leve', esf: 'aos moderados esforços', crep: 'em bases', edema: 'edema 1+/4+ em MMII' }],
+            ['mod', 'Moderada', { t: 'moderada', esf: 'aos pequenos esforços', crep: 'até terço médio bilateralmente', edema: 'edema 2+/4+ em MMII' }],
+            ['imp', 'Importante', { t: 'importante', esf: 'em repouso', crep: 'até ápices bilateralmente', edema: 'edema ___/4+ em MMII' }]
+          ] }
+        ],
+        chips: [
+          { id: 'b3', label: 'B3', on: false },
+          { id: 'hepato', label: 'Hepatomegalia', on: false },
+          { id: 'ascite', label: 'Ascite', on: false },
+          { id: 'pocus', label: 'POCUS', on: false },
+          { id: 'nitro', label: 'Nitroglicerina EV', on: false },
+          { id: 'vni', label: 'VNI', on: false }
+        ],
+        blocos: [
+          { id: 'hda', titulo: 'Identificação e história', linhas: [
+            'ADMISSÃO PS — {data} ___h',
+            'Paciente de ___ anos, com IC de etiologia ___, FEVE ___% (eco de __/__/____), NYHA ___ basal.',
+            'Há ___ com piora da dispneia, agora {grau.esf}, ortopneia e edema de MMII. Ganho de ___ kg.',
+            'Provável fator de descompensação: ___.',
+            'Em uso de: ___.'
+          ] },
+          { id: 'ef', titulo: 'Exame físico', linhas: [
+            ['grau=leve', 'BEG, LOC, MUC, eupneic{o|a} em repouso.'],
+            ['grau=mod', 'REG, LOC, MUC, levemente taquipneic{o|a}.'],
+            ['grau=imp', 'REG, LOC, MUC, taquipneic{o|a}, com uso de musculatura acessória, falando frases curtas.'],
+            'PA {PAS} x {PAD} mmHg (PP proporcional {PPP}%) | FC {FC} bpm | FR {FR} irpm | SpO2 {SpO2}% em ___',
+            ['grau=leve', 'ACV: {?b3:RCR 3T (B3)|RCR 2T BNF}, sem sopros. Sem TJP a 45°, RHJ presente.'],
+            ['grau=mod', 'ACV: {?b3:RCR 3T (B3)|RCR 2T BNF}, sem sopros. TJP a 45°, RHJ presente.'],
+            ['grau=imp', 'ACV: {?b3:RCR 3T (B3)|RCR 2T BNF}. TJP até o ângulo da mandíbula a 45°, RHJ presente.'],
+            'AR: MV+ com crepitantes {grau.crep}.',
+            ['hepato', 'ABD: fígado a ___ cm do RCD{?ascite:, com ascite}.'],
+            ['ascite&!hepato', 'ABD: ascite presente.'],
+            'EXT: {grau.edema}, quentes, TEC < 3 s.'
+          ] },
+          { id: 'ex', titulo: 'Exames', linhas: [
+            'ECG: ___.',
+            'RX de tórax: ___.',
+            'NT-proBNP ___ | Cr ___ | Ur ___ | Na ___ | K ___ | Hb ___ | troponina ___',
+            ['pocus', 'POCUS: linhas B ___, VCI ___ mm com colapso de ___%, derrame pleural ___.']
+          ] },
+          { id: 'imp', titulo: 'Impressão', linhas: [
+            'Impressão: IC descompensada, perfil B (quente e úmido), congestão {grau}.'
+          ] },
+          { id: 'cd', titulo: 'Conduta', cab: 'Conduta:', num: true, linhas: [
+            'Furosemida ___ mg EV agora e de ___/___ h. Sódio urinário em 2 h e diurese em 6 h para avaliar a resposta.',
+            ['nitro', 'Nitroglicerina EV ___ mcg/min, titulada pela PA.'],
+            ['vni', 'VNI com PEEP ___ cmH2O e FiO2 ___%.'],
+            'Balanço hídrico, diurese e peso diário.',
+            'Mantenho a terapia de IC em uso: ___.',
+            'Investigação e tratamento do fator desencadeante: ___.',
+            'Cr, Na, K e Mg em 24 h.',
+            'Profilaxia de TEV com ___.'
+          ] }
+        ],
+        info: 'Furosemida EV: 20 a 40 mg se virgem de diurético; em usuário crônico, 1 a 2 vezes a dose oral diária. Resposta adequada: sódio urinário em 2 h > 50 a 70 mEq/L ou diurese em 6 h > 100 a 150 mL/h; se insuficiente, dobrar a dose (ESC 2021). Nitrato se PAS > 110 mmHg. Sem hipoperfusão, manter o betabloqueador.'
+      },
+
+      {
+        id: 'perfil-c', ctx: 'ps', titulo: 'Perfil C / choque cardiogênico', botao: 'Perfil C / choque',
+        sin: 'choque cardiogenico perfil c frio umido scai hipoperfusao dobutamina noradrenalina inotropico',
+        opcoes: [SCAI],
+        chips: [
+          { id: 'hepato', label: 'Hepatomegalia', on: false },
+          { id: 'livedo', label: 'Livedo', on: false },
+          { id: 'dobuta', label: 'Dobutamina', on: true },
+          { id: 'nora', label: 'Noradrenalina', on: false },
+          { id: 'milri', label: 'Milrinona', on: false }
+        ],
+        blocos: [
+          { id: 'hda', titulo: 'Identificação e história', linhas: [
+            'ADMISSÃO PS — {data} ___h',
+            'Paciente de ___ anos, com IC de etiologia ___, FEVE ___%, NYHA ___ basal.',
+            'Há ___ com piora da dispneia, fadiga intensa, sonolência e redução da diurese.',
+            'Provável fator de descompensação: ___.',
+            'Em uso de: ___.'
+          ] },
+          { id: 'ef', titulo: 'Exame físico', linhas: [
+            'REG, sonolent{o|a}, porém orientad{o|a}, pálid{o|a}, sudoreic{o|a}, taquipneic{o|a}.',
+            'PA {PAS} x {PAD} mmHg (PAM {PAM}, PP proporcional {PPP}%) | FC {FC} bpm | FR {FR} irpm | SpO2 {SpO2}% em ___',
+            'ACV: RCR 3T (B3). TJP a 45°, RHJ presente.',
+            'AR: MV+ com crepitantes até terço médio bilateralmente.',
+            ['hepato', 'ABD: fígado a ___ cm do RCD.'],
+            'EXT: frias e pegajosas, TEC ___ s, pulsos finos{?livedo:, livedo em joelhos}. Edema ___/4+ em MMII.'
+          ] },
+          { id: 'ex', titulo: 'Exames', linhas: [
+            'Lactato ___ mmol/L | Cr ___ (basal ___) | Ur ___ | Na ___ | K ___ | TGO ___ | TGP ___ | troponina ___ | NT-proBNP ___',
+            'ECG: ___.',
+            'Ecocardiograma à beira do leito: ___.'
+          ] },
+          { id: 'imp', titulo: 'Impressão', linhas: [
+            'Impressão: IC descompensada, perfil C (frio e úmido), em choque cardiogênico SCAI {scai}.'
+          ] },
+          { id: 'cd', titulo: 'Conduta', cab: 'Conduta:', num: true, linhas: [
+            'Monitorização contínua, acesso venoso central e PAI.',
+            ['dobuta', 'Dobutamina ___ mcg/kg/min, titulada por perfusão, lactato e diurese.'],
+            ['nora', 'Noradrenalina ___ mcg/kg/min para PAM ≥ 65 mmHg.'],
+            ['milri', 'Milrinona ___ mcg/kg/min.'],
+            'Furosemida ___ mg EV, com reavaliação da diurese em 6 h.',
+            'Suspendo betabloqueador e vasodilatadores orais enquanto houver hipoperfusão.',
+            'Lactato de ___/___ h. Metas: PAM ≥ 65 mmHg, lactato em queda e diurese ≥ 0,5 mL/kg/h.',
+            'Discutido com ___ para leito de UTI e avaliação de suporte circulatório mecânico.'
+          ] }
+        ],
+        info: 'SCAI 2022: C = hipoperfusão que exige intervenção além de volume (inotrópico, vasopressor ou suporte mecânico), em geral com lactato ≥ 2 mmol/L; D = piora apesar da intervenção inicial; E = colapso circulatório (PCR, RCP ou ECMO em curso). Noradrenalina é o vasopressor preferido; dobutamina ou milrinona para o baixo débito.'
+      },
+
+      {
+        id: 'ef-normal-ps', ctx: 'ps', titulo: 'Exame normal (PS)', botao: 'Exame normal',
+        sin: 'exame fisico normal ps pronto socorro',
+        blocos: [
+          { id: 'ef', titulo: 'Exame físico', linhas: [
+            'BEG, LOC, MUC, acianótic{o|a}, anictéric{o|a}, afebril, eupneic{o|a} em AA.',
+            'PA {PAS} x {PAD} mmHg | FC {FC} bpm | FR {FR} irpm | SpO2 {SpO2}% em AA | Tax {Tax} °C | HGT {HGT} mg/dL',
+            'ACV: RCR 2T BNF, sem sopros. Sem TJP a 45°. Pulsos periféricos simétricos.',
+            'AR: MV+ bilateralmente, sem RA.',
+            'ABD: plano, flácido, RHA+, indolor à palpação, sem VMG.',
+            'EXT: bem perfundidas, TEC < 3 s, sem edemas, panturrilhas livres.',
+            'NEURO: Glasgow 15, sem déficits focais.'
+          ] }
+        ]
+      },
+
+      // ======================= UTI =======================
+      {
+        id: 'choque-dva', ctx: 'uti', titulo: 'Choque cardiogênico em DVA', botao: 'Choque em DVA',
+        sin: 'choque cardiogenico uti evolucao sistemas droga vasoativa scai dobutamina noradrenalina',
+        opcoes: [
+          SCAI,
+          { id: 'traj', label: 'Em relação a ontem', padrao: 'est', valores: [
+            ['est', 'Estável', 'estável'],
+            ['mel', 'Melhor', 'em melhora'],
+            ['pio', 'Pior', 'em piora']
+          ] },
+          { id: 'resp', label: 'Respiratório', padrao: 'cn', valores: [
+            ['aa', 'Ar ambiente', 'em ar ambiente'],
+            ['cn', 'Cateter nasal', 'em cateter nasal a ___ L/min'],
+            ['vni', 'VNI', 'em VNI intermitente, PEEP ___ e FiO2 ___%'],
+            ['vm', 'VM', 'em VM, modo ___, PEEP ___ e FiO2 ___%']
+          ] },
+          { id: 'neuro', label: 'Neurológico', padrao: 'loc', valores: [
+            ['loc', 'LOC', 'LOC'],
+            ['sed', 'Sedado(a)', 'sedad{o|a}, RASS ___']
+          ] },
+          { id: 'inf', label: 'Infeccioso', padrao: 'sem', valores: [
+            ['sem', 'Sem antibiótico', 'afebril, sem antibiótico'],
+            ['atb', 'Com antibiótico', 'Tmax ___ °C, em uso de ___ (D___)']
+          ] }
+        ],
+        listas: [
+          { id: 'dva', label: 'Drogas vasoativas', vazio: 'sem droga vasoativa', padrao: ['nora', 'dobuta'], itens: [
+            ['nora', 'Noradrenalina', 'noradrenalina ___ mcg/kg/min'],
+            ['dobuta', 'Dobutamina', 'dobutamina ___ mcg/kg/min'],
+            ['milri', 'Milrinona', 'milrinona ___ mcg/kg/min'],
+            ['vaso', 'Vasopressina', 'vasopressina ___ U/min']
+          ] },
+          { id: 'disp', label: 'Dispositivos', vazio: 'sem dispositivos invasivos', padrao: ['cvc', 'pai', 'svd'], itens: [
+            ['cvc', 'CVC', 'CVC em VJI ___ (D___)'],
+            ['pai', 'PAI', 'PAI em radial ___ (D___)'],
+            ['svd', 'SVD', 'SVD (D___)'],
+            ['tot', 'TOT', 'TOT (D___)'],
+            ['bia', 'BIA', 'BIA (D___)'],
+            ['mp', 'MP provisório', 'MP provisório (D___)']
+          ] }
+        ],
+        chips: [{ id: 'b3', label: 'B3', on: true }],
+        blocos: [
+          { id: 'sint', titulo: 'Cabeçalho e síntese', linhas: [
+            'EVOLUÇÃO UTI — {data} — D___ de internação',
+            'Paciente de ___ anos, com ___, FEVE ___%, internad{o|a} em __/__/____ por choque cardiogênico.',
+            'Últimas 24 h: ___.'
+          ] },
+          { id: 'sist', titulo: 'Por sistemas', linhas: [
+            'HEMODINÂMICA: {dva}. PA {PAS} x {PAD} mmHg (PAM {PAM}) | FC {FC} bpm | ritmo ___. Lactato ___ → ___ mmol/L. Extremidades ___, TEC ___ s.',
+            'CV: {?b3:RCR 3T (B3)|RCR 2T BNF}. TJP a 45°.',
+            'RESPIRATÓRIO: {resp}, SpO2 {SpO2}%. MV+ com crepitantes em bases.',
+            'NEURO: {neuro}.',
+            'TGI: dieta ___. Abdome flácido e indolor.',
+            'RENAL: diurese ___ mL em 24 h (___ mL/kg/h). BH ___ mL (acumulado ___ mL). Cr ___ (basal ___). Na ___ | K ___ | Mg ___.',
+            'HEMATO: Hb ___ | plaquetas ___. Profilaxia de TEV com ___.',
+            'INFECCIOSO: {inf}.',
+            'DISPOSITIVOS: {disp}.'
+          ] },
+          { id: 'imp', titulo: 'Impressão', linhas: [
+            'IMPRESSÃO: choque cardiogênico SCAI {scai} por ___, {traj} em relação a ontem.'
+          ] },
+          { id: 'cd', titulo: 'Conduta', cab: 'CONDUTA:', num: true, linhas: [
+            'Titulação de DVA para PAM ≥ 65 mmHg e melhora da perfusão.',
+            'Lactato de ___/___ h.',
+            'Meta de balanço hídrico: ___ mL em 24 h.',
+            'Reposição de K e Mg para K ≥ 4,0 e Mg ≥ 2,0.',
+            ['scai=d,e', 'Discutido suporte circulatório mecânico com ___.'],
+            'Família informada: ___.'
+          ] }
+        ],
+        info: 'SCAI 2022 (Naidu): estágio pela gravidade e pela trajetória; registrar a trajetória todo dia. O modificador A indica PCR com risco de lesão anóxica.'
+      },
+
+      {
+        id: 'alta-uti', ctx: 'uti', titulo: 'Estável, para alta da UTI', botao: 'Alta da UTI',
+        sin: 'alta uti estavel evolucao curta sistemas',
+        chips: [{ id: 'disp', label: 'Ainda com dispositivo', on: false }],
+        blocos: [
+          { id: 'sint', titulo: 'Cabeçalho e síntese', linhas: [
+            'EVOLUÇÃO UTI — {data} — D___ de internação',
+            'Paciente de ___ anos, internad{o|a} por ___. Evolui estável nas últimas 24 h, sem droga vasoativa há ___ h.'
+          ] },
+          { id: 'sist', titulo: 'Por sistemas', linhas: [
+            'HEMODINÂMICA: sem DVA. PA {PAS} x {PAD} mmHg | FC {FC} bpm | ritmo ___. Extremidades quentes, TEC < 3 s.',
+            'RESPIRATÓRIO: eupneic{o|a} em AA, SpO2 {SpO2}%. MV+ bilateralmente, sem RA.',
+            'NEURO: LOC.',
+            'TGI: dieta oral, boa aceitação.',
+            'RENAL: diurese ___ mL em 24 h. Cr ___ (basal ___). K ___.',
+            'HEMATO: Hb ___ | plaquetas ___.',
+            'INFECCIOSO: afebril, sem antibiótico.',
+            'DISPOSITIVOS: {?disp:___|acessos invasivos retirados}.'
+          ] },
+          { id: 'imp', titulo: 'Impressão', linhas: [
+            'IMPRESSÃO: ___, estável e em condições de alta da UTI.'
+          ] },
+          { id: 'cd', titulo: 'Conduta', cab: 'CONDUTA:', num: true, linhas: [
+            'Alta da UTI para ___.',
+            'Mantenho ___.',
+            'Pendências: ___.'
+          ] }
+        ],
+        info: 'Antes de liberar: sem droga vasoativa, sem suporte ventilatório e sem arritmia instável; plano e pendências passados à equipe que recebe.'
+      },
+
+      {
+        id: 'ef-normal-uti', ctx: 'uti', titulo: 'Exame normal (UTI)', botao: 'Exame normal',
+        sin: 'exame fisico normal uti sistemas',
+        blocos: [
+          { id: 'sist', titulo: 'Por sistemas', linhas: [
+            'HEMODINÂMICA: sem DVA. PA {PAS} x {PAD} mmHg | FC {FC} bpm | ritmo sinusal. Extremidades quentes, TEC < 3 s.',
+            'CV: RCR 2T BNF, sem sopros. Sem TJP a 45°.',
+            'RESPIRATÓRIO: eupneic{o|a} em AA, SpO2 {SpO2}%. MV+ bilateralmente, sem RA.',
+            'NEURO: LOC, sem déficits focais.',
+            'TGI: abdome plano, flácido, RHA+, indolor.',
+            'RENAL: diurese ___ mL em 24 h.',
+            'EXT: sem edemas, panturrilhas livres.'
+          ] }
+        ]
+      },
+
+      // ======================= PROCEDIMENTOS =======================
+      {
+        id: 'cvc', ctx: 'proc', titulo: 'Acesso venoso central', vitais: false,
+        sin: 'cvc cateter venoso central jugular subclavia femoral puncao procedimento acesso',
+        opcoes: [
+          { id: 'sitio', label: 'Sítio', padrao: 'vjid', valores: [
+            ['vjid', 'VJI D', 'veia jugular interna direita'],
+            ['vjie', 'VJI E', 'veia jugular interna esquerda'],
+            ['scd', 'Subclávia D', 'veia subclávia direita'],
+            ['sce', 'Subclávia E', 'veia subclávia esquerda'],
+            ['femd', 'Femoral D', 'veia femoral direita'],
+            ['feme', 'Femoral E', 'veia femoral esquerda']
+          ] },
+          { id: 'indic', label: 'Indicação', padrao: 'dva', valores: [
+            ['dva', 'DVA', 'infusão de droga vasoativa'],
+            ['dif', 'Acesso difícil', 'acesso venoso periférico difícil'],
+            ['irrit', 'Medicação irritante', 'infusão de medicações irritantes ou vesicantes'],
+            ['mp', 'Para MP', 'passagem de marcapasso provisório'],
+            ['out', 'Outra', '___']
+          ] },
+          { id: 'lumen', label: 'Vias', padrao: '3', valores: [
+            ['2', 'Duplo lúmen', 'duplo lúmen'],
+            ['3', 'Triplo lúmen', 'triplo lúmen']
+          ] },
+          TCLE
+        ],
+        chips: [
+          { id: 'usg', label: 'Guiado por USG', on: true },
+          { id: 'arterial', label: 'Punção arterial inadvertida', on: false }
+        ],
+        blocos: [
+          { id: 'desc', titulo: 'Descrição', linhas: [
+            'PROCEDIMENTO — ACESSO VENOSO CENTRAL — {data} ___h',
+            'Executor: ___. Supervisão: ___.',
+            'Indicação: {indic}.',
+            '{tcle} Checagem pré-procedimento: paciente, sítio e lado confirmados.',
+            'Paciente monitorizad{o|a}, em decúbito dorsal{?sitio=femd,feme:|, em Trendelenburg}. Higiene das mãos, gorro, máscara, avental e luvas estéreis, campo estéril amplo. Antissepsia com clorexidina alcoólica. Anestesia local com lidocaína 2% sem vasoconstritor.',
+            'Punção da {sitio} {?usg:guiada por ultrassonografia em tempo real|por reparos anatômicos}, com refluxo venoso não pulsátil. Fio-guia passado sem resistência{?usg: e visualizado na veia antes da dilatação}. Cateter de {lumen} inserido pela técnica de Seldinger e fixado a ___ cm da pele. Fio-guia retirado íntegro. Refluxo e lavagem adequados em todas as vias. Curativo estéril.',
+            'Número de punções: ___. {?arterial:Intercorrência: punção arterial inadvertida, com compressão local por ___ min, sem hematoma expansivo.|Intercorrências: nenhuma.}',
+            '{?sitio=femd,feme:Cateter liberado para uso após confirmação de refluxo venoso adequado.|Radiografia de tórax: ___. Cateter liberado para uso após confirmação da posição.}'
+          ] }
+        ],
+        info: 'SHEA/IDSA/APIC 2022: USG para guiar a inserção, barreira máxima e clorexidina alcoólica; a subclávia tem o menor risco infeccioso no CTI e a femoral deve ser evitada em obesos na inserção eletiva. ASA 2020: confirmar a posição venosa antes de dilatar e a posição da ponta assim que clinicamente possível.'
+      },
+
+      {
+        id: 'pai', ctx: 'proc', titulo: 'PAI', vitais: false,
+        sin: 'pressao arterial invasiva pai cateter arterial radial femoral procedimento',
+        opcoes: [
+          { id: 'sitio', label: 'Sítio', padrao: 'rade', valores: [
+            ['rade', 'Radial E', 'artéria radial esquerda'],
+            ['radd', 'Radial D', 'artéria radial direita'],
+            ['femd', 'Femoral D', 'artéria femoral direita'],
+            ['feme', 'Femoral E', 'artéria femoral esquerda']
+          ] },
+          { id: 'indic', label: 'Indicação', padrao: 'dva', valores: [
+            ['dva', 'DVA', 'monitorização contínua da PA em uso de droga vasoativa'],
+            ['inst', 'Instabilidade', 'monitorização contínua da PA por instabilidade hemodinâmica'],
+            ['gaso', 'Gasometrias', 'coleta seriada de gasometria arterial']
+          ] },
+          TCLE
+        ],
+        chips: [{ id: 'usg', label: 'Guiada por USG', on: false }],
+        blocos: [
+          { id: 'desc', titulo: 'Descrição', linhas: [
+            'PROCEDIMENTO — PRESSÃO ARTERIAL INVASIVA — {data} ___h',
+            'Executor: ___. Supervisão: ___.',
+            'Indicação: {indic}.',
+            '{tcle} Checagem pré-procedimento: paciente, sítio e lado confirmados.',
+            'Paciente em decúbito dorsal{?sitio=rade,radd:, com o punho em leve extensão}. Higiene das mãos, luvas estéreis e campo estéril. Antissepsia com clorexidina alcoólica. Anestesia local com lidocaína 2% sem vasoconstritor.',
+            'Punção da {sitio} {?usg:guiada por ultrassonografia|por palpação}, com fluxo arterial pulsátil. Cateter arterial inserido com fio-guia e fixado à pele. Sistema de transdução conectado, zerado e nivelado no eixo flebostático, com curva de boa qualidade. Curativo estéril.',
+            'Número de punções: ___. Intercorrências: nenhuma. Extremidade distal bem perfundida após o procedimento.'
+          ] }
+        ],
+        info: 'Radial é o sítio preferencial. A USG em tempo real aumenta o sucesso na primeira punção. Conferir a perfusão distal e a curva (sem amortecimento) depois de fixar.'
+      },
+
+      {
+        id: 'mp', ctx: 'proc', titulo: 'Marcapasso provisório', vitais: false,
+        sin: 'marcapasso transvenoso provisorio mp bavt bradicardia eletrodo ecg intracavitario procedimento',
+        opcoes: [
+          { id: 'via', label: 'Via', padrao: 'vjid', valores: [
+            ['vjid', 'VJI D', 'veia jugular interna direita'],
+            ['vjie', 'VJI E', 'veia jugular interna esquerda'],
+            ['femd', 'Femoral D', 'veia femoral direita']
+          ] },
+          { id: 'indic', label: 'Indicação', padrao: 'bavt', valores: [
+            ['bavt', 'BAVT', 'bloqueio atrioventricular total'],
+            ['bav2', 'BAV 2º grau avançado', 'bloqueio atrioventricular de segundo grau avançado'],
+            ['dns', 'Disfunção sinusal', 'disfunção do nó sinusal com pausas'],
+            ['out', 'Outra', '___']
+          ] },
+          { id: 'modo', label: 'Modo', padrao: 'vvi', valores: [
+            ['vvi', 'VVI', 'VVI'],
+            ['voo', 'VOO', 'VOO (assíncrono)']
+          ] },
+          TCLE
+        ],
+        chips: [
+          { id: 'instavel', label: 'Instabilidade hemodinâmica', on: true },
+          { id: 'pas', label: 'Pás de MP transcutâneo', on: true },
+          { id: 'usg', label: 'Punção guiada por USG', on: true },
+          { id: 'rx', label: 'Com radioscopia', on: false }
+        ],
+        blocos: [
+          { id: 'desc', titulo: 'Descrição', linhas: [
+            'PROCEDIMENTO — MARCAPASSO TRANSVENOSO PROVISÓRIO — {data} ___h',
+            'Executor: ___. Supervisão: ___.',
+            'Indicação: {indic}{?instavel:, com instabilidade hemodinâmica}.',
+            '{tcle} Checagem pré-procedimento: paciente, sítio e lado confirmados.',
+            'Paciente monitorizad{o|a}, em decúbito dorsal{?via=femd:|, em Trendelenburg}.{?pas: Pás de marcapasso transcutâneo posicionadas.} Paramentação completa e campo estéril amplo. Antissepsia com clorexidina alcoólica. Anestesia local com lidocaína 2% sem vasoconstritor.',
+            'Punção da {via} {?usg:guiada por ultrassonografia|por reparos anatômicos}, com passagem de introdutor ___ Fr pela técnica de Seldinger.',
+            '{?rx:Eletrodo bipolar progredido sob radioscopia até o ápice do ventrículo direito.|Eletrodo bipolar progredido à beira do leito, sem radioscopia, guiado por ECG intracavitário: ondas P amplas no átrio direito, aumento do QRS ao cruzar a valva tricúspide e corrente de lesão com supradesnivelamento de ST ao contato com o endocárdio do ventrículo direito.}',
+            'Captura ventricular confirmada, com QRS em padrão de BRE. Limiar de comando de ___ mA. Programado em modo {modo}, frequência ___ bpm, saída ___ mA e sensibilidade ___ mV.',
+            'Eletrodo fixado a ___ cm na pele. Curativo estéril. Intercorrências: nenhuma.',
+            'Radiografia de tórax: ___.'
+          ] }
+        ],
+        info: 'Limiar de comando ideal ≤ 1 mA; saída de 2 a 3 vezes o limiar. Checar limiar e sensibilidade a cada plantão e após mudança de posição. Perda de captura ou QRS que passa de padrão de BRE para BRD sugerem deslocamento ou perfuração.'
+      },
+
+      {
+        id: 'toraco', ctx: 'proc', titulo: 'Toracocentese', vitais: false,
+        sin: 'toracocentese derrame pleural puncao pleural procedimento',
+        opcoes: [
+          { id: 'lado', label: 'Lado', padrao: 'd', valores: [
+            ['d', 'Direito', 'à direita'],
+            ['e', 'Esquerdo', 'à esquerda']
+          ] },
+          TIPO_PUNCAO,
+          TCLE
+        ],
+        listas: [
+          { id: 'amostras', label: 'Exames enviados', vazio: '___', padrao: ['bioq', 'glic', 'cel', 'cult'], itens: [
+            ['bioq', 'Proteína e DHL', 'proteína total e DHL (com dosagens séricas)'],
+            ['glic', 'Glicose', 'glicose'],
+            ['ph', 'pH', 'pH'],
+            ['cel', 'Celularidade', 'celularidade com diferencial'],
+            ['cult', 'Gram e cultura', 'cultura com Gram'],
+            ['cito', 'Citologia', 'citologia oncótica'],
+            ['ada', 'ADA', 'ADA'],
+            ['trig', 'Triglicérides', 'triglicérides']
+          ] }
+        ],
+        chips: [{ id: 'interromp', label: 'Interrompido por sintomas', on: false }],
+        blocos: [
+          { id: 'desc', titulo: 'Descrição', linhas: [
+            'PROCEDIMENTO — TORACOCENTESE — {data} ___h',
+            'Executor: ___. Supervisão: ___.',
+            'Indicação: derrame pleural {lado}; punção {tipo}.',
+            '{tcle} Checagem pré-procedimento: paciente, sítio e lado confirmados.',
+            'Paciente sentad{o|a}, com o tronco levemente inclinado para a frente. Ultrassonografia torácica com derrame ___ e local de punção definido no ___º espaço intercostal, linha ___.',
+            'Antissepsia com clorexidina alcoólica e campo estéril. Anestesia local com lidocaína 2% sem vasoconstritor por planos até a pleura parietal.',
+            'Punção na borda superior da costela inferior, com saída de líquido ___. Drenagem lenta, com retirada de ___ mL.{?interromp: Procedimento interrompido por tosse e desconforto torácico.}',
+            'Material enviado para: {amostras}.',
+            'Curativo oclusivo. {?interromp:Sem outras intercorrências.|Intercorrências: nenhuma.}',
+            'Controle pós-procedimento: ___.'
+          ] }
+        ],
+        info: 'BTS 2023: USG obrigatória; punção na borda superior da costela; drenagem lenta, sem vácuo ou aspiração de parede; em geral até 1,5 L por vez; interromper se aperto torácico, dor, tosse persistente ou piora da dispneia. Os critérios de Light pedem proteína e DHL séricas do mesmo dia.'
+      },
+
+      {
+        id: 'paracentese', ctx: 'proc', titulo: 'Paracentese', vitais: false,
+        sin: 'paracentese ascite puncao abdominal albumina gasa procedimento',
+        opcoes: [
+          { id: 'lado', label: 'Local', padrao: 'fie', valores: [
+            ['fie', 'FIE', 'fossa ilíaca esquerda'],
+            ['fid', 'FID', 'fossa ilíaca direita']
+          ] },
+          TIPO_PUNCAO,
+          TCLE
+        ],
+        listas: [
+          { id: 'amostras', label: 'Exames enviados', vazio: '___', padrao: ['cel', 'prot', 'alb', 'cult'], itens: [
+            ['cel', 'Celularidade', 'celularidade com diferencial'],
+            ['prot', 'Proteína total', 'proteína total'],
+            ['alb', 'Albumina (GASA)', 'albumina (com albumina sérica do mesmo dia)'],
+            ['cult', 'Cultura', 'cultura em frascos de hemocultura inoculados à beira do leito'],
+            ['gd', 'Glicose e DHL', 'glicose e DHL'],
+            ['cito', 'Citologia', 'citologia oncótica'],
+            ['ada', 'ADA', 'ADA'],
+            ['amil', 'Amilase', 'amilase']
+          ] }
+        ],
+        chips: [{ id: 'albumina', label: 'Reposição de albumina', on: false }],
+        blocos: [
+          { id: 'desc', titulo: 'Descrição', linhas: [
+            'PROCEDIMENTO — PARACENTESE — {data} ___h',
+            'Executor: ___. Supervisão: ___.',
+            'Indicação: ascite ___; punção {tipo}.',
+            '{tcle} Checagem pré-procedimento: paciente, sítio e lado confirmados.',
+            'Paciente em decúbito dorsal. Ultrassonografia com bolsão de ascite em {lado}, sem alças interpostas.',
+            'Antissepsia com clorexidina alcoólica e campo estéril. Anestesia local com lidocaína 2% sem vasoconstritor.',
+            'Punção em {lado}, lateral à borda do músculo reto abdominal, com saída de líquido ___. Drenagem de ___ mL.',
+            'Material enviado para: {amostras}.',
+            ['albumina', 'Reposição de albumina humana 20%, ___ g EV.'],
+            'Curativo oclusivo. Intercorrências: nenhuma.'
+          ] }
+        ],
+        info: 'AASLD 2021: análise inicial com celularidade e diferencial, proteína total e GASA; cultura em frascos de hemocultura à beira do leito, antes do antibiótico. Albumina de 6 a 8 g por litro retirado quando a drenagem passa de 5 L. Não é preciso corrigir coagulograma e plaquetas de rotina antes da punção.'
+      }
+    ]
+  };
+})();
+
+</script>
+<script>
+// Aba "Evoluções" — montador por cenário (Fase 1, 14/11/2026).
+// Contexto → cenário → ajustes (♂/♀, sinais vitais, opções, chips) → copiar.
+// Dados em data-prontuario.js (window.PRONT). Sem servidor e sem IA.
+(function () {
+  const D = window.PRONT;
+  const root = document.getElementById('montador-root');
+  if (!D || !root) return;
+
+  // ---------- estado ----------
+  const LS = 'cardio.montador.';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(LS + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(LS + k, JSON.stringify(v)); } catch (e) { /* sem armazenamento: segue em memória */ } }
+  };
+  const ctxIds = D.contextos.map(c => c.id);
+  const S = {
+    ctx: ctxIds.includes(store.get('ctx', 'triagem')) ? store.get('ctx', 'triagem') : 'triagem',
+    sexo: store.get('sexo', 'm') === 'f' ? 'f' : 'm',
+    cen: {},   // cenário aberto em cada contexto
+    vit: {},   // sinais vitais digitados (valem para todos os cenários até "Novo paciente")
+    sel: {}    // escolhas por cenário: { o: opções, l: listas, c: chips }
+  };
+  const VITAIS = [
+    ['PAS', 'PAS'], ['PAD', 'PAD'], ['FC', 'FC'], ['FR', 'FR'], ['SpO2', 'SpO2 %'], ['Tax', 'Tax °C'], ['HGT', 'HGT']
+  ];
+
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const porId = id => D.cenarios.find(c => c.id === id);
+  const doCtx = ctx => D.cenarios.filter(c => c.ctx === ctx);
+
+  function selDe(sc) {
+    if (!S.sel[sc.id]) {
+      const o = {}, l = {}, c = {};
+      (sc.opcoes || []).forEach(op => { o[op.id] = op.padrao || op.valores[0][0]; });
+      (sc.listas || []).forEach(ls => { l[ls.id] = (ls.padrao || []).slice(); });
+      (sc.chips || []).forEach(ch => { c[ch.id] = !!ch.on; });
+      S.sel[sc.id] = { o, l, c };
+    }
+    return S.sel[sc.id];
+  }
+
+  // ---------- motor de texto ----------
+  function juntar(itens) {
+    if (itens.length <= 1) return itens.join('');
+    return itens.slice(0, -1).join(', ') + ' e ' + itens[itens.length - 1];
+  }
+  function hoje() {
+    const d = new Date();
+    return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+  }
+  function num(k) {
+    const n = parseFloat(String(S.vit[k] || '').trim().replace(',', '.'));
+    return isFinite(n) ? n : null;
+  }
+  function calc(k) {
+    const s = num('PAS'), d = num('PAD');
+    if (s === null || d === null || s <= 0 || d < 0 || d >= s) return null;
+    if (k === 'PPP') return Math.round((s - d) / s * 100);
+    if (k === 'PAM') return Math.round((s + 2 * d) / 3);
+    return null;
+  }
+  function vital(k) {
+    if (k === 'data') return hoje();
+    if (k === 'PPP' || k === 'PAM') { const v = calc(k); return v === null ? '___' : String(v); }
+    const v = String(S.vit[k] || '').trim();
+    return v || '___';
+  }
+  function cond(expr, sc, st) {
+    return expr.split('&').every(p => {
+      p = p.trim();
+      let neg = false;
+      if (p.charAt(0) === '!') { neg = true; p = p.slice(1); }
+      let r;
+      const m = p.match(/^([\w-]+)(!?=)([\w,-]+)$/);
+      if (m) {
+        r = m[3].split(',').includes(st.o[m[1]]);
+        if (m[2] === '!=') r = !r;
+      } else {
+        r = !!st.c[p] || !!(st.l[p] && st.l[p].length);
+      }
+      return neg ? !r : r;
+    });
+  }
+  function resolver(t, sc, st) {
+    // 1) opções e listas
+    t = t.replace(/\{([\w-]+)(?:\.([\w-]+))?\}/g, (m, id, chave) => {
+      const op = (sc.opcoes || []).find(o => o.id === id);
+      if (op) {
+        const v = op.valores.find(x => x[0] === st.o[id]) || op.valores[0];
+        const tx = v[2];
+        return typeof tx === 'object' ? (chave ? (tx[chave] || '') : tx.t) : tx;
+      }
+      const ls = (sc.listas || []).find(l => l.id === id);
+      if (ls) {
+        const marcados = ls.itens.filter(x => st.l[id].includes(x[0])).map(x => x[2] || x[1]);
+        if (!marcados.length) return ls.vazio != null ? ls.vazio : '___';
+        return (ls.antes || '') + juntar(marcados) + (ls.depois || '');
+      }
+      return m; // {data} e sinais vitais seguem para o passo 4
+    });
+    // 2) concordância com o sexo
+    let antes;
+    do { antes = t; t = t.replace(/\{([^{}?|:]*)\|([^{}|]*)\}/g, (m, a, b) => (S.sexo === 'f' ? b : a)); } while (t !== antes);
+    // 3) trechos condicionais
+    t = t.replace(/\{\?([^:{}]+):([^{}|]*)(?:\|([^{}]*))?\}/g, (m, c, sim, nao) => (cond(c, sc, st) ? sim : (nao || '')));
+    // 4) data e sinais vitais
+    t = t.replace(/\{(data|PAS|PAD|FC|FR|SpO2|Tax|HGT|PPP|PAM)\}/g, (m, k) => vital(k));
+    // 5) acabamento
+    return t.replace(/ {2,}/g, ' ').replace(/ +([.,;])/g, '$1').trim();
+  }
+  function linha(L) {
+    if (typeof L === 'string') return { t: L };
+    if (Array.isArray(L)) return { se: L[0], t: L[1] };
+    return L;
+  }
+  function textoBloco(b, sc, st) {
+    const out = [];
+    let n = 0;
+    (b.linhas || []).forEach(L => {
+      const o = linha(L);
+      if (o.se && !cond(o.se, sc, st)) return;
+      let tx = resolver(o.t, sc, st);
+      if (!tx) return;
+      if (b.num && o.n !== false) tx = (++n) + '. ' + tx;
+      out.push(tx);
+    });
+    if (!out.length) return '';
+    if (b.cab) out.unshift(b.cab);
+    return out.join('\n');
+  }
+  function blocosProntos(sc) {
+    const st = selDe(sc);
+    return (sc.blocos || []).map(b => ({ b, tx: textoBloco(b, sc, st) })).filter(x => x.tx);
+  }
+  function textoTudo(sc) { return blocosProntos(sc).map(x => x.tx).join('\n\n'); }
+  function vitaisUsados(sc) {
+    const todo = JSON.stringify(sc.blocos || []);
+    const usa = new Set();
+    VITAIS.forEach(v => { if (todo.includes('{' + v[0] + '}')) usa.add(v[0]); });
+    if (todo.includes('{PPP}') || todo.includes('{PAM}')) { usa.add('PAS'); usa.add('PAD'); }
+    return usa;
+  }
+
+  // ---------- tela ----------
+  root.innerHTML =
+    '<div class="mt-top">' +
+      '<div class="mt-ctx" role="group" aria-label="Contexto"></div>' +
+      '<div class="mt-sexo" role="group" aria-label="Sexo do paciente">' +
+        '<button type="button" data-sexo="m" title="Masculino">♂</button>' +
+        '<button type="button" data-sexo="f" title="Feminino">♀</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="mt-grid">' +
+      '<div class="mt-cen" role="group" aria-label="Cenário"></div>' +
+      '<div class="mt-panel"></div>' +
+    '</div>';
+  const elCtx = root.querySelector('.mt-ctx');
+  const elSexo = root.querySelector('.mt-sexo');
+  const elCen = root.querySelector('.mt-cen');
+  const elPanel = root.querySelector('.mt-panel');
+
+  function cenAtual() {
+    const lista = doCtx(S.ctx);
+    let sc = porId(S.cen[S.ctx]);
+    if (!sc || sc.ctx !== S.ctx) sc = lista[0];
+    S.cen[S.ctx] = sc && sc.id;
+    return sc;
+  }
+
+  function renderTopo() {
+    elCtx.innerHTML = D.contextos.map(c =>
+      '<button type="button" class="mt-pill" data-ctx="' + c.id + '" aria-pressed="' + (c.id === S.ctx) + '">' + esc(c.label) + '</button>').join('');
+    elSexo.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sexo === S.sexo)));
+  }
+  function renderCenarios() {
+    const sc = cenAtual();
+    elCen.innerHTML = doCtx(S.ctx).map(c =>
+      '<button type="button" data-cen="' + c.id + '" aria-pressed="' + (sc && c.id === sc.id) + '">' + esc(c.botao || c.titulo) + '</button>').join('');
+  }
+
+  function grupoOpcao(op, st) {
+    return '<div class="mt-grp"><div class="mt-grp-t">' + esc(op.label) + '</div><div class="mt-chips">' +
+      op.valores.map(v => '<button type="button" class="mt-chip mt-seg" data-op="' + op.id + '" data-v="' + esc(v[0]) + '" aria-pressed="' + (st.o[op.id] === v[0]) + '">' + esc(v[1]) + '</button>').join('') +
+      '</div></div>';
+  }
+  function grupoLista(ls, st) {
+    return '<div class="mt-grp"><div class="mt-grp-t">' + esc(ls.label) + '</div><div class="mt-chips">' +
+      ls.itens.map(it => '<button type="button" class="mt-chip" data-ls="' + ls.id + '" data-v="' + esc(it[0]) + '" aria-pressed="' + st.l[ls.id].includes(it[0]) + '">' + esc(it[1]) + '</button>').join('') +
+      '</div></div>';
+  }
+
+  function renderPainel() {
+    const sc = cenAtual();
+    if (!sc) { elPanel.innerHTML = ''; return; }
+    const st = selDe(sc);
+    const usa = sc.vitais === false ? new Set() : vitaisUsados(sc);
+    let h = '<h3>' + esc(sc.titulo) + '</h3>';
+
+    if (usa.size) {
+      h += '<div class="mt-vit">';
+      VITAIS.forEach(v => {
+        if (!usa.has(v[0])) return;
+        h += '<label>' + esc(v[1]) + '<input type="text" inputmode="decimal" autocomplete="off" data-vit="' + v[0] + '" value="' + esc(S.vit[v[0]] || '') + '"></label>';
+      });
+      h += '<span class="mt-calc" aria-live="polite"></span>';
+      h += '<button type="button" class="btn-ghost mt-novo" title="Limpa sinais vitais e escolhas">Novo paciente</button>';
+      h += '</div>';
+    }
+
+    const temAjuste = (sc.opcoes || []).length || (sc.listas || []).length || (sc.chips || []).length;
+    if (temAjuste) {
+      h += '<div class="mt-ajustes">';
+      (sc.opcoes || []).forEach(op => { h += grupoOpcao(op, st); });
+      (sc.listas || []).forEach(ls => { h += grupoLista(ls, st); });
+      if ((sc.chips || []).length) {
+        h += '<div class="mt-grp"><div class="mt-grp-t">Achados e ajustes</div><div class="mt-chips">' +
+          sc.chips.map(ch => '<button type="button" class="mt-chip" data-chip="' + ch.id + '" aria-pressed="' + !!st.c[ch.id] + '">' + esc(ch.label) + '</button>').join('') +
+          '</div></div>';
+      }
+      h += '</div>';
+    }
+
+    if (sc.info) {
+      h += '<details class="mt-info"><summary>ⓘ Por quê — não entra na cópia</summary><p>' + esc(sc.info) + '</p></details>';
+    }
+
+    h += '<div class="mt-blocos"></div>';
+    h += '<button type="button" class="mt-tudo">Copiar tudo</button>';
+    elPanel.innerHTML = h;
+    renderTexto();
+  }
+
+  function renderTexto() {
+    const sc = cenAtual();
+    if (!sc) return;
+    const prontos = blocosProntos(sc);
+    const el = elPanel.querySelector('.mt-blocos');
+    if (el) {
+      el.innerHTML = prontos.map((x, i) =>
+        '<div class="mt-bloco"><div class="mt-bloco-h"><strong>' + esc(x.b.titulo || 'Texto') + '</strong>' +
+        '<button type="button" class="btn-ghost mt-copia" data-i="' + i + '">Copiar</button></div>' +
+        '<pre>' + esc(x.tx) + '</pre></div>').join('');
+    }
+    const calcEl = elPanel.querySelector('.mt-calc');
+    if (calcEl) {
+      const ppp = calc('PPP'), pam = calc('PAM');
+      if (ppp === null) { calcEl.textContent = ''; calcEl.classList.remove('alerta'); }
+      else {
+        calcEl.textContent = 'PAM ' + pam + ' · PP proporcional ' + ppp + '%' + (ppp < 25 ? ' (< 25%: sugere IC < 2,2)' : '');
+        calcEl.classList.toggle('alerta', ppp < 25);
+      }
+    }
+  }
+
+  function renderTudo() { renderTopo(); renderCenarios(); renderPainel(); }
+
+  // ---------- eventos ----------
+  elCtx.addEventListener('click', e => {
+    const b = e.target.closest('[data-ctx]'); if (!b) return;
+    S.ctx = b.dataset.ctx; store.set('ctx', S.ctx);
+    renderTudo();
+  });
+  elSexo.addEventListener('click', e => {
+    const b = e.target.closest('[data-sexo]'); if (!b) return;
+    S.sexo = b.dataset.sexo; store.set('sexo', S.sexo);
+    renderTopo(); renderTexto();
+  });
+  elCen.addEventListener('click', e => {
+    const b = e.target.closest('[data-cen]'); if (!b) return;
+    S.cen[S.ctx] = b.dataset.cen;
+    renderCenarios(); renderPainel();
+    if (window.matchMedia && window.matchMedia('(max-width: 860px)').matches) {
+      elPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+  elPanel.addEventListener('click', e => {
+    const sc = cenAtual(); if (!sc) return;
+    const st = selDe(sc);
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.op) {
+      st.o[b.dataset.op] = b.dataset.v;
+      b.parentElement.querySelectorAll('[data-op]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      renderTexto();
+    } else if (b.dataset.ls) {
+      const arr = st.l[b.dataset.ls], v = b.dataset.v, i = arr.indexOf(v);
+      if (i >= 0) arr.splice(i, 1); else arr.push(v);
+      b.setAttribute('aria-pressed', String(i < 0));
+      renderTexto();
+    } else if (b.dataset.chip) {
+      st.c[b.dataset.chip] = !st.c[b.dataset.chip];
+      b.setAttribute('aria-pressed', String(st.c[b.dataset.chip]));
+      renderTexto();
+    } else if (b.classList.contains('mt-copia')) {
+      const x = blocosProntos(sc)[+b.dataset.i];
+      if (x && window.copyText) window.copyText(x.tx);
+    } else if (b.classList.contains('mt-tudo')) {
+      if (window.copyText) window.copyText(textoTudo(sc));
+    } else if (b.classList.contains('mt-novo')) {
+      S.vit = {}; S.sel = {};
+      renderPainel();
+      if (window.toast) window.toast('Pronto para o próximo paciente');
+    }
+  });
+  elPanel.addEventListener('input', e => {
+    const i = e.target.closest('[data-vit]'); if (!i) return;
+    S.vit[i.dataset.vit] = i.value;
+    renderTexto();
+  });
+
+  // Abre um cenário pelo id (usado pela busca global).
+  window.cardioMontadorAbrir = function (id) {
+    const sc = porId(id); if (!sc) return;
+    S.ctx = sc.ctx; S.cen[sc.ctx] = sc.id; store.set('ctx', S.ctx);
+    renderTudo();
+  };
+  // Para testes e para outras abas: texto completo de um cenário com as escolhas atuais.
+  window.cardioMontadorTexto = function (id) { const sc = porId(id || S.cen[S.ctx]); return sc ? textoTudo(sc) : ''; };
+
+  renderTudo();
+})();
+
+</script>
+<script>
 // Navegação em hubs (2 níveis) + busca global + utilidades compartilhadas
 (function () {
   const HUBS = [
@@ -14297,7 +15477,7 @@ window.PROTOCOLOS = [
     { id: 'ferramentas', label: '🧮 Ferramentas', views: [['scores', '🧮 Scores'], ['pretest', '🎯 Pré-teste'], ['doses', '💊 Doses']] },
     { id: 'mbe', label: '📐 MBE', views: [['mbe', '📐 MBE']] },
     { id: 'plantao', label: '🚨 Plantão', views: [['protocolos', '🚨 Protocolos']] },
-    { id: 'prontuario', label: '📝 Prontuário', views: [['transcricao', '📝 Transcrever laudo'], ['evolucoes', '🗂️ Evoluções'], ['orientacoes', '💬 Orientações']] },
+    { id: 'prontuario', label: '📝 Prontuário', views: [['montador', '🗂️ Evoluções'], ['transcricao', '📝 Transcrever laudo'], ['orientacoes', '💬 Orientações'], ['evolucoes', '📚 Biblioteca anterior']] },
     { id: 'sobre', label: 'ℹ️ Sobre', views: [['novidades', '🆕 Atualizações'], ['sobre', 'ℹ️ Sobre']] }
   ];
   const viewHub = {};
@@ -14381,9 +15561,15 @@ window.PROTOCOLOS = [
         run: () => { showView('ensaios'); const i = document.getElementById('ensaios-busca'); if (i) { i.value = tr.n; i.dispatchEvent(new Event('input')); } }
       }); });
     });
+    // evoluções por cenário (montador)
+    ((window.PRONT && window.PRONT.cenarios) || []).forEach(c => IDX.push({
+      label: c.titulo, sub: 'Evolução — ' + ((window.PRONT.contextos.find(x => x.id === c.ctx) || {}).label || ''),
+      type: 'Evolução', kw: c.sin || '',
+      run: () => { showView('montador'); if (window.cardioMontadorAbrir) window.cardioMontadorAbrir(c.id); }
+    }));
     built = true;
   }
-  function badgeClass(t) { return 'gs-' + ({ 'Conduta': 'cond', 'Score': 'score', 'Dose': 'dose', 'Diretriz': 'guia', 'Ensaio': 'ens', 'Protocolo': 'prot', 'Orientação': 'orient', 'Atualização': 'guia' }[t] || 'cond'); }
+  function badgeClass(t) { return 'gs-' + ({ 'Conduta': 'cond', 'Score': 'score', 'Dose': 'dose', 'Diretriz': 'guia', 'Ensaio': 'ens', 'Protocolo': 'prot', 'Orientação': 'orient', 'Atualização': 'guia', 'Evolução': 'orient' }[t] || 'cond'); }
 
   if (gi && gr) {
     const run = () => {
