@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta name="cardio-build" content="2026-11-14 16:42" />
+  <meta name="cardio-build" content="2026-11-14 21:36" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CardioResidente — Ferramentas para o residente de cardiologia</title>
@@ -788,8 +788,7 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .rec-cert { font-weight: 600; }
 .rec-obs { background: #eef5fb; border-color: #c7dcef; }
 
-
-/* ---------- Evoluções por cenário (montador) — Fase 1, 14/11/2026 ---------- */
+/* ---------- Evoluções por cenário (montador) — Fases 1 e 2, 14/11/2026 ---------- */
 .mt-top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 14px; }
 .mt-ctx { display: flex; flex-wrap: wrap; gap: 6px; }
 .mt-pill {
@@ -808,14 +807,38 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 .mt-grid { display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: start; }
 .mt-cen { display: flex; flex-direction: column; gap: 8px; }
 .mt-cen button {
+  display: flex; align-items: center; gap: 8px;
   text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 10px;
   padding: 12px 14px; font-size: 14px; font-weight: 500; color: var(--text); cursor: pointer; transition: .15s;
 }
+.mt-cen-t { flex: 1; }
+.mt-k {
+  flex: none; min-width: 20px; height: 20px; border: 1px solid var(--line); border-radius: 5px; background: var(--bg-soft);
+  font-size: 11px; line-height: 18px; text-align: center; font-weight: 600; color: var(--muted);
+}
+.mt-cen button[aria-pressed="true"] .mt-k { border-color: var(--accent); color: var(--accent); background: #fff; }
+.mt-cen-c { flex: none; font-size: 10.5px; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); }
+.mt-atalhos { margin: 4px 2px 0; font-size: 11.5px; line-height: 1.4; color: var(--muted); }
+.mt-vazio { margin: 4px 2px; font-size: 13px; color: var(--muted); }
+.mt-busca {
+  flex: 1 1 200px; max-width: 300px; min-width: 0; padding: 8px 14px; border: 1px solid var(--line); border-radius: 20px;
+  font-size: 16px; /* 16px evita o zoom automático do iOS */ background: var(--card); color: var(--text);
+}
+.mt-busca:focus { outline: none; border-color: var(--blue); }
 .mt-cen button:hover { border-color: var(--blue); }
 .mt-cen button[aria-pressed="true"] { border-color: var(--accent); background: #fdecee; font-weight: 600; }
 
 .mt-panel { scroll-margin-top: calc(var(--stick-top, 0px) + 8px); }
-.mt-panel h3 { margin: 0 0 10px; font-size: 18px; }
+.mt-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 10px; }
+.mt-panel h3 { margin: 0; font-size: 18px; }
+.mt-link { flex: none; }
+.mt-panel [hidden] { display: none !important; }
+.mt-alertas {
+  background: #fff7e6; border: 1px solid #f0cf94; color: #6b4300; border-radius: 10px;
+  padding: 8px 12px; margin: 0 0 12px; font-size: 13px; line-height: 1.45;
+}
+.mt-alertas p { margin: 0; }
+.mt-alertas p + p { margin-top: 6px; }
 .mt-vit {
   display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;
   background: var(--bg-soft); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px;
@@ -864,9 +887,16 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
 @media (max-width: 860px) {
   .mt-grid { grid-template-columns: 1fr; gap: 14px; }
   .mt-cen { display: grid; grid-template-columns: 1fr 1fr; }
-  .mt-cen button { text-align: center; padding: 12px 8px; font-size: 13.5px; }
+  .mt-cen button { flex-direction: column; justify-content: center; gap: 2px; text-align: center; padding: 12px 8px; font-size: 13.5px; }
+  .mt-cen-t { flex: none; }
+  .mt-k, .mt-atalhos { display: none; }
+  .mt-vazio { grid-column: 1 / -1; }
+  .mt-busca { order: 3; flex-basis: 100%; max-width: none; }
   .mt-sexo { margin-left: 0; }
   .mt-novo { margin-left: 0; }
+}
+@media (hover: none) {
+  .mt-k, .mt-atalhos { display: none; }
 }
 
 </style>
@@ -3111,6 +3141,7 @@ window.DIRETRIZES = [
 // Conteúdo revisado em 04/08/2026: AHA/ACC TEP 2026 (categorias A–E), SBC HAS 2025
 // (fim do termo urgência hipertensiva), betabloqueador pós-IAM (REDUCE-AMI e REBOOT),
 // Surviving Sepsis 2026 e terapias atuais para ATTR-CM.
+// Revisado em 14/11/2026: energias de cardioversão pela AHA 2025 (FA >= 200 J, flutter 200 J).
 // Backup da versão anterior: assets/js/data-evolucoes.ORIGINAL-2026-08-03.js.bak
 window.EVOLUCOES = [
   {
@@ -3920,8 +3951,8 @@ HAS-BLED ___ — serve para corrigir fatores de sangramento, não para contraind
 
 DESTINO E CONDUTA
 1. Instável — cardioversão elétrica sincronizada imediata, com sedação por etomidato
-   ou propofol e fentanil. Energia bifásica: FA 120 a 200 J · flutter e TSV 50 a 100 J ·
-   TV monomórfica com pulso 100 J.
+   ou propofol e fentanil. Energia bifásica inicial (AHA 2025): FA 200 J ou mais ·
+   flutter 200 J · TSV e TV monomórfica com pulso 100 J.
 2. Estável, FA com menos de 24 h de início e baixo risco embólico — cardioversão química
    ou elétrica é possível. Em alto risco (FA valvar, evento embólico prévio ou CHA2DS2-VA
    de 2 ou mais), não cardioverter de imediato mesmo com menos de 24 h: anticoagular
@@ -5727,7 +5758,7 @@ Procurar hipotensão, dor torácica isquêmica, IC aguda ou edema agudo de pulm�
 e rebaixamento do nível de consciência.
 Se sim, cardioversão elétrica sincronizada imediata.
 Sedação: etomidato 0,15 a 0,3 mg/kg, ou propofol 0,5 a 1 mg/kg, mais fentanil 1 mcg/kg.
-Energia bifásica: FA 120 a 200 J · flutter e TSV 50 a 100 J · TV monomórfica com pulso 100 J.
+Energia bifásica inicial (AHA 2025): FA 200 J ou mais · flutter 200 J · TSV e TV monomórfica com pulso 100 J.
 
 2. ESTÁVEL — DEFINIR TEMPO E RISCO EMBÓLICO (SBC 2025)
 Início dos sintomas há ___ h. A janela segura para cardioversão sem anticoagulação prévia
@@ -11286,7 +11317,8 @@ window.DOSES = [
 
 </script>
   <script>
-// Protocolos de plantão — algoritmos de emergência (ACLS/AHA 2020 e diretrizes ESC).
+// Protocolos de plantão — algoritmos de emergência (ACLS/AHA 2020, energias de cardioversão da AHA 2025,
+// diretrizes ESC e SBC). Revisado em 14/11/2026: crise hipertensiva pela SBC HAS 2025.
 // Apoio à decisão: siga o protocolo da sua instituição e o ACLS vigente.
 // passos[].t: passo | dose | decisao | alerta | nota | sub(items[])
 window.PROTOCOLOS = [
@@ -11323,7 +11355,7 @@ window.PROTOCOLOS = [
     passos: [
       { t: 'passo', x: 'FC ≥ 150 bpm geralmente sintomática. O₂ se necessário, monitor, acesso, ECG de 12 derivações.' },
       { t: 'decisao', x: 'INSTÁVEL? (hipotensão, rebaixamento, dor torácica isquêmica, IC aguda).' },
-      { t: 'dose', x: 'SIM → cardioversão elétrica SINCRONIZADA imediata (sedação se possível). Energia: QRS estreito regular 50–100 J · FA 120–200 J · TV monomórfica com pulso 100 J. TV polimórfica instável → desfibrilar.' },
+      { t: 'dose', x: 'SIM → cardioversão elétrica SINCRONIZADA imediata (sedação se possível). Energia bifásica inicial (AHA 2025): FA ≥ 200 J · flutter 200 J · QRS estreito regular 100 J · TV monomórfica com pulso 100 J; aumentar se não reverter e sincronizar de novo antes de cada choque. TV polimórfica instável → desfibrilar.' },
       { t: 'decisao', x: 'ESTÁVEL → avaliar a largura do QRS.' },
       { t: 'sub', items: ['QRS ESTREITO (< 0,12 s): manobra vagal → adenosina 6 mg EV em bólus rápido → 12 mg (repetir 12 mg). Se não reverter/recorrer: betabloqueador ou BCC (diltiazem).', 'QRS LARGO (≥ 0,12 s): se TV provável → amiodarona 150 mg EV em 10 min (repetir) (procainamida, citada nas diretrizes estrangeiras, não consta entre os antiarrítmicos disponíveis no Brasil — SBC 2026, Tabela 1 do posicionamento de tempestade elétrica); considerar cardioversão eletiva. Adenosina apenas se regular e monomórfica.'] },
       { t: 'alerta', x: 'FA pré-excitada (WPW — QRS largo, irregular, muito rápida): NÃO usar bloqueadores do nó AV (adenosina, BCC, betabloqueador, digoxina) — podem acelerar a condução pela via acessória e precipitar FV. Use cardioversão elétrica ou procainamida/ibutilida.' },
@@ -11364,19 +11396,20 @@ window.PROTOCOLOS = [
     passos: [
       { t: 'passo', x: 'Suspeite: dor torácica/dorsal súbita, intensa, migratória; assimetria de pulsos/PA; sopro de IAo; síncope. Risco em HAS, Marfan, valva bicúspide.' },
       { t: 'passo', x: 'Confirmação: angio-TC de aorta (ou ecocardiograma transesofágico se instável). Dois acessos calibrosos, analgesia (morfina).' },
-      { t: 'dose', x: '1º — CONTROLE DA FC: betabloqueador EV (esmolol, metoprolol ou labetalol) com alvo FC < 60 bpm, ANTES de vasodilatador (evita taquicardia reflexa e ↑ do estresse de parede).' },
+      { t: 'dose', x: '1º — CONTROLE DA FC: betabloqueador EV (esmolol ou metoprolol; labetalol EV não está disponível no Brasil) com alvo FC < 60 bpm, ANTES de vasodilatador (evita taquicardia reflexa e ↑ do estresse de parede).' },
       { t: 'dose', x: '2º — CONTROLE DA PA: alvo PAS 100–120 mmHg; associar nitroprussiato se necessário, sempre após o betabloqueador.' },
       { t: 'decisao', x: 'Tipo A (acomete aorta ascendente) → CIRURGIA de emergência. Tipo B não complicada → tratamento clínico; TEVAR se complicada (má-perfusão, dor/HAS refratária, expansão).' }
     ]
   },
   {
-    id: 'crisehas', nome: 'Emergência hipertensiva', area: 'Hipertensão',
+    id: 'crisehas', nome: 'Crise hipertensiva (SBC HAS 2025)', area: 'Hipertensão',
     passos: [
-      { t: 'passo', x: 'PA muito elevada (geralmente > 180/120) COM lesão aguda de órgão-alvo: encefalopatia/AVC, EAP, SCA, dissecção, LRA, eclâmpsia, retinopatia grave.' },
-      { t: 'decisao', x: 'Sem lesão aguda de órgão-alvo = URGÊNCIA hipertensiva → reduzir a PA em horas/dias com fármacos VO, ambulatorial. NÃO usar EV agressivo.' },
-      { t: 'passo', x: 'Emergência: internar (preferir UTI) e reduzir a PA de forma CONTROLADA com anti-hipertensivo EV titulável.' },
-      { t: 'dose', x: 'Alvo geral: reduzir a PA em no máximo 25% na 1ª hora; depois ~160/100 nas 2–6 h. Opções: nitroprussiato 0,3–10 mcg/kg/min · nitroglicerina (se EAP/isquemia) · labetalol · esmolol.' },
-      { t: 'alerta', x: 'Exceções ao alvo: DISSECÇÃO → FC < 60 bpm e PAS 90–120 mmHg em até 20 min (SBC HAS 2025). AVC isquêmico → só tratar se PA muito alta/trombólise (alvos específicos). Eclâmpsia → sulfato de magnésio + anti-hipertensivo.' }
+      { t: 'passo', x: 'EMERGÊNCIA hipertensiva = PA muito elevada (em geral PAS ≥ 180 e/ou PAD ≥ 110 mmHg, às vezes menos) COM lesão aguda e progressiva de órgão-alvo: encefalopatia, AVC, EAP, SCA, dissecção de aorta, LRA, retinopatia grave, eclâmpsia.' },
+      { t: 'decisao', x: 'SEM lesão aguda de órgão-alvo: a SBC HAS 2025 retirou o termo urgência hipertensiva. Agora é ELEVAÇÃO IMPORTANTE DA PA SEM LESÃO PROGRESSIVA DE ÓRGÃOS-ALVO (≥ 180/110 mmHg): não é emergência, sem medicação EV e sem internação.' },
+      { t: 'dose', x: 'Sem LOA: 30 min de observação em ambiente calmo; sem resposta → anti-hipertensivo VO de ação rápida (clonidina ou captopril) ou ajuste do tratamento crônico. Nifedipina de liberação rápida é PROSCRITA. Reavaliação ambulatorial em 1–7 dias, com meta < 160/100 mmHg (FRACA/BAIXA).' },
+      { t: 'passo', x: 'Emergência: UTI, monitorização e anti-hipertensivo EV titulável, vigiando a progressão da lesão de órgão-alvo (FORTE/MODERADA).' },
+      { t: 'dose', x: 'Alvo geral: reduzir a PA em até 25% na 1ª hora, depois para ~160/100 mmHg em 2–6 h e normalizar em 24–48 h (FRACA/MODERADA). Opções: nitroprussiato 0,3–10 mcg/kg/min · nitroglicerina (EAP/isquemia) · esmolol ou metoprolol · hidralazina (gestação). Labetalol, nicardipina e enalaprilato EV não estão disponíveis no Brasil.' },
+      { t: 'alerta', x: 'Exceções ao alvo geral: DISSECÇÃO → FC < 60 bpm e PAS 90–120 mmHg em até 20 min, betabloqueador antes do vasodilatador (FORTE/BAIXA). SCA → PAS < 140 mmHg (evitar < 120) e PAD 70–80 mmHg em 24–72 h (FORTE/ALTA). EAP → nitroglicerina EV nas primeiras 48 h, sem número-alvo. AVC isquêmico → < 185/110 antes da trombólise e < 180/105 nas 24 h seguintes; sem trombólise, tratar só se ≥ 220/120 (redução de 15% em 24 h). AVC hemorrágico com PAS 150–220 → PAS < 140 mmHg. Eclâmpsia → sulfato de magnésio + anti-hipertensivo.' }
     ]
   },
   {
@@ -11460,7 +11493,7 @@ window.PROTOCOLOS = [
     id: 'faaguda', nome: 'Fibrilação atrial aguda', area: 'Arritmia',
     passos: [
       { t: 'passo', x: 'FA com resposta ventricular rápida. Monitor, acesso, ECG; avaliar instabilidade e tempo de início.' },
-      { t: 'decisao', x: 'INSTÁVEL (hipotensão, isquemia, IC, choque) → cardioversão elétrica SINCRONIZADA (120–200 J).' },
+      { t: 'decisao', x: 'INSTÁVEL (hipotensão, isquemia, IC, choque) → cardioversão elétrica SINCRONIZADA imediata, energia bifásica inicial ≥ 200 J (AHA 2025; flutter 200 J).' },
       { t: 'dose', x: 'ESTÁVEL — controle de frequência: betabloqueador OU diltiazem/verapamil EV. Na ICFEr, preferir betabloqueador, amiodarona ou digoxina (evitar BCC não-diidro).' },
       { t: 'passo', x: 'Anticoagulação conforme CHA₂DS₂-VA. SBC FA 2025: FA com > 24 h (ou duração incerta) → anticoagulação por ≥ 3 semanas antes da cardioversão OU ETE para excluir trombo (I-B); < 24 h → cardioverter já anticoagulado com DOAC ou heparina. A ESC 2024 também usa 24 h; a ACC/AHA 2023 mantém 48 h. Manter ACO ≥ 4 semanas após a cardioversão.' },
       { t: 'nota', x: 'Meta de FC (SBC 2025): repouso < 80 bpm; < 110 bpm é aceitável em assintomático (leniente). A SBC 2025 prefere o controle de ritmo precoce como estratégia inicial (I-A).' },
@@ -14379,7 +14412,7 @@ window.PROTOCOLOS = [
 
 </script>
   <script>
-// Evoluções por cenário (montador) — Fase 1, 14/11/2026.
+// Evoluções por cenário (montador) — Fase 1 e Fase 2, 14/11/2026.
 //
 // Cada cenário = contexto + blocos de texto prontos para colar. O texto final é
 // montado em tempo real a partir das escolhas da tela.
@@ -14387,12 +14420,15 @@ window.PROTOCOLOS = [
 // Linguagem dos modelos:
 //   {o|a}              concordância com o sexo (♂ usa o primeiro, ♀ o segundo)
 //   {id} / {id.chave}  texto da opção escolhida (opcoes) ou da lista marcada (listas)
-//   {?cond:sim|não}    trecho condicional; cond = chip, !chip, opcao=valor ou opcao=v1,v2,
-//                      vários unidos por &. O "não" é opcional. Sem chaves dentro.
+//   {?cond:sim|não}    trecho condicional; o "não" é opcional. Sem chaves dentro.
+//                      cond = chip, !chip, opcao=v1,v2, opcao!=v, lista (algo marcado)
+//                      ou lista.item1,item2 (algum desses itens marcado); vários unidos por &.
 //   {data}             data de hoje
 //   {PAS} {PAD} {FC} {FR} {SpO2} {Tax} {HGT}  sinais vitais digitados (vazio vira ___)
 //   {PAM} {PPP}        calculados a partir de PAS e PAD (PPP = pressão de pulso proporcional)
 //   Linha ['cond', 'texto'] só entra quando cond é verdadeira.
+//   se: 'cond' numa opção, lista ou chip = só aparece na tela quando cond é verdadeira.
+//   alertas: [['cond', 'texto']] = aviso na tela quando cond é verdadeira; não entra na cópia.
 //
 // Convenção do site (04/08/2026), mantida: o único campo é ___ (datas __/__/____),
 // sem colchetes de alternativa, sem bullets, nenhum número plausível pré-escrito.
@@ -14405,6 +14441,7 @@ window.PROTOCOLOS = [
       ['urg', 'Urgência', 'Consentimento dispensado por urgência.']
     ]
   };
+  const TCLE_URG = Object.assign({}, TCLE, { padrao: 'urg' });
 
   const FR = {
     id: 'fr', label: 'Fatores de risco', vazio: '___', itens: [
@@ -14429,6 +14466,57 @@ window.PROTOCOLOS = [
   const SCAI = {
     id: 'scai', label: 'Estágio SCAI', padrao: 'c', valores: [
       ['c', 'C', 'C'], ['d', 'D', 'D'], ['e', 'E', 'E']
+    ]
+  };
+
+  const KILLIP = {
+    id: 'killip', label: 'Killip', padrao: '1', valores: [
+      ['1', 'I', 'I'], ['2', 'II', 'II'], ['3', 'III', 'III'], ['4', 'IV', 'IV']
+    ]
+  };
+
+  const TRAJ = {
+    id: 'traj', label: 'Em relação a ontem', padrao: 'est', valores: [
+      ['est', 'Estável', 'estável'],
+      ['mel', 'Melhor', 'em melhora'],
+      ['pio', 'Pior', 'em piora']
+    ]
+  };
+
+  const RESP_VALORES = [
+    ['aa', 'Ar ambiente', 'em ar ambiente'],
+    ['cn', 'Cateter nasal', 'em cateter nasal a ___ L/min'],
+    ['vni', 'VNI', 'em VNI intermitente, PEEP ___ e FiO2 ___%'],
+    ['vm', 'VM', 'em VM, modo ___, PEEP ___ e FiO2 ___%']
+  ];
+  const resp = padrao => ({ id: 'resp', label: 'Respiratório', padrao, valores: RESP_VALORES });
+
+  const INF = {
+    id: 'inf', label: 'Infeccioso', padrao: 'sem', valores: [
+      ['sem', 'Sem antibiótico', 'afebril, sem antibiótico'],
+      ['atb', 'Com antibiótico', 'Tmax ___ °C, em uso de ___ (D___)']
+    ]
+  };
+
+  const DVA = {
+    id: 'dva', label: 'Drogas vasoativas', vazio: 'sem droga vasoativa', padrao: ['nora', 'dobuta'], itens: [
+      ['nora', 'Noradrenalina', 'noradrenalina ___ mcg/kg/min'],
+      ['dobuta', 'Dobutamina', 'dobutamina ___ mcg/kg/min'],
+      ['milri', 'Milrinona', 'milrinona ___ mcg/kg/min'],
+      ['vaso', 'Vasopressina', 'vasopressina ___ U/min']
+    ]
+  };
+
+  const DISP = {
+    id: 'disp', label: 'Dispositivos', vazio: 'sem dispositivos invasivos', padrao: ['cvc', 'pai', 'svd'], itens: [
+      ['cvc', 'CVC', 'CVC em VJI ___ (D___)'],
+      ['pai', 'PAI', 'PAI em radial ___ (D___)'],
+      ['svd', 'SVD', 'SVD (D___)'],
+      ['tot', 'TOT', 'TOT (D___)'],
+      ['bia', 'BIA', 'BIA (D___)'],
+      ['impella', 'Impella', 'Impella (D___)'],
+      ['ecmo', 'ECMO VA', 'ECMO VA (D___)'],
+      ['mp', 'MP provisório', 'MP provisório (D___)']
     ]
   };
 
@@ -14587,7 +14675,7 @@ window.PROTOCOLOS = [
             'Conduta: encaminho à sala de emergência para monitorização, suporte ventilatório e tratamento da congestão. Caso discutido com ___.'
           ] }
         ],
-        info: 'Na sala: VNI se desconforto ou hipoxemia; nitrato se PAS > 110 mmHg; diurético de alça EV. Extremidades frias ou PAS baixa: use o cenário Hipoperfusão.'
+        info: 'Na sala: VNI se desconforto ou hipoxemia; nitrato se PAS > 110 mmHg; diurético de alça EV. Extremidades frias ou PAS baixa: use o cenário Hipoperfusão. A admissão completa do EAP hipertensivo está no PS.'
       },
 
       {
@@ -14670,7 +14758,170 @@ window.PROTOCOLOS = [
             ['estab=inst', 'Conduta: encaminho imediatamente à sala de emergência. Caso discutido com ___.']
           ] }
         ],
-        info: 'Instabilidade: hipotensão, dor torácica isquêmica, IC aguda, rebaixamento do nível de consciência ou síncope. Taquicardia irregular de QRS largo: pensar em FA pré-excitada e não usar bloqueador do nó AV.'
+        info: 'Instabilidade: hipotensão, dor torácica isquêmica, IC aguda, rebaixamento do nível de consciência ou síncope. Taquicardia irregular de QRS largo: pensar em FA pré-excitada e não usar bloqueador do nó AV. A admissão completa da FA de alta resposta está no PS.'
+      },
+
+      {
+        id: 'bradi', ctx: 'triagem', titulo: 'Bradicardia / BAV', botao: 'Bradicardia',
+        sin: 'bradicardia bradiarritmia bav bavt bloqueio atrioventricular total mobitz marcapasso atropina fc baixa',
+        opcoes: [
+          { id: 'estab', label: 'Estabilidade', padrao: 'est', valores: [
+            ['est', 'Estável', 'est'],
+            ['inst', 'Instável', 'inst']
+          ] },
+          { id: 'ritmo', label: 'Ritmo no ECG', padrao: 'bavt', valores: [
+            ['bavt', 'BAVT', 'BAV total'],
+            ['bav2', 'BAV 2º grau', 'BAV de 2º grau ___'],
+            ['sinus', 'Bradicardia sinusal', 'bradicardia sinusal'],
+            ['fa', 'FA de baixa resposta', 'FA de baixa resposta ventricular'],
+            ['junc', 'Ritmo juncional', 'ritmo juncional']
+          ] }
+        ],
+        listas: [
+          { id: 'sint', label: 'Sintomas', vazio: '', padrao: ['tont'], itens: [
+            ['tont', 'Tontura', 'tontura'],
+            ['pre', 'Pré-síncope', 'pré-síncope'],
+            ['sinc', 'Síncope', 'síncope'],
+            ['disp', 'Dispneia', 'dispneia'],
+            ['fad', 'Fadiga', 'fadiga'],
+            ['dor', 'Dor torácica', 'dor torácica']
+          ] }
+        ],
+        chips: [
+          { id: 'crono', label: 'Droga bradicardizante', on: false },
+          { id: 'drc', label: 'DRC', on: false },
+          { id: 'chagas', label: 'Chagas', on: false }
+        ],
+        blocos: [
+          { id: 'hda', titulo: 'Identificação e história', linhas: [
+            'TRIAGEM — {data} ___h',
+            'Paciente de ___ anos, {?sint:com {sint} há ___|assintomátic{o|a}, com FC baixa aferida em ___}.',
+            'Antecedentes: ___{?chagas:, doença de Chagas}{?drc:, DRC}. Em uso de ___{?crono:, com efeito cronotrópico negativo}.'
+          ] },
+          { id: 'ef', titulo: 'Exame físico', linhas: [
+            ['estab=est', 'BEG, LOC, MUC, eupneic{o|a} em AA.'],
+            ['estab=inst', 'REG, pálid{o|a}, sudoreic{o|a}, ___.'],
+            'PA {PAS} x {PAD} mmHg | FC {FC} bpm | FR {FR} irpm | SpO2 {SpO2}% em AA',
+            'ACV: ritmo cardíaco {?ritmo=fa:irregular|regular}, bradicárdico, sem sopros.',
+            'AR: MV+ bilateralmente, sem RA.'
+          ] },
+          { id: 'ecg', titulo: 'ECG', linhas: [
+            'ECG (___h): {ritmo}, FC ___ bpm, QRS de ___ ms.'
+          ] },
+          { id: 'cd', titulo: 'Impressão e conduta', linhas: [
+            ['estab=est', 'Impressão: bradiarritmia sem critérios de instabilidade.'],
+            ['estab=inst', 'Impressão: bradiarritmia com instabilidade (___).'],
+            ['estab=est', 'Conduta: abro ficha para o PS, com monitorização contínua.'],
+            ['estab=inst', 'Conduta: encaminho imediatamente à sala de emergência, com monitorização e pás de marcapasso transcutâneo. Caso discutido com ___.']
+          ] }
+        ],
+        info: 'Instabilidade: hipotensão, alteração aguda do nível de consciência, dor torácica isquêmica, IC aguda ou choque. Atropina 1 mg EV a cada 3 a 5 min, até 3 mg; se falhar, marcapasso transcutâneo ou infusão de dopamina ou adrenalina e, depois, transvenoso (AHA 2025). No BAV de 2º grau Mobitz II e no BAVT a atropina costuma falhar. Procurar causa reversível: betabloqueador, BCC, digoxina, amiodarona, hipercalemia e isquemia, sobretudo IAM inferior.'
+      },
+
+      {
+        id: 'sincope', ctx: 'triagem', titulo: 'Síncope',
+        sin: 'sincope desmaio perda transitoria de consciencia pre sincope lipotimia queda',
+        opcoes: [
+          { id: 'cena', label: 'Circunstância', padrao: 'orto', valores: [
+            ['orto', 'Ortostase prolongada', 'após ortostase prolongada'],
+            ['levant', 'Ao levantar', 'ao se levantar'],
+            ['sit', 'Situacional', 'desencadeada por ___'],
+            ['esforco', 'Ao esforço', 'durante esforço físico'],
+            ['decub', 'Em decúbito', 'em decúbito'],
+            ['sem', 'Sem gatilho', 'sem desencadeante identificado']
+          ] },
+          { id: 'risco', label: 'Risco (ESC 2018)', padrao: 'baixo', valores: [
+            ['baixo', 'Baixo', 'baixo'],
+            ['alto', 'Alto', 'alto']
+          ] }
+        ],
+        chips: [
+          { id: 'prod', label: 'Pródromos', on: true },
+          { id: 'palp', label: 'Palpitação antes', on: false },
+          { id: 'dor', label: 'Dor torácica', on: false },
+          { id: 'trauma', label: 'Trauma', on: false },
+          { id: 'sopro', label: 'Sopro', on: false }
+        ],
+        blocos: [
+          { id: 'hda', titulo: 'Identificação e história', linhas: [
+            'TRIAGEM — {data} ___h',
+            'Paciente de ___ anos, com perda transitória da consciência há ___, {cena}, com duração de ___ e recuperação espontânea e completa.{?prod: Pródromos de ___.| Sem pródromos.}{?palp: Palpitação imediatamente antes do episódio.}{?dor: Dor torácica associada.}{?trauma: Trauma em ___.}',
+            'Antecedentes: ___. Em uso de ___.'
+          ] },
+          { id: 'ef', titulo: 'Exame físico', linhas: [
+            'BEG, LOC, MUC, eupneic{o|a} em AA.',
+            'PA {PAS} x {PAD} mmHg deitad{o|a} e ___ x ___ mmHg em pé | FC {FC} bpm | SpO2 {SpO2}% em AA | HGT {HGT} mg/dL',
+            'ACV: {?sopro:RCR 2T, sopro ___|RCR 2T BNF, sem sopros}.',
+            'NEURO: sem déficits focais.'
+          ] },
+          { id: 'ecg', titulo: 'ECG', linhas: [
+            'ECG (___h): ___.'
+          ] },
+          { id: 'cd', titulo: 'Impressão e conduta', linhas: [
+            ['risco=baixo', 'Impressão: síncope com características de baixo risco, provável reflexa.'],
+            ['risco=alto', 'Impressão: síncope com característica de alto risco (___).'],
+            ['risco=baixo', 'Conduta: abro ficha para o PS.'],
+            ['risco=alto', 'Conduta: encaminho à sala de emergência para monitorização contínua. Caso discutido com ___.']
+          ] }
+        ],
+        info: 'ESC 2018. Alto risco: síncope ao esforço ou em decúbito, palpitação súbita seguida de síncope, dor torácica, cardiopatia estrutural grave ou DAC, PAS < 90 mmHg, história familiar de morte súbita e ECG alterado (BAV Mobitz II ou BAVT, bradicardia < 40 bpm em vigília, TVNS, pré-excitação, QT longo ou curto, padrão de Brugada, isquemia). Baixo risco: pródromos típicos, gatilho reflexo (ortostase prolongada, calor, dor, emoção), situacional ou ao se levantar, sem cardiopatia e com ECG normal. SBC Cardiogeriatria 2026: no idoso com possível causa cardíaca, internar.'
+      },
+
+      {
+        id: 'crise-has', ctx: 'triagem', titulo: 'PA elevada / crise hipertensiva', botao: 'PA elevada',
+        sin: 'crise hipertensiva urgencia emergencia hipertensiva pa elevada pico hipertensivo lesao de orgao alvo loa cefaleia',
+        opcoes: [
+          { id: 'loa', label: 'Lesão aguda de órgão-alvo', padrao: 'sem', valores: [
+            ['sem', 'Sem LOA aguda', 'sem'],
+            ['com', 'Com LOA (emergência)', 'com']
+          ] }
+        ],
+        listas: [
+          { id: 'sint', label: 'Sintomas', vazio: '', antes: ' Refere ', depois: '.', itens: [
+            ['cef', 'Cefaleia', 'cefaleia'],
+            ['tont', 'Tontura', 'tontura'],
+            ['dor', 'Dor torácica', 'dor torácica'],
+            ['disp', 'Dispneia', 'dispneia'],
+            ['visual', 'Alteração visual', 'alteração visual'],
+            ['neuro', 'Déficit neurológico', 'déficit neurológico']
+          ] },
+          { id: 'lesao', label: 'Lesão de órgão-alvo', se: 'loa=com', vazio: '___', itens: [
+            ['ence', 'Encefalopatia', 'encefalopatia hipertensiva'],
+            ['avc', 'AVC', 'AVC'],
+            ['eap', 'EAP', 'edema agudo de pulmão'],
+            ['sca', 'SCA', 'SCA'],
+            ['aorta', 'Síndrome aórtica', 'síndrome aórtica aguda'],
+            ['lra', 'LRA', 'lesão renal aguda'],
+            ['retino', 'Retinopatia grave', 'retinopatia hipertensiva grave'],
+            ['eclamp', 'Pré-eclâmpsia', 'pré-eclâmpsia ou eclâmpsia']
+          ] }
+        ],
+        blocos: [
+          { id: 'hda', titulo: 'Identificação e história', linhas: [
+            'TRIAGEM — {data} ___h',
+            'Paciente de ___ anos, com PA elevada aferida em ___.{sint}{?!sint: Assintomátic{o|a}.}',
+            'Antecedentes: ___. Anti-hipertensivos em uso: ___ (última tomada ___).'
+          ] },
+          { id: 'ef', titulo: 'Exame físico', linhas: [
+            ['loa=sem', 'BEG, LOC, MUC, eupneic{o|a} em AA.'],
+            ['loa=com', 'REG, ___.'],
+            'PA {PAS} x {PAD} mmHg (MSD) e ___ x ___ mmHg (MSE), confirmada após repouso | FC {FC} bpm | FR {FR} irpm | SpO2 {SpO2}% em AA',
+            'ACV: RCR 2T BNF, sem sopros. Pulsos simétricos.',
+            'AR: MV+ bilateralmente, sem RA.',
+            'NEURO: {?loa=com&lesao.avc,ence:___|sem déficits focais}.'
+          ] },
+          { id: 'ecg', titulo: 'ECG', linhas: [
+            ['loa=com', 'ECG (___h): ___.'],
+            ['loa=sem&sint.dor', 'ECG (___h): ___.']
+          ] },
+          { id: 'cd', titulo: 'Impressão e conduta', linhas: [
+            ['loa=sem', 'Impressão: elevação importante da PA sem lesão aguda de órgão-alvo.'],
+            ['loa=com', 'Impressão: emergência hipertensiva ({lesao}).'],
+            ['loa=sem', 'Conduta: abro ficha para o PS, com nova medida da PA após 30 min de repouso em ambiente calmo.'],
+            ['loa=com', 'Conduta: encaminho à sala de emergência para monitorização e anti-hipertensivo EV titulável. Caso discutido com ___.']
+          ] }
+        ],
+        info: 'SBC HAS 2025: saiu o termo urgência hipertensiva. PA ≥ 180 e/ou ≥ 110 mmHg sem LOA aguda passa a ser elevação importante da PA sem lesão progressiva de órgãos-alvo: 30 min de repouso em ambiente calmo; se não melhorar, captopril ou clonidina VO; sem medicação EV, sem internação e reavaliação ambulatorial em 1 a 7 dias (meta < 160/100 mmHg). Nifedipina de liberação rápida é proscrita. Emergência (LOA aguda): reduzir até 25% na 1ª hora, chegar a cerca de 160/100 mmHg em 2 a 6 h e normalizar em 24 a 48 h; dissecção, AVC, SCA e EAP têm metas próprias. Labetalol e nicardipina EV não estão disponíveis no Brasil.'
       },
 
       {
@@ -14690,7 +14941,7 @@ window.PROTOCOLOS = [
       // ======================= PS =======================
       {
         id: 'ic-b', ctx: 'ps', titulo: 'IC aguda perfil B',
-        sin: 'ic descompensada congesto perfil b quente umido admissao ps diuretico furosemida',
+        sin: 'ic descompensada congesto perfil b quente umido admissao ps diuretico furosemida acetazolamida',
         opcoes: [
           { id: 'grau', label: 'Congestão', padrao: 'mod', valores: [
             ['leve', 'Leve', { t: 'leve', esf: 'aos moderados esforços', crep: 'em bases', edema: 'edema 1+/4+ em MMII' }],
@@ -14704,7 +14955,8 @@ window.PROTOCOLOS = [
           { id: 'ascite', label: 'Ascite', on: false },
           { id: 'pocus', label: 'POCUS', on: false },
           { id: 'nitro', label: 'Nitroglicerina EV', on: false },
-          { id: 'vni', label: 'VNI', on: false }
+          { id: 'vni', label: 'VNI', on: false },
+          { id: 'acetazol', label: 'Acetazolamida', on: false }
         ],
         blocos: [
           { id: 'hda', titulo: 'Identificação e história', linhas: [
@@ -14738,6 +14990,7 @@ window.PROTOCOLOS = [
           ] },
           { id: 'cd', titulo: 'Conduta', cab: 'Conduta:', num: true, linhas: [
             'Furosemida ___ mg EV agora e de ___/___ h. Sódio urinário em 2 h e diurese em 6 h para avaliar a resposta.',
+            ['acetazol', 'Acetazolamida ___ mg VO por dia, junto com o diurético de alça.'],
             ['nitro', 'Nitroglicerina EV ___ mcg/min, titulada pela PA.'],
             ['vni', 'VNI com PEEP ___ cmH2O e FiO2 ___%.'],
             'Balanço hídrico, diurese e peso diário.',
@@ -14747,7 +15000,7 @@ window.PROTOCOLOS = [
             'Profilaxia de TEV com ___.'
           ] }
         ],
-        info: 'Furosemida EV: 20 a 40 mg se virgem de diurético; em usuário crônico, 1 a 2 vezes a dose oral diária. Resposta adequada: sódio urinário em 2 h > 50 a 70 mEq/L ou diurese em 6 h > 100 a 150 mL/h; se insuficiente, dobrar a dose (ESC 2021). Nitrato se PAS > 110 mmHg. Sem hipoperfusão, manter o betabloqueador.'
+        info: 'SBC IC 2026: furosemida EV em até 1 h, 20 a 40 mg se virgem de diurético ou 1 a 2 vezes a dose oral diária se já usa; escalonar pela diurese de 6 h (> 100 a 150 mL/h) e de 24 h (≥ 3 a 4 L), com teto de 400 a 600 mg/dia; acetazolamida oral na admissão se hipervolemia (FORTE-MODERADA); acompanhar a descongestão por escores clínicos e POCUS. Nitrato se PAS > 110 mmHg. Sem hipoperfusão, manter o betabloqueador.'
       },
 
       {
@@ -14796,7 +15049,408 @@ window.PROTOCOLOS = [
             'Discutido com ___ para leito de UTI e avaliação de suporte circulatório mecânico.'
           ] }
         ],
-        info: 'SCAI 2022: C = hipoperfusão que exige intervenção além de volume (inotrópico, vasopressor ou suporte mecânico), em geral com lactato ≥ 2 mmol/L; D = piora apesar da intervenção inicial; E = colapso circulatório (PCR, RCP ou ECMO em curso). Noradrenalina é o vasopressor preferido; dobutamina ou milrinona para o baixo débito.'
+        info: 'SCAI 2022: C = hipoperfusão que exige intervenção além de volume (inotrópico, vasopressor ou suporte mecânico), em geral com lactato ≥ 2 mmol/L; D = piora apesar da intervenção inicial; E = colapso circulatório (PCR, RCP ou ECMO em curso). SBC IC 2026: time de choque, inotrópico beta-agonista e classificação SCAI; cateter de artéria pulmonar se houver incerteza. Noradrenalina é o vasopressor preferido; dobutamina ou milrinona para o baixo débito.'
+      },
+
+      {
+        id: 'sca-ssst', ctx: 'ps', titulo: 'SCA sem supra de ST', botao: 'SCA sem supra',
+        sin: 'sca sem supra iam sem supra nstemi angina instavel troponina grace estrategia invasiva cateterismo dupla antiagregacao',
+        opcoes: [
+          { id: 'dx', label: 'Diagnóstico', padrao: 'iam', valores: [
+            ['iam', 'IAM sem supra', 'IAM sem supradesnivelamento de ST'],
+            ['ai', 'Angina instável', 'angina instável']
+          ] },
+          KILLIP,
+          { id: 'estrat', label: 'Estratégia invasiva', padrao: 'precoce', valores: [
+            ['imediata', 'Imediata (< 2 h)', 'imediata (< 2 h)'],
+            ['precoce', 'Precoce (< 24 h)', 'precoce (< 24 h)'],
+            ['intern', 'Na internação', 'durante a internação'],
+            ['seletiva', 'Seletiva', 'seletiva']
+          ] },
+          { id: 'p2y', label: 'Inibidor de P2Y12', padrao: 'adiar', valores: [
+            ['adiar', 'Após a anatomia', 'adiar'],
+            ['tica', 'Ticagrelor', 'tica'],
+            ['clopi', 'Clopidogrel', 'clopi']
+          ] },
+          { id: 'antic', label: 'Anticoagulante', padrao: 'enox', valores: [
+            ['enox', 'Enoxaparina', 'enoxaparina ___ mg SC de 12/12 h'],
+            ['fonda', 'Fondaparinux', 'fondaparinux ___ mg SC 1x/dia'],
+            ['hnf', 'HNF', 'HNF em infusão contínua, ajustada pelo TTPa']
+          ] }
+        ],
+        listas: [FR],
+        chips: [
+          { id: 'dor', label: 'Ainda com dor', on: false },
+          { id: 'nitro', label: 'Nitroglicerina EV', on: false },
+          { id: 'bb', label: 'Betabloqueador', on: true }
+        ],
+        blocos: [
+          { id: 'hda', titulo: 'Identificação e história', linhas: [
+            'ADMISSÃO PS — {data} ___h',
+            'Paciente de ___ anos, com dor torácica em aperto há ___, irradiada para ___, {?dor:ainda presente na admissão|sem dor no momento}.',
+            'Fatores de risco: {fr}.',
+            'Antecedentes: ___. Em uso de ___.'
+          ] },
+          { id: 'ef', titulo: 'Exame físico', linhas: [
+            ['killip=1,2', 'BEG, LOC, MUC, eupneic{o|a} em AA.'],
+            ['killip=3,4', 'REG, LOC, taquipneic{o|a}, sudoreic{o|a}.'],
+            'PA {PAS} x {PAD} mmHg | FC {FC} bpm | FR {FR} irpm | SpO2 {SpO2}% em ___',
+            'ACV: RCR 2T BNF, sem sopros. Pulsos simétricos.',
+            ['killip=1', 'AR: MV+ bilateralmente, sem RA.'],
+            ['killip=2', 'AR: MV+ com crepitantes em bases.'],
+            ['killip=3,4', 'AR: MV+ com crepitantes até ___ bilateralmente.'],
+            ['killip=4', 'EXT: frias, TEC ___ s, pulsos finos.'],
+            ['killip=1,2,3', 'EXT: bem perfundidas, TEC < 3 s, sem edemas.']
+          ] },
+          { id: 'ex', titulo: 'Exames', linhas: [
+            'ECG (___h, ___ min da chegada): ___.',
+            'Troponina ultrassensível: ___ (0 h) e ___ (___ h).',
+            'Cr ___ | K ___ | Hb ___ | plaquetas ___ | glicemia ___'
+          ] },
+          { id: 'imp', titulo: 'Impressão', linhas: [
+            'Impressão: {dx}, Killip {killip}. GRACE ___.'
+          ] },
+          { id: 'cd', titulo: 'Conduta', cab: 'Conduta:', num: true, linhas: [
+            'Monitorização contínua e ECG seriado, também na recorrência da dor.',
+            'AAS: ataque de ___ mg e manutenção de ___ mg/dia.',
+            ['p2y=adiar', 'Inibidor de P2Y12 após a definição da anatomia coronária.'],
+            ['p2y=tica', 'Ticagrelor: ataque de ___ mg e manutenção de ___ mg de 12/12 h.'],
+            ['p2y=clopi', 'Clopidogrel: ataque de ___ mg e manutenção de ___ mg/dia.'],
+            'Anticoagulação com {antic}.',
+            'Estatina de alta intensidade: ___.',
+            ['bb', 'Betabloqueador: ___.'],
+            ['nitro', 'Nitroglicerina EV ___ mcg/min para controle da dor.'],
+            ['estrat!=seletiva', 'Estratégia invasiva {estrat}: cateterismo ___.'],
+            ['estrat=seletiva', 'Estratégia seletiva: estratificação não invasiva de isquemia antes de decidir o cateterismo.'],
+            'Ecocardiograma transtorácico.'
+          ] }
+        ],
+        info: 'ACC/AHA 2025: estratégia invasiva na internação para risco intermediário ou alto; no baixo risco, invasiva de rotina ou seletiva após estratificação. Momento (protocolo do site, ESC 2023): imediata (< 2 h) se instabilidade, dor refratária, arritmia maligna ou complicação mecânica; precoce (< 24 h) se GRACE > 140, alteração dinâmica de ST ou troponina em ascensão. Ticagrelor ou prasugrel são preferidos ao clopidogrel na ICP; o pré-tratamento com P2Y12 só é considerado se o cateterismo passar de 24 h. DAPT por 12 meses como padrão e estatina de alta intensidade para todos. Referência: AAS 150 a 300 mg de ataque; ticagrelor 180 mg e depois 90 mg de 12/12 h; enoxaparina 1 mg/kg de 12/12 h (1x/dia se ClCr < 30); fondaparinux 2,5 mg/dia.'
+      },
+
+      {
+        id: 'iam-cst', ctx: 'ps', titulo: 'IAM com supra de ST', botao: 'IAM com supra',
+        sin: 'iam com supra stemi supradesnivelamento infarto reperfusao icp primaria angioplastia fibrinolise trombolise tenecteplase oclusao coronaria omi hemodinamica',
+        opcoes: [
+          { id: 'parede', label: 'Parede', padrao: 'ant', valores: [
+            ['ant', 'Anterior', 'anterior'],
+            ['inf', 'Inferior', 'inferior'],
+            ['lat', 'Lateral', 'lateral'],
+            ['post', 'Posterior', 'posterior'],
+            ['eq', 'Equivalente (OMI)', 'eq']
+          ] },
+          KILLIP,
+          { id: 'reperf', label: 'Reperfusão', padrao: 'icp', valores: [
+            ['icp', 'ICP primária', 'icp'],
+            ['fibri', 'Fibrinólise', 'fibri']
+          ] },
+          { id: 'p2y', label: 'Inibidor de P2Y12', se: 'reperf=icp', padrao: 'tica', valores: [
+            ['tica', 'Ticagrelor', 'Ticagrelor'],
+            ['prasu', 'Prasugrel', 'Prasugrel'],
+            ['clopi', 'Clopidogrel', 'Clopidogrel']
+          ] }
+        ],
+        listas: [FR],
+        chips: [{ id: 'vd', label: 'IAM de VD', on: false }],
+        blocos: [
+          { id: 'hda', titulo: 'Identificação e história', linhas: [
+            'ADMISSÃO PS — {data} ___h',
+            'Paciente de ___ anos, com dor torácica em aperto iniciada às ___h, irradiada para ___, associada a ___. Chegada ao PS às ___h.',
+            'Fatores de risco: {fr}.',
+            'Antecedentes: ___. Em uso de ___.'
+          ] },
+          { id: 'ef', titulo: 'Exame físico', linhas: [
+            ['killip=1,2', 'REG, LOC, sudoreic{o|a}, eupneic{o|a} em AA.'],
+            ['killip=3,4', 'REG, LOC, sudoreic{o|a}, taquipneic{o|a}.'],
+            'PA {PAS} x {PAD} mmHg | FC {FC} bpm | FR {FR} irpm | SpO2 {SpO2}% em ___',
+            'ACV: RCR 2T BNF, sem sopros. Pulsos simétricos.{?vd: TJP a 45°.}',
+            ['killip=1', 'AR: MV+ bilateralmente, sem RA.'],
+            ['killip=2', 'AR: MV+ com crepitantes em bases.'],
+            ['killip=3,4', 'AR: MV+ com crepitantes até ___ bilateralmente.'],
+            ['killip=4', 'EXT: frias, TEC ___ s, pulsos finos.'],
+            ['killip=1,2,3', 'EXT: bem perfundidas, TEC < 3 s.']
+          ] },
+          { id: 'ecg', titulo: 'ECG', linhas: [
+            ['parede!=eq', 'ECG (___h, ___ min da chegada): supradesnivelamento de ST em ___, parede {parede}.'],
+            ['parede=eq', 'ECG (___h, ___ min da chegada): ___, equivalente de oclusão coronária aguda.'],
+            ['vd', 'Derivações direitas: supradesnivelamento de ST em V4R de ___ mm.']
+          ] },
+          { id: 'ex', titulo: 'Exames', linhas: [
+            'Troponina ___ | Cr ___ | K ___ | Hb ___ | plaquetas ___ | coagulograma ___'
+          ] },
+          { id: 'imp', titulo: 'Impressão', linhas: [
+            ['parede!=eq', 'Impressão: IAM com supradesnivelamento de ST de parede {parede}{?vd: com extensão para VD}, Killip {killip}, com ___ h de dor.'],
+            ['parede=eq', 'Impressão: IAM por oclusão coronária aguda sem supra clássico, Killip {killip}, com ___ h de dor.']
+          ] },
+          { id: 'cd', titulo: 'Conduta', cab: 'Conduta:', num: true, linhas: [
+            'Monitorização contínua, acesso venoso e desfibrilador à beira do leito.',
+            'AAS: ataque de ___ mg.',
+            ['reperf=icp', '{p2y}: ataque de ___ mg.'],
+            ['reperf=icp', 'Hemodinâmica acionada às ___h para ICP primária, com HNF na sala.'],
+            ['reperf=fibri', 'Clopidogrel: ataque de ___ mg.'],
+            ['reperf=fibri', 'Tenecteplase ___ mg EV em bolus às ___h.'],
+            ['reperf=fibri', 'Enoxaparina ___ mg EV em bolus e ___ mg SC de 12/12 h.'],
+            ['reperf=fibri', 'Transferência para centro com hemodinâmica: cateterismo em 2 a 24 h, ou de resgate se a fibrinólise falhar.'],
+            'Estatina de alta intensidade: ___.',
+            ['vd', 'Sem nitrato e sem diurético pelo acometimento de VD.'],
+            'Caso discutido com ___.'
+          ] }
+        ],
+        info: 'ESC 2023 e protocolo do site: ICP primária se feita em até 120 min do diagnóstico (porta-balão ≤ 90 min). Se não der e houver < 12 h de sintomas, fibrinólise em até 10 min e transferência: cateterismo em 2 a 24 h, ou de resgate se o supra não cair ≥ 50% em 60 a 90 min. Tenecteplase pelo peso, com metade da dose a partir de 75 anos. Ataque: AAS 150 a 300 mg; ticagrelor 180 mg ou prasugrel 60 mg na ICP (prasugrel contraindicado após AVC ou AIT); com fibrinólise, clopidogrel 300 mg (75 mg acima de 75 anos). Enoxaparina com fibrinólise: sem bolus EV a partir de 75 anos. ACC/AHA 2025: acesso radial preferido. IAM de VD: evitar nitrato e diurético.'
+      },
+
+      {
+        id: 'eap', ctx: 'ps', titulo: 'EAP hipertensivo',
+        sin: 'edema agudo de pulmao eap hipertensivo emergencia hipertensiva vni nitroglicerina congestao flash',
+        opcoes: [
+          { id: 'vent', label: 'Suporte ventilatório', padrao: 'vni', valores: [
+            ['vni', 'VNI', 'vni'],
+            ['o2', 'O2 suplementar', 'o2'],
+            ['iot', 'IOT', 'iot']
+          ] }
+        ],
+        chips: [
+          { id: 'dor', label: 'Dor torácica', on: false },
+          { id: 'b3', label: 'B3', on: false },
+          { id: 'nitro', label: 'Nitroglicerina EV', on: true },
+          { id: 'furo', label: 'Furosemida', on: true },
+          { id: 'acetazol', label: 'Acetazolamida', on: false },
+          { id: 'pocus', label: 'POCUS', on: false }
+        ],
+        blocos: [
+          { id: 'hda', titulo: 'Identificação e história', linhas: [
+            'ADMISSÃO PS — {data} ___h',
+            'Paciente de ___ anos, com dispneia de início súbito há ___, ortopneia e tosse. {?dor:Dor torácica associada.|Nega dor torácica.}',
+            'Antecedentes: ___. FEVE prévia: ___. Em uso de ___.'
+          ] },
+          { id: 'ef', titulo: 'Exame físico', linhas: [
+            'REG, LOC, sentad{o|a}, taquipneic{o|a}, com uso de musculatura acessória, sudoreic{o|a}.',
+            'PA {PAS} x {PAD} mmHg | FC {FC} bpm | FR {FR} irpm | SpO2 {SpO2}% em ___',
+            'ACV: {?b3:RCR 3T (B3)|RCR 2T BNF}, sem sopros.',
+            'AR: MV+ com crepitantes até ___ bilateralmente.',
+            'EXT: quentes, TEC < 3 s, edema ___/4+ em MMII.'
+          ] },
+          { id: 'ex', titulo: 'Exames', linhas: [
+            'ECG: ___.',
+            'RX de tórax: ___.',
+            'Gasometria: pH ___ | pCO2 ___ | pO2 ___ | HCO3 ___ | lactato ___',
+            'Troponina ___ | NT-proBNP ___ | Cr ___ | Na ___ | K ___',
+            ['pocus', 'POCUS: linhas B ___, VCI ___ mm, função de VE ___, derrame pleural ___.']
+          ] },
+          { id: 'imp', titulo: 'Impressão', linhas: [
+            'Impressão: edema agudo de pulmão hipertensivo (emergência hipertensiva). Fator desencadeante: ___.'
+          ] },
+          { id: 'cd', titulo: 'Conduta', cab: 'Conduta:', num: true, linhas: [
+            'Decúbito elevado e monitorização contínua.',
+            ['vent=vni', 'VNI com PEEP ___ cmH2O, pressão de suporte ___ cmH2O e FiO2 ___%.'],
+            ['vent=o2', 'O2 por ___, com alvo de SpO2 ___%.'],
+            ['vent=iot', 'IOT e ventilação mecânica (ver descrição do procedimento).'],
+            ['nitro', 'Nitroglicerina EV ___ mcg/min, com aumento rápido conforme a PA e a resposta clínica.'],
+            ['furo', 'Furosemida ___ mg EV.'],
+            ['acetazol', 'Acetazolamida ___ mg VO.'],
+            'Redução progressiva da PA guiada pela melhora clínica.',
+            'Troponina e ECG seriados.',
+            'Reavaliação clínica e gasometria em ___ h.'
+          ] }
+        ],
+        info: 'SBC HAS 2025: no EAP hipertensivo não há número-alvo de PA; a redução é progressiva, guiada pela clínica, com nitroglicerina EV. SBC IC 2026: VNI se desconforto respiratório ou hipoxemia; nitrato se PAS > 110 mmHg; furosemida EV em até 1 h (20 a 40 mg se virgem de diurético; 1 a 2 vezes a dose oral se já usa); acetazolamida se hipervolemia; recomendação contra morfina de rotina. Com pouca hipervolemia, a vasodilatação é o pilar: nitrato em dose alta com furosemida em dose baixa teve menos ventilação mecânica e IAM que o inverso (Cotter, Lancet 1998).'
+      },
+
+      {
+        id: 'fa-rvr', ctx: 'ps', titulo: 'FA / flutter de alta resposta', botao: 'FA alta resposta',
+        sin: 'fa fibrilacao atrial flutter alta resposta ventricular controle de frequencia ritmo cardioversao anticoagulacao cha2ds2-va',
+        opcoes: [
+          { id: 'arr', label: 'Arritmia', padrao: 'fa', valores: [
+            ['fa', 'FA', 'fibrilação atrial'],
+            ['flutter', 'Flutter', 'flutter atrial']
+          ] },
+          { id: 'tempo', label: 'Duração', padrao: 'mais', valores: [
+            ['menos', '< 24 h', { t: 'iniciadas há menos de 24 h (às ___h)', imp: 'com menos de 24 h de evolução' }],
+            ['mais', '> 24 h ou incerta', { t: 'há mais de 24 h ou de início incerto', imp: 'com mais de 24 h ou duração incerta' }]
+          ] },
+          { id: 'fe', label: 'FEVE', padrao: 'desc', valores: [
+            ['pres', 'Preservada', 'preservada'],
+            ['red', 'Reduzida', 'reduzida'],
+            ['desc', 'Desconhecida', 'desconhecida']
+          ] },
+          { id: 'estrat', label: 'Estratégia', padrao: 'freq', valores: [
+            ['freq', 'Controle de FC', 'freq'],
+            ['cvq', 'Cardioversão química', 'cvq'],
+            ['cve', 'Cardioversão elétrica', 'cve']
+          ] }
+        ],
+        chips: [
+          { id: 'instavel', label: 'Instabilidade', on: false },
+          { id: 'aco', label: 'Já anticoagulado(a)', on: false },
+          { id: 'ete', label: 'ETE sem trombo', on: false, se: 'tempo=mais' }
+        ],
+        alertas: [
+          ['estrat!=freq&tempo=mais&!ete&!instavel', 'FA ou flutter com > 24 h ou duração incerta: cardioversão eletiva só após 3 semanas de anticoagulação efetiva ou ETE sem trombo (SBC FA 2025).'],
+          ['estrat=freq&fe=red', 'FEVE reduzida: controle de FC com betabloqueador, amiodarona ou digoxina; sem BCC não di-hidropiridínico.']
+        ],
+        blocos: [
+          { id: 'hda', titulo: 'Identificação e história', linhas: [
+            'ADMISSÃO PS — {data} ___h',
+            'Paciente de ___ anos, com palpitações {tempo}, associadas a ___.',
+            'Antecedentes: ___. Em uso de ___{?aco:, anticoagulad{o|a} com ___}.'
+          ] },
+          { id: 'ef', titulo: 'Exame físico', linhas: [
+            ['!instavel', 'BEG, LOC, MUC, eupneic{o|a} em AA.'],
+            ['instavel', 'REG, ___.'],
+            'PA {PAS} x {PAD} mmHg | FC {FC} bpm | FR {FR} irpm | SpO2 {SpO2}% em ___',
+            'ACV: ritmo cardíaco {?arr=fa:irregular|regular}, taquicárdico, sem sopros.',
+            'AR: MV+ bilateralmente, sem RA.',
+            'EXT: sem edemas, panturrilhas livres.'
+          ] },
+          { id: 'ex', titulo: 'Exames', linhas: [
+            'ECG (___h): {arr} com resposta ventricular de ___ bpm{?arr=flutter:, condução AV ___}.',
+            'K ___ | Mg ___ | Cr ___ | TSH ___ | troponina ___',
+            'Ecocardiograma: ___.'
+          ] },
+          { id: 'imp', titulo: 'Impressão', linhas: [
+            'Impressão: {arr} de alta resposta ventricular, {tempo.imp}{?instavel:, com instabilidade hemodinâmica}. FEVE {fe}. CHA2DS2-VA ___ | HAS-BLED ___.'
+          ] },
+          { id: 'cd', titulo: 'Conduta', cab: 'Conduta:', num: true, linhas: [
+            'Monitorização contínua.',
+            ['estrat=freq', 'Controle de FC com ___ EV, alvo inicial de FC < 110 bpm.'],
+            ['estrat=cvq', 'Cardioversão química com ___.'],
+            ['estrat=cve', 'Cardioversão elétrica sincronizada (ver descrição do procedimento).'],
+            'Anticoagulação com ___.',
+            ['estrat=freq&tempo=mais', 'Cardioversão eletiva só após 3 semanas de anticoagulação ou ETE sem trombo.'],
+            ['estrat!=freq&tempo=mais&ete', 'ETE sem trombo em __/__/____.'],
+            ['estrat!=freq', 'Anticoagulação por pelo menos 4 semanas após a cardioversão e depois conforme CHA2DS2-VA.'],
+            'Reposição de K e Mg, se baixos.',
+            'Investigação de fator desencadeante: ___.'
+          ] }
+        ],
+        info: 'SBC FA 2025: FA com > 24 h ou de duração incerta exige anticoagulação ≥ 3 semanas ou ETE sem trombo antes da cardioversão; com < 24 h, cardioverter já anticoagulado com DOAC ou heparina; anticoagular ≥ 4 semanas depois em todos e, a longo prazo, pelo CHA2DS2-VA. Meta de FC < 80 bpm em repouso (< 110 aceitável se assintomático); a SBC prefere o controle de ritmo precoce. FEVE reduzida: betabloqueador, amiodarona ou digoxina, sem BCC não di-hidropiridínico. Instável: cardioversão sincronizada imediata (AHA 2025: ≥ 200 J). FA pré-excitada: não usar bloqueador do nó AV.'
+      },
+
+      {
+        id: 'tep', ctx: 'ps', titulo: 'TEP agudo', botao: 'TEP',
+        sin: 'tep tromboembolismo pulmonar embolia anticoagulacao trombolise pesi categorias aha acc 2026 pert vd',
+        opcoes: [
+          { id: 'cat', label: 'Categoria (AHA/ACC 2026)', padrao: 'c1', valores: [
+            ['a', 'A', 'A'], ['b', 'B', 'B'],
+            ['c1', 'C1', 'C1'], ['c2', 'C2', 'C2'], ['c3', 'C3', 'C3'],
+            ['d1', 'D1', 'D1'], ['d2', 'D2', 'D2'],
+            ['e1', 'E1', 'E1'], ['e2', 'E2', 'E2']
+          ] },
+          { id: 'antic', label: 'Anticoagulante', padrao: 'enox', valores: [
+            ['enox', 'Enoxaparina', 'enoxaparina ___ mg SC de 12/12 h'],
+            ['hnf', 'HNF', 'HNF em infusão contínua, ajustada pelo TTPa'],
+            ['riva', 'Rivaroxabana', 'rivaroxabana ___ mg VO de 12/12 h'],
+            ['apixa', 'Apixabana', 'apixabana ___ mg VO de 12/12 h']
+          ] }
+        ],
+        chips: [
+          { id: 'r', label: 'R+ (insuficiência respiratória)', on: false },
+          { id: 'tvp', label: 'TVP clínica', on: false }
+        ],
+        blocos: [
+          { id: 'hda', titulo: 'Identificação e história', linhas: [
+            'ADMISSÃO PS — {data} ___h',
+            'Paciente de ___ anos, com dispneia de início súbito há ___, associada a ___.',
+            'Fatores de risco para TEV: ___. Antecedentes: ___. Em uso de ___.'
+          ] },
+          { id: 'ef', titulo: 'Exame físico', linhas: [
+            ['cat=a,b', 'BEG, LOC, MUC, eupneic{o|a} em AA.'],
+            ['cat=c1,c2,c3,d1', 'REG, LOC, taquipneic{o|a}.'],
+            ['cat=d2,e1,e2', 'REG, ___, taquipneic{o|a}, sudoreic{o|a}.'],
+            'PA {PAS} x {PAD} mmHg | FC {FC} bpm | FR {FR} irpm | SpO2 {SpO2}% em ___',
+            'ACV: RCR 2T BNF, sem sopros. TJP ___.',
+            'AR: MV+ bilateralmente, sem RA.',
+            ['cat=d2,e1,e2', 'EXT: frias, TEC ___ s{?tvp:, edema assimétrico em MI ___}.'],
+            ['cat!=d2,e1,e2', '{?tvp:EXT: edema assimétrico em MI ___, com empastamento de panturrilha.|EXT: sem edemas, panturrilhas livres.}']
+          ] },
+          { id: 'ex', titulo: 'Exames', linhas: [
+            'Angio-TC de tórax: ___.',
+            'Ecocardiograma: VD ___, TAPSE ___ mm, relação VD/VE ___.',
+            'Troponina ___ | NT-proBNP ___ | lactato ___ | Cr ___',
+            'sPESI ___ (PESI classe ___).'
+          ] },
+          { id: 'imp', titulo: 'Impressão', linhas: [
+            'Impressão: TEP agudo, categoria {cat}{?r: R+} (AHA/ACC 2026).'
+          ] },
+          { id: 'cd', titulo: 'Conduta', cab: 'Conduta:', num: true, linhas: [
+            'Anticoagulação com {antic}.',
+            ['cat=a,b', 'Alta precoce, com DOAC retirado no mesmo dia e retorno ambulatorial garantido.'],
+            ['cat=c1', 'Internação em enfermaria, sem terapia de reperfusão.'],
+            ['cat=c2,c3', 'Internação com monitorização contínua; PERT acionado.'],
+            ['cat=d1,d2', 'Internação em UTI; PERT acionado. Noradrenalina ___ mcg/kg/min, se hipotensão.'],
+            ['cat=d1,d2', 'Terapia avançada discutida com o PERT: ___.'],
+            ['cat=e1,e2', 'Noradrenalina ___ mcg/kg/min. PERT acionado.'],
+            ['cat=e1,e2', 'Reperfusão: ___ às ___h.'],
+            ['cat!=a,b,c1', 'Evito intubação e sedação profunda, salvo necessidade absoluta.'],
+            ['r', 'Suporte respiratório com ___.'],
+            'Investigação de fator desencadeante: ___.'
+          ] }
+        ],
+        info: 'AHA/ACC 2026: a categoria segue o achado mais grave e pode mudar na internação. A e B: alta precoce razoável; trombólise é danosa. C1: anticoagular, sem terapia avançada. C2 e C3: monitorizar e acionar o PERT; terapia avançada de benefício incerto. D1 e D2: UTI, PERT e noradrenalina; terapia avançada pode ser considerada. E1: reperfusão razoável (trombólise sistêmica ou por cateter, trombectomia ou cirurgia). E2: trombólise sistêmica razoável; VA-ECMO no choque refratário. HBPM preferida à HNF, que fica para instabilidade, ClCr < 30 ou reperfusão prevista. Rivaroxabana 15 mg de 12/12 h por 21 dias; apixabana 10 mg de 12/12 h por 7 dias; alteplase 100 mg em 2 h. Em C a E, não intubar nem sedar profundamente sem necessidade absoluta (Classe 3).'
+      },
+
+      {
+        id: 'aorta', ctx: 'ps', titulo: 'Síndrome aórtica aguda', botao: 'Síndrome aórtica',
+        sin: 'dissecao de aorta sindrome aortica aguda hematoma intramural ulcera penetrante stanford tipo a tipo b esmolol nitroprussiato tevar',
+        opcoes: [
+          { id: 'tipo', label: 'Tipo', padrao: 'susp', valores: [
+            ['susp', 'Suspeita', 'susp'],
+            ['a', 'Stanford A', 'tipo A de Stanford'],
+            ['b', 'Stanford B', 'tipo B de Stanford']
+          ] },
+          { id: 'lesao', label: 'Lesão', se: 'tipo!=susp', padrao: 'dis', valores: [
+            ['dis', 'Dissecção', 'dissecção aguda de aorta'],
+            ['him', 'Hematoma intramural', 'hematoma intramural de aorta'],
+            ['ulc', 'Úlcera penetrante', 'úlcera aterosclerótica penetrante de aorta']
+          ] },
+          { id: 'bb', label: 'Betabloqueador', padrao: 'esmo', valores: [
+            ['esmo', 'Esmolol', 'esmolol ___ mcg/kg/min'],
+            ['meto', 'Metoprolol', 'metoprolol ___ mg']
+          ] }
+        ],
+        chips: [
+          { id: 'assim', label: 'Assimetria de pulsos ou PA', on: false },
+          { id: 'iao', label: 'Sopro de IAo', on: false },
+          { id: 'deficit', label: 'Déficit neurológico', on: false },
+          { id: 'complic', label: 'Complicada', on: false, se: 'tipo=b' }
+        ],
+        blocos: [
+          { id: 'hda', titulo: 'Identificação e história', linhas: [
+            'ADMISSÃO PS — {data} ___h',
+            'Paciente de ___ anos, com dor torácica de início súbito e forte intensidade há ___, irradiada para ___.',
+            'Antecedentes: ___. Em uso de ___.'
+          ] },
+          { id: 'ef', titulo: 'Exame físico', linhas: [
+            'REG, LOC, sudoreic{o|a}.',
+            'PA {PAS} x {PAD} mmHg (MSD) e ___ x ___ mmHg (MSE) | FC {FC} bpm | FR {FR} irpm | SpO2 {SpO2}% em AA',
+            'ACV: {?iao:RCR 2T, sopro diastólico em foco aórtico|RCR 2T BNF, sem sopros}.',
+            'Pulsos periféricos {?assim:assimétricos (___)|simétricos}.',
+            'AR: MV+ bilateralmente, sem RA.',
+            'NEURO: {?deficit:___|sem déficits focais}.'
+          ] },
+          { id: 'ex', titulo: 'Exames', linhas: [
+            'Angio-TC de aorta: ___.',
+            'ECG: ___.',
+            'Ecocardiograma ou POCUS: derrame pericárdico ___, insuficiência aórtica ___.',
+            'Hb ___ | Cr ___ | lactato ___ | troponina ___ | D-dímero ___'
+          ] },
+          { id: 'imp', titulo: 'Impressão', linhas: [
+            ['tipo=susp', 'Impressão: suspeita de síndrome aórtica aguda. ADD-RS ___.'],
+            ['tipo!=susp', 'Impressão: {lesao}, {tipo}{?tipo=b&complic:, complicada (___)}.']
+          ] },
+          { id: 'cd', titulo: 'Conduta', cab: 'Conduta:', num: true, linhas: [
+            'Monitorização contínua, dois acessos venosos calibrosos e PAI.',
+            'Analgesia com ___ EV.',
+            'Betabloqueador EV: {bb}, com alvo de FC < 60 bpm.',
+            'Se PAS ≥ 120 mmHg após o betabloqueador: nitroprussiato ___ mcg/kg/min, com alvo de PAS < 120 mmHg.',
+            ['tipo=susp', 'Angio-TC de aorta de urgência. Sem antiagregante ou anticoagulante até excluir síndrome aórtica.'],
+            ['tipo=a', 'Cirurgia cardíaca acionada às ___h para correção de emergência.'],
+            ['tipo=b&!complic', 'Tratamento clínico em UTI, com controle de dor, FC e PA.'],
+            ['tipo=b&complic', 'Discutido reparo endovascular (TEVAR) com ___.'],
+            'Caso discutido com ___.'
+          ] }
+        ],
+        info: 'ESC 2024: 1º betabloqueador EV até FC ≤ 60 bpm; 2º opioide EV para a dor; 3º vasodilatador EV se a PAS seguir ≥ 120 mmHg, buscando a menor PA que mantenha a perfusão. SBC HAS 2025: FC < 60 bpm e PAS entre 90 e 120 mmHg em até 20 min. Vasodilatador antes do betabloqueador causa taquicardia reflexa. Tipo A: cirurgia de emergência. Tipo B: tratamento clínico; TEVAR se complicada (má perfusão, ruptura, dor ou hipertensão refratárias, expansão). ADD-RS ≤ 1 com D-dímero negativo ajuda a afastar; com pré-teste alto, ir direto à angio-TC.'
       },
 
       {
@@ -14818,46 +15472,22 @@ window.PROTOCOLOS = [
       // ======================= UTI =======================
       {
         id: 'choque-dva', ctx: 'uti', titulo: 'Choque cardiogênico em DVA', botao: 'Choque em DVA',
-        sin: 'choque cardiogenico uti evolucao sistemas droga vasoativa scai dobutamina noradrenalina',
+        sin: 'choque cardiogenico uti evolucao sistemas droga vasoativa scai dobutamina noradrenalina swan ganz',
         opcoes: [
           SCAI,
-          { id: 'traj', label: 'Em relação a ontem', padrao: 'est', valores: [
-            ['est', 'Estável', 'estável'],
-            ['mel', 'Melhor', 'em melhora'],
-            ['pio', 'Pior', 'em piora']
-          ] },
-          { id: 'resp', label: 'Respiratório', padrao: 'cn', valores: [
-            ['aa', 'Ar ambiente', 'em ar ambiente'],
-            ['cn', 'Cateter nasal', 'em cateter nasal a ___ L/min'],
-            ['vni', 'VNI', 'em VNI intermitente, PEEP ___ e FiO2 ___%'],
-            ['vm', 'VM', 'em VM, modo ___, PEEP ___ e FiO2 ___%']
-          ] },
+          TRAJ,
+          resp('cn'),
           { id: 'neuro', label: 'Neurológico', padrao: 'loc', valores: [
             ['loc', 'LOC', 'LOC'],
             ['sed', 'Sedado(a)', 'sedad{o|a}, RASS ___']
           ] },
-          { id: 'inf', label: 'Infeccioso', padrao: 'sem', valores: [
-            ['sem', 'Sem antibiótico', 'afebril, sem antibiótico'],
-            ['atb', 'Com antibiótico', 'Tmax ___ °C, em uso de ___ (D___)']
-          ] }
+          INF
         ],
-        listas: [
-          { id: 'dva', label: 'Drogas vasoativas', vazio: 'sem droga vasoativa', padrao: ['nora', 'dobuta'], itens: [
-            ['nora', 'Noradrenalina', 'noradrenalina ___ mcg/kg/min'],
-            ['dobuta', 'Dobutamina', 'dobutamina ___ mcg/kg/min'],
-            ['milri', 'Milrinona', 'milrinona ___ mcg/kg/min'],
-            ['vaso', 'Vasopressina', 'vasopressina ___ U/min']
-          ] },
-          { id: 'disp', label: 'Dispositivos', vazio: 'sem dispositivos invasivos', padrao: ['cvc', 'pai', 'svd'], itens: [
-            ['cvc', 'CVC', 'CVC em VJI ___ (D___)'],
-            ['pai', 'PAI', 'PAI em radial ___ (D___)'],
-            ['svd', 'SVD', 'SVD (D___)'],
-            ['tot', 'TOT', 'TOT (D___)'],
-            ['bia', 'BIA', 'BIA (D___)'],
-            ['mp', 'MP provisório', 'MP provisório (D___)']
-          ] }
+        listas: [DVA, DISP],
+        chips: [
+          { id: 'b3', label: 'B3', on: true },
+          { id: 'swan', label: 'Swan-Ganz', on: false }
         ],
-        chips: [{ id: 'b3', label: 'B3', on: true }],
         blocos: [
           { id: 'sint', titulo: 'Cabeçalho e síntese', linhas: [
             'EVOLUÇÃO UTI — {data} — D___ de internação',
@@ -14866,6 +15496,7 @@ window.PROTOCOLOS = [
           ] },
           { id: 'sist', titulo: 'Por sistemas', linhas: [
             'HEMODINÂMICA: {dva}. PA {PAS} x {PAD} mmHg (PAM {PAM}) | FC {FC} bpm | ritmo ___. Lactato ___ → ___ mmol/L. Extremidades ___, TEC ___ s.',
+            ['swan', 'SWAN-GANZ: PVC ___ | PAP ___/___ (média ___) | POAP ___ | DC ___ L/min | IC ___ L/min/m² | RVS ___ | SvO2 ___%.'],
             'CV: {?b3:RCR 3T (B3)|RCR 2T BNF}. TJP a 45°.',
             'RESPIRATÓRIO: {resp}, SpO2 {SpO2}%. MV+ com crepitantes em bases.',
             'NEURO: {neuro}.',
@@ -14887,7 +15518,206 @@ window.PROTOCOLOS = [
             'Família informada: ___.'
           ] }
         ],
-        info: 'SCAI 2022 (Naidu): estágio pela gravidade e pela trajetória; registrar a trajetória todo dia. O modificador A indica PCR com risco de lesão anóxica.'
+        info: 'SCAI 2022 (Naidu): estágio pela gravidade e pela trajetória; registrar a trajetória todo dia. O modificador A indica PCR com risco de lesão anóxica. SBC IC 2026: cateter de artéria pulmonar se houver incerteza sobre o perfil hemodinâmico (FORTE-MODERADA).'
+      },
+
+      {
+        id: 'desmame', ctx: 'uti', titulo: 'IC em desmame de inotrópico', botao: 'Desmame de inotrópico',
+        sin: 'desmame dobutamina milrinona inotropico ic uti evolucao sistemas baixo debito',
+        opcoes: [
+          { id: 'ino', label: 'Inotrópico', padrao: 'dobuta', valores: [
+            ['dobuta', 'Dobutamina', 'dobutamina'],
+            ['milri', 'Milrinona', 'milrinona']
+          ] },
+          { id: 'passo', label: 'Hoje', padrao: 'reduz', valores: [
+            ['reduz', 'Reduzir', 'reduz'],
+            ['manter', 'Manter', 'manter'],
+            ['susp', 'Suspender', 'susp'],
+            ['falha', 'Falha, voltar', 'falha']
+          ] },
+          TRAJ,
+          resp('aa'),
+          INF
+        ],
+        listas: [
+          { id: 'tmf', label: 'Terapia oral de IC', vazio: 'ainda sem terapia oral de IC', itens: [
+            ['bb', 'Betabloqueador', 'betabloqueador ___'],
+            ['sraa', 'IECA/BRA/INRA', 'bloqueio do SRAA com ___'],
+            ['arm', 'ARM', 'espironolactona ___'],
+            ['isglt2', 'iSGLT2', 'iSGLT2 ___'],
+            ['diur', 'Diurético VO', 'furosemida VO ___']
+          ] }
+        ],
+        chips: [
+          { id: 'b3', label: 'B3', on: false },
+          { id: 'svo2', label: 'SvcO2', on: false }
+        ],
+        blocos: [
+          { id: 'sint', titulo: 'Cabeçalho e síntese', linhas: [
+            'EVOLUÇÃO UTI — {data} — D___ de internação',
+            'Paciente de ___ anos, com IC de etiologia ___, FEVE ___%, internad{o|a} em __/__/____ por ___. Em uso de {ino} desde __/__/____.',
+            'Últimas 24 h: ___.'
+          ] },
+          { id: 'sist', titulo: 'Por sistemas', linhas: [
+            'HEMODINÂMICA: {ino} ___ mcg/kg/min (ontem ___). PA {PAS} x {PAD} mmHg (PAM {PAM}, PP proporcional {PPP}%) | FC {FC} bpm | ritmo ___. Lactato ___ mmol/L{?svo2:, SvcO2 ___%}. Extremidades ___, TEC ___ s.',
+            'CV: {?b3:RCR 3T (B3)|RCR 2T BNF}. TJP ___.',
+            'RESPIRATÓRIO: {resp}, SpO2 {SpO2}%. MV+ ___.',
+            'NEURO: LOC.',
+            'TGI: dieta ___, aceitação ___.',
+            'RENAL: diurese ___ mL em 24 h. BH ___ mL. Peso ___ kg (ontem ___). Cr ___ (basal ___). Na ___ | K ___ | Mg ___.',
+            'HEMATO: Hb ___ | plaquetas ___. Profilaxia de TEV com ___.',
+            'INFECCIOSO: {inf}.',
+            'TERAPIA DE IC: {tmf}.',
+            'DISPOSITIVOS: ___.'
+          ] },
+          { id: 'imp', titulo: 'Impressão', linhas: [
+            'IMPRESSÃO: IC ___ em desmame de {ino}, {traj} em relação a ontem.'
+          ] },
+          { id: 'cd', titulo: 'Conduta', cab: 'CONDUTA:', num: true, linhas: [
+            ['passo=reduz', 'Reduzo {ino} para ___ mcg/kg/min e reavalio perfusão, diurese e lactato em ___ h.'],
+            ['passo=manter', 'Mantenho {ino} em ___ mcg/kg/min por ___.'],
+            ['passo=susp', 'Suspendo {ino}, com reavaliação clínica e lactato em ___ h.'],
+            ['passo=falha', 'Retorno {ino} para ___ mcg/kg/min por falha de desmame (___).'],
+            'Diurético: ___. Meta de balanço hídrico: ___ mL em 24 h.',
+            'Terapia de IC: ___.',
+            'Reposição de K e Mg para K ≥ 4,0 e Mg ≥ 2,0.',
+            ['passo=falha', 'Discutida com ___ a avaliação para terapia avançada.'],
+            'Família informada: ___.'
+          ] }
+        ],
+        info: 'Não há protocolo de desmame validado em diretriz: reduzir em etapas e, a cada passo, reavaliar perfusão, diurese, lactato e função renal. A milrinona tem meia-vida mais longa que a dobutamina, ainda mais na disfunção renal, e o efeito some devagar. Dependência de inotrópico corresponde ao INTERMACS 3 e pede avaliação para terapia avançada. SBC IC 2026: inotrópico beta-agonista no choque cardiogênico (FORTE-MODERADA) e BIA se houver piora apesar do inotrópico (FORTE-BAIXA).'
+      },
+
+      {
+        id: 'pos-iam', ctx: 'uti', titulo: 'Pós-IAM após ICP', botao: 'Pós-IAM / ICP',
+        sin: 'pos iam pos angioplastia icp stent unidade coronariana evolucao dapt dupla antiagregacao',
+        opcoes: [
+          KILLIP,
+          { id: 'acesso', label: 'Acesso da ICP', padrao: 'rad', valores: [
+            ['rad', 'Radial', 'radial ___'],
+            ['fem', 'Femoral', 'femoral ___']
+          ] },
+          TRAJ
+        ],
+        listas: [
+          { id: 'med', label: 'Em uso', vazio: '___', padrao: ['aas', 'p2y', 'estat'], itens: [
+            ['aas', 'AAS', 'AAS'],
+            ['p2y', 'P2Y12', 'inibidor de P2Y12 (___)'],
+            ['estat', 'Estatina', 'estatina de alta intensidade'],
+            ['bb', 'Betabloqueador', 'betabloqueador'],
+            ['sraa', 'IECA/BRA', 'IECA ou BRA'],
+            ['arm', 'ARM', 'espironolactona'],
+            ['isglt2', 'iSGLT2', 'iSGLT2'],
+            ['ibp', 'IBP', 'IBP'],
+            ['acod', 'Anticoagulante', 'anticoagulante (___)']
+          ] }
+        ],
+        chips: [
+          { id: 'eco', label: 'Eco feito', on: false },
+          { id: 'dor', label: 'Angina recorrente', on: false },
+          { id: 'arr', label: 'Arritmia', on: false }
+        ],
+        blocos: [
+          { id: 'sint', titulo: 'Cabeçalho e síntese', linhas: [
+            'EVOLUÇÃO UTI — {data} — D___ de internação',
+            'Paciente de ___ anos, internad{o|a} por IAM ___ de parede ___ em __/__/____. ICP de ___ com ___ stent farmacológico em __/__/____, por via {acesso}. Lesões residuais: ___.',
+            'Últimas 24 h: {?dor:angina recorrente (___)|sem dor torácica}{?arr:; arritmia: ___}.'
+          ] },
+          { id: 'sist', titulo: 'Por sistemas', linhas: [
+            'HEMODINÂMICA: sem DVA. PA {PAS} x {PAD} mmHg | FC {FC} bpm | ritmo ___.',
+            'CV: RCR 2T BNF, sem sopros novos. Killip {killip}.',
+            ['killip=1', 'RESPIRATÓRIO: eupneic{o|a} em AA, SpO2 {SpO2}%. MV+ bilateralmente, sem RA.'],
+            ['killip!=1', 'RESPIRATÓRIO: ___, SpO2 {SpO2}%. MV+ com crepitantes ___.'],
+            'SÍTIO DE PUNÇÃO: {acesso} sem hematoma, pulso distal presente.',
+            'RENAL: diurese ___. Cr ___ (antes do contraste ___). K ___.',
+            'HEMATO: Hb ___ | plaquetas ___.',
+            'LABORATÓRIO: troponina ___ (pico ___) | LDL ___ | HbA1c ___',
+            ['eco', 'ECOCARDIOGRAMA: FEVE ___%, ___.'],
+            'EM USO: {med}.'
+          ] },
+          { id: 'imp', titulo: 'Impressão', linhas: [
+            'IMPRESSÃO: IAM ___ de parede ___, D___ pós-ICP, Killip {killip}, {traj} em relação a ontem.'
+          ] },
+          { id: 'cd', titulo: 'Conduta', cab: 'CONDUTA:', num: true, linhas: [
+            'DAPT com AAS e ___ por 12 meses, salvo alto risco de sangramento.',
+            'Estatina de alta intensidade, com perfil lipídico de controle após a alta.',
+            'Betabloqueador e bloqueio do SRAA conforme FEVE e PA: ___.',
+            ['!eco', 'Ecocardiograma transtorácico antes da alta.'],
+            'Mobilização progressiva e encaminhamento para reabilitação cardíaca.',
+            'Previsão de alta: ___.'
+          ] }
+        ],
+        info: 'ACC/AHA 2025: DAPT por pelo menos 12 meses como padrão sem alto risco de sangramento, com ticagrelor ou prasugrel preferidos ao clopidogrel após ICP; IBP se risco de sangramento digestivo; estatina de alta intensidade para todos, com ezetimiba associada se preciso; terapia não estatina se LDL ≥ 70 mg/dL com estatina máxima; reabilitação cardíaca. A FEVE antes da alta define betabloqueador, bloqueio do SRAA, ARM e iSGLT2.'
+      },
+
+      {
+        id: 'pos-pcr', ctx: 'uti', titulo: 'Pós-PCR', botao: 'Pós-PCR',
+        sin: 'pos pcr pos parada rce retorno da circulacao controle de temperatura hipotermia normotermia neuroprognostico uti evolucao',
+        opcoes: [
+          { id: 'local', label: 'PCR', padrao: 'ih', valores: [
+            ['ih', 'Intra-hospitalar', 'intra-hospitalar'],
+            ['eh', 'Extra-hospitalar', 'extra-hospitalar']
+          ] },
+          { id: 'ritmo', label: 'Ritmo inicial', padrao: 'fv', valores: [
+            ['fv', 'FV/TV sem pulso', 'FV/TV sem pulso'],
+            ['aesp', 'AESP', 'AESP'],
+            ['assist', 'Assistolia', 'assistolia']
+          ] },
+          { id: 'temp', label: 'Temperatura', padrao: 'normo', valores: [
+            ['normo', 'Normotermia', 'controle de temperatura com alvo de ___ °C'],
+            ['hipo', 'Hipotermia', 'hipotermia controlada com alvo de ___ °C'],
+            ['fim', 'Concluído', 'controle de temperatura concluído em __/__/____']
+          ] },
+          { id: 'neuro', label: 'Neurológico', padrao: 'sed', valores: [
+            ['sed', 'Sedado(a)', 'sedad{o|a}, RASS ___'],
+            ['desp', 'Desperto(a)', 'despert{o|a}, ___']
+          ] },
+          TRAJ,
+          resp('vm'),
+          INF
+        ],
+        listas: [
+          Object.assign({}, DVA, { padrao: ['nora'] }),
+          Object.assign({}, DISP, { padrao: ['cvc', 'pai', 'svd', 'tot'] })
+        ],
+        chips: [
+          { id: 'cate', label: 'CATE feito', on: false },
+          { id: 'crise', label: 'Crise ou mioclonia', on: false },
+          { id: 'eeg', label: 'EEG', on: false },
+          { id: 'tc', label: 'TC de crânio', on: false }
+        ],
+        blocos: [
+          { id: 'sint', titulo: 'Cabeçalho e síntese', linhas: [
+            'EVOLUÇÃO UTI — {data} — D___ pós-PCR',
+            'Paciente de ___ anos, com ___, internad{o|a} após PCR {local} em __/__/____. Ritmo inicial {ritmo}, RCE após ___ min. Causa presumida: ___.',
+            'Últimas 24 h: ___.'
+          ] },
+          { id: 'sist', titulo: 'Por sistemas', linhas: [
+            'NEURO: {neuro}. Pupilas ___, reflexo fotomotor ___. {?crise:Crise ou mioclonia: ___.|Sem crises ou mioclonias.}{?eeg: EEG: ___.}{?tc: TC de crânio: ___.}',
+            'TEMPERATURA: {temp}. Tmax ___ °C.',
+            'HEMODINÂMICA: {dva}. PA {PAS} x {PAD} mmHg (PAM {PAM}) | FC {FC} bpm | ritmo ___. Lactato ___ → ___ mmol/L.',
+            'CV: ECG após o RCE: ___.{?cate: CATE: ___.} Ecocardiograma: ___.',
+            'RESPIRATÓRIO: {resp}, SpO2 {SpO2}%. Gasometria: pH ___ | pCO2 ___ | pO2 ___.',
+            'TGI: dieta ___.',
+            'RENAL: diurese ___ mL em 24 h. Cr ___. Na ___ | K ___ | Mg ___. Glicemias ___.',
+            'HEMATO: Hb ___ | plaquetas ___. Profilaxia de TEV com ___.',
+            'INFECCIOSO: {inf}.',
+            'DISPOSITIVOS: {disp}.'
+          ] },
+          { id: 'imp', titulo: 'Impressão', linhas: [
+            'IMPRESSÃO: pós-PCR {local} em {ritmo}, por ___, {traj} em relação a ontem.'
+          ] },
+          { id: 'cd', titulo: 'Conduta', cab: 'CONDUTA:', num: true, linhas: [
+            ['temp!=fim', 'Mantenho {temp} até completar ___ h, com prevenção ativa de febre.'],
+            ['temp=fim', 'Prevenção ativa de febre até ___.'],
+            'Metas: PAM ≥ 65 mmHg, SpO2 entre 90 e 98% e PaCO2 entre 35 e 45 mmHg.',
+            'Sedação: ___.',
+            ['crise', 'Anticonvulsivante: ___.'],
+            'Neuroprognóstico multimodal não antes de 72 h após a normotermia.',
+            'Família informada: ___.'
+          ] }
+        ],
+        info: 'AHA 2025: em quem não obedece a comandos, controle de temperatura entre 32 e 37,5 °C por pelo menos 36 h; SpO2 de 90 a 98%, PaCO2 de 35 a 45 mmHg e PAM ≥ 65 mmHg; neuroprognóstico multimodal pelo menos 72 h após a normotermia. ERC-ESICM: prevenir febre (> 37,7 °C) por pelo menos 72 h. Cateterismo de emergência se supra de ST; sem supra e sem choque, a angiografia imediata de rotina não melhorou a sobrevida (COACT, TOMAHAWK).'
       },
 
       {
@@ -15059,6 +15889,236 @@ window.PROTOCOLOS = [
       },
 
       {
+        id: 'cve', ctx: 'proc', titulo: 'Cardioversão elétrica sincronizada', botao: 'Cardioversão elétrica', vitais: false,
+        sin: 'cve cardioversao eletrica sincronizada fa flutter tsv tv choque sedacao procedimento',
+        opcoes: [
+          { id: 'arr', label: 'Ritmo', padrao: 'fa', valores: [
+            ['fa', 'FA', 'fibrilação atrial'],
+            ['flutter', 'Flutter', 'flutter atrial'],
+            ['tsv', 'TSV', 'taquicardia supraventricular'],
+            ['tv', 'TV com pulso', 'taquicardia ventricular monomórfica com pulso']
+          ] },
+          { id: 'carater', label: 'Caráter', padrao: 'elet', valores: [
+            ['elet', 'Eletiva', 'eletiva'],
+            ['urg', 'Urgência', 'de urgência, por instabilidade hemodinâmica (___)']
+          ] },
+          { id: 'antic', label: 'Anticoagulação', se: 'arr=fa,flutter', padrao: 'aco', valores: [
+            ['aco', 'ACO ≥ 3 semanas', '___ há ___ semanas'],
+            ['ete', 'ETE sem trombo', '___, com ETE sem trombo em __/__/____'],
+            ['24h', '< 24 h de evolução', '___, com menos de 24 h de evolução'],
+            ['agora', 'Iniciada agora', '___, iniciada agora, sem atrasar a cardioversão']
+          ] },
+          { id: 'sed', label: 'Sedação', padrao: 'propo', valores: [
+            ['propo', 'Propofol', 'propofol ___ mg'],
+            ['etom', 'Etomidato', 'etomidato ___ mg'],
+            ['mida', 'Midazolam', 'midazolam ___ mg'],
+            ['ceta', 'Cetamina', 'cetamina ___ mg']
+          ] },
+          { id: 'pas', label: 'Posição das pás', padrao: 'al', valores: [
+            ['al', 'Anterolateral', 'anterolateral'],
+            ['ap', 'Anteroposterior', 'anteroposterior']
+          ] },
+          { id: 'result', label: 'Resultado', padrao: 'rs', valores: [
+            ['rs', 'Ritmo sinusal', 'rs'],
+            ['falha', 'Sem reversão', 'falha']
+          ] },
+          TCLE
+        ],
+        chips: [
+          { id: 'jejum', label: 'Jejum', on: true },
+          { id: 'fenta', label: 'Fentanil', on: false }
+        ],
+        alertas: [
+          ['arr=fa,flutter&carater=elet&antic=agora', 'Cardioversão eletiva de FA ou flutter pede ACO ≥ 3 semanas, ETE sem trombo ou menos de 24 h de evolução já anticoagulado (SBC FA 2025).']
+        ],
+        blocos: [
+          { id: 'desc', titulo: 'Descrição', linhas: [
+            'PROCEDIMENTO — CARDIOVERSÃO ELÉTRICA SINCRONIZADA — {data} ___h',
+            'Executor: ___. Supervisão: ___.',
+            'Indicação: {arr}, cardioversão {carater}.',
+            ['arr=fa,flutter', 'Anticoagulação: {antic}.'],
+            '{tcle}{?jejum: Jejum de ___ h.} Paciente monitorizad{o|a}, com acesso venoso, oxigênio e material de via aérea disponíveis.',
+            'Sedação com {?fenta:fentanil ___ mcg e }{sed} EV.',
+            'Pás em posição {pas}. Modo sincronizado confirmado, com marcação sobre o QRS.',
+            'Choque bifásico sincronizado de ___ J. Total de ___ choques; energia final de ___ J.',
+            ['result=rs', 'Reversão para ritmo sinusal, FC ___ bpm. ECG após o procedimento: ___.'],
+            ['result=falha', 'Sem reversão. Ritmo final: ___, FC ___ bpm.'],
+            'Recuperação da sedação sem intercorrências, sem lesão de pele.',
+            ['arr=fa,flutter', 'Anticoagulação mantida por pelo menos 4 semanas e depois conforme CHA2DS2-VA.']
+          ] }
+        ],
+        info: 'AHA 2025: energia inicial ≥ 200 J na FA e 200 J no flutter (bifásico); 100 J na TSV e na TV monomórfica; TV polimórfica recebe desfibrilação. SBC FA 2025: FA com > 24 h ou de duração incerta exige ACO ≥ 3 semanas ou ETE sem trombo; ACO por ≥ 4 semanas depois em todos. Sincronizar de novo antes de cada choque, porque muitos aparelhos voltam ao modo não sincronizado.'
+      },
+
+      {
+        id: 'iot', ctx: 'proc', titulo: 'IOT em sequência rápida', botao: 'IOT', vitais: false,
+        sin: 'iot intubacao orotraqueal sequencia rapida via aerea videolaringoscopio etomidato cetamina rocuronio procedimento',
+        opcoes: [
+          { id: 'indic', label: 'Indicação', padrao: 'iresp', valores: [
+            ['iresp', 'Insuficiência respiratória', 'insuficiência respiratória ___'],
+            ['rebaix', 'Rebaixamento', 'rebaixamento do nível de consciência'],
+            ['choque', 'Choque', 'choque com ___'],
+            ['proc', 'Procedimento', 'proteção de via aérea para ___'],
+            ['out', 'Outra', '___']
+          ] },
+          { id: 'pre', label: 'Pré-oxigenação', padrao: 'vni', valores: [
+            ['vni', 'VNI', 'VNI'],
+            ['masc', 'Máscara com reservatório', 'máscara com reservatório'],
+            ['bvm', 'Bolsa-válvula-máscara', 'bolsa-válvula-máscara com válvula de PEEP'],
+            ['cnaf', 'CNAF', 'cateter nasal de alto fluxo']
+          ] },
+          { id: 'ind', label: 'Indução', padrao: 'etom', valores: [
+            ['etom', 'Etomidato', 'etomidato ___ mg'],
+            ['ceta', 'Cetamina', 'cetamina ___ mg'],
+            ['propo', 'Propofol', 'propofol ___ mg'],
+            ['mida', 'Midazolam', 'midazolam ___ mg']
+          ] },
+          { id: 'bnm', label: 'Bloqueador neuromuscular', padrao: 'roc', valores: [
+            ['roc', 'Rocurônio', 'rocurônio ___ mg'],
+            ['sux', 'Succinilcolina', 'succinilcolina ___ mg']
+          ] },
+          { id: 'lar', label: 'Laringoscópio', padrao: 'video', valores: [
+            ['video', 'Videolaringoscópio', 'Videolaringoscopia'],
+            ['direta', 'Lâmina direta', 'Laringoscopia direta']
+          ] },
+          TCLE_URG
+        ],
+        chips: [
+          { id: 'fenta', label: 'Fentanil', on: false },
+          { id: 'vaso', label: 'Vasopressor preparado', on: true },
+          { id: 'bougie', label: 'Bougie', on: false },
+          { id: 'intercor', label: 'Intercorrência', on: false }
+        ],
+        blocos: [
+          { id: 'desc', titulo: 'Descrição', linhas: [
+            'PROCEDIMENTO — INTUBAÇÃO OROTRAQUEAL EM SEQUÊNCIA RÁPIDA — {data} ___h',
+            'Executor: ___. Supervisão: ___.',
+            'Indicação: {indic}.',
+            '{tcle} Checagem pré-procedimento: material de via aérea difícil, aspiração e capnógrafo disponíveis; acesso venoso pérvio{?vaso:; vasopressor preparado}.',
+            'Paciente monitorizad{o|a}, em decúbito dorsal com cabeceira elevada. Pré-oxigenação com {pre} por ___ min, com SpO2 de ___% e PA de ___ x ___ mmHg antes da indução.',
+            'Indução com {?fenta:fentanil ___ mcg, }{ind} e {bnm} EV.',
+            '{lar} com Cormack-Lehane ___{?bougie:, com auxílio de bougie}. Tubo orotraqueal nº ___ com cuff, passado na ___ tentativa e fixado a ___ cm na rima labial. Pressão do cuff de ___ cmH2O.',
+            'Posição confirmada por capnografia com curva sustentada e ausculta simétrica, sem ruído em epigástrio.',
+            '{?intercor:Intercorrências: ___.|Intercorrências: nenhuma. SpO2 mínima de ___%.}',
+            'VM em modo ___, VC ___ mL (___ mL/kg de peso predito), PEEP ___ cmH2O e FiO2 ___%. Sedação contínua com ___.',
+            'Radiografia de tórax: ___.'
+          ] }
+        ],
+        info: 'DEVICE (NEJM 2023): o videolaringoscópio aumentou a intubação na primeira tentativa (85% x 71%). PREOXI (NEJM 2024): pré-oxigenação com VNI reduziu a hipoxemia durante a intubação. RSI (NEJM 2025): cetamina e etomidato sem diferença de mortalidade em 28 dias, com mais colapso cardiovascular na cetamina (22% x 17%). No cardiopata, deixar vasopressor pronto antes da indução. No TEP com disfunção de VD, intubar só sem alternativa (AHA/ACC 2026).'
+      },
+
+      {
+        id: 'pcr', ctx: 'proc', titulo: 'Registro de PCR', vitais: false,
+        sin: 'pcr parada cardiorrespiratoria rcp reanimacao registro utstein fv aesp assistolia rce obito codigo azul',
+        opcoes: [
+          { id: 'local', label: 'Local', padrao: 'uti', valores: [
+            ['uti', 'UTI', 'na UTI'],
+            ['ps', 'PS', 'no PS'],
+            ['enf', 'Enfermaria', 'na enfermaria'],
+            ['out', 'Outro', 'em ___']
+          ] },
+          { id: 'ritmo', label: 'Ritmo inicial', padrao: 'fv', valores: [
+            ['fv', 'FV/TV sem pulso', 'FV/TV sem pulso'],
+            ['aesp', 'AESP', 'AESP'],
+            ['assist', 'Assistolia', 'assistolia']
+          ] },
+          { id: 'desf', label: 'Desfecho', padrao: 'rce', valores: [
+            ['rce', 'RCE', 'rce'],
+            ['obito', 'Óbito', 'obito']
+          ] }
+        ],
+        listas: [
+          { id: 'drogas', label: 'Medicações', vazio: 'nenhuma', padrao: ['adr'], itens: [
+            ['adr', 'Adrenalina', 'adrenalina ___ mg (___ doses)'],
+            ['amio', 'Amiodarona', 'amiodarona ___ mg'],
+            ['lido', 'Lidocaína', 'lidocaína ___ mg'],
+            ['bic', 'Bicarbonato', 'bicarbonato de sódio ___ mEq'],
+            ['ca', 'Cálcio', 'gluconato de cálcio ___'],
+            ['mg', 'Magnésio', 'sulfato de magnésio ___ g']
+          ] }
+        ],
+        chips: [
+          { id: 'testem', label: 'Testemunhada', on: true },
+          { id: 'monit', label: 'Monitorizado(a)', on: true },
+          { id: 'iot', label: 'IOT na RCP', on: true },
+          { id: 'pocus', label: 'POCUS', on: false },
+          { id: 'trombo', label: 'Trombólise', on: false }
+        ],
+        blocos: [
+          { id: 'desc', titulo: 'Registro', linhas: [
+            'REGISTRO DE PCR — {data}',
+            'Equipe: ___. Coordenação: ___.',
+            'PCR {local} às ___h, {?testem:testemunhada|não testemunhada}{?monit:, em paciente monitorizad{o|a}}. Ritmo inicial: {ritmo}.',
+            'RCP iniciada às ___h, com compressões de alta qualidade e troca do compressor a cada 2 min.',
+            ['ritmo=fv', 'Desfibrilação bifásica com ___ J; total de ___ choques.'],
+            'Medicações: {drogas}.',
+            'Via aérea: {?iot:IOT às ___h, com capnografia de ___ mmHg|ventilação com bolsa-válvula-máscara}.',
+            'Ritmos nas checagens: ___. Causas reversíveis consideradas: ___.',
+            ['pocus', 'POCUS nas pausas: ___.'],
+            ['trombo', 'Trombólise com ___ às ___h por suspeita de ___.'],
+            ['desf=rce', 'RCE às ___h, após ___ min de RCP. Ritmo após o RCE: ___. PA ___ x ___ mmHg.'],
+            ['desf=rce', 'Após o RCE: ECG de 12 derivações, gasometria, controle de temperatura e ___.'],
+            ['desf=obito', 'Esforços encerrados às ___h, após ___ min de RCP, sem RCE. Óbito constatado às ___h. Família comunicada por ___.']
+          ] }
+        ],
+        info: 'Registro no modelo Utstein: local, se foi testemunhada, ritmo inicial, horários (colapso, início da RCP, primeiro choque, primeira adrenalina, RCE) e desfecho. Protocolo do site e AHA 2025: 100 a 120 compressões/min com 5 a 6 cm de profundidade; desfibrilar assim que possível nos ritmos chocáveis; adrenalina 1 mg a cada 3 a 5 min, o mais cedo possível nos não chocáveis; amiodarona 300 mg e depois 150 mg na FV/TV refratária; capnografia para a qualidade da RCP e o RCE.'
+      },
+
+      {
+        id: 'pericardio', ctx: 'proc', titulo: 'Pericardiocentese', vitais: false,
+        sin: 'pericardiocentese derrame pericardico tamponamento cardiaco puncao pericardica pigtail procedimento',
+        opcoes: [
+          { id: 'carater', label: 'Indicação', padrao: 'tamp', valores: [
+            ['tamp', 'Tamponamento', 'tamp'],
+            ['diag', 'Diagnóstica', 'diag']
+          ] },
+          { id: 'via', label: 'Via', padrao: 'subx', valores: [
+            ['subx', 'Subxifoide', 'subxifoide'],
+            ['apic', 'Apical', 'apical'],
+            ['paraest', 'Paraesternal E', 'paraesternal esquerda']
+          ] },
+          { id: 'guia', label: 'Guia', padrao: 'eco', valores: [
+            ['eco', 'Ecocardiograma', 'ecocardiografia'],
+            ['fluoro', 'Fluoroscopia', 'fluoroscopia']
+          ] },
+          TCLE
+        ],
+        listas: [
+          { id: 'amostras', label: 'Exames enviados', vazio: '___', padrao: ['bioq', 'cel', 'cult', 'cito'], itens: [
+            ['bioq', 'Proteína e DHL', 'proteína total e DHL (com dosagens séricas)'],
+            ['glic', 'Glicose', 'glicose'],
+            ['cel', 'Celularidade', 'celularidade com diferencial'],
+            ['cult', 'Gram e cultura', 'cultura com Gram'],
+            ['cito', 'Citologia', 'citologia oncótica'],
+            ['ada', 'ADA', 'ADA'],
+            ['bk', 'Micobactérias', 'pesquisa e cultura para micobactérias']
+          ] }
+        ],
+        chips: [
+          { id: 'dreno', label: 'Pigtail deixado', on: true },
+          { id: 'melhora', label: 'Melhora hemodinâmica', on: true, se: 'carater=tamp' }
+        ],
+        blocos: [
+          { id: 'desc', titulo: 'Descrição', linhas: [
+            'PROCEDIMENTO — PERICARDIOCENTESE — {data} ___h',
+            'Executor: ___. Supervisão: ___.',
+            ['carater=tamp', 'Indicação: tamponamento cardíaco (___).'],
+            ['carater=diag', 'Indicação: derrame pericárdico ___, para diagnóstico.'],
+            '{tcle} Checagem pré-procedimento: paciente e sítio confirmados.',
+            'Paciente monitorizad{o|a}, em decúbito dorsal com cabeceira elevada. Ecocardiograma com derrame pericárdico ___, de ___ mm na janela {via}.',
+            'Antissepsia com clorexidina alcoólica e campo estéril amplo. Anestesia local com lidocaína 2% sem vasoconstritor.',
+            'Punção por via {via} guiada por {guia}, com saída de líquido ___. Posição confirmada por ___.',
+            ['dreno', 'Cateter pigtail ___ Fr passado pela técnica de Seldinger, fixado à pele e conectado a sistema fechado.'],
+            'Drenagem de ___ mL.',
+            ['carater=tamp', '{?melhora:Melhora hemodinâmica após a drenagem, com PA ___ x ___ mmHg e FC ___ bpm.|Hemodinâmica após a drenagem: ___.}'],
+            'Material enviado para: {amostras}.',
+            'Ecocardiograma de controle: ___. Intercorrências: nenhuma.'
+          ] }
+        ],
+        info: 'SBC POCUS 2026: a pericardiocentese guiada por ultrassom tem sucesso de cerca de 95% e complicações abaixo de 2%. Tamponamento é diagnóstico clínico e ecocardiográfico: no paciente instável, não atrasar a drenagem. Preferir drenagem cirúrgica no trauma, na dissecção de aorta e no derrame purulento ou loculado. Soro fisiológico agitado injetado pela agulha ajuda a confirmar a posição no pericárdio.'
+      },
+
+      {
         id: 'toraco', ctx: 'proc', titulo: 'Toracocentese', vitais: false,
         sin: 'toracocentese derrame pleural puncao pleural procedimento',
         opcoes: [
@@ -15144,9 +16204,11 @@ window.PROTOCOLOS = [
 })();
 
 </script>
-<script>
-// Aba "Evoluções" — montador por cenário (Fase 1, 14/11/2026).
+  <script>
+// Aba "Evoluções" — montador por cenário (Fase 1 e Fase 2, 14/11/2026).
 // Contexto → cenário → ajustes (♂/♀, sinais vitais, opções, chips) → copiar.
+// Fase 2: busca de cenários, link direto (#montador/<id>), atalhos de teclado,
+// grupos que só aparecem quando fazem sentido (se) e avisos fora da cópia (alertas).
 // Dados em data-prontuario.js (window.PRONT). Sem servidor e sem IA.
 (function () {
   const D = window.PRONT;
@@ -15154,6 +16216,7 @@ window.PROTOCOLOS = [
   if (!D || !root) return;
 
   // ---------- estado ----------
+  const VIEW = 'montador';
   const LS = 'cardio.montador.';
   const store = {
     get(k, d) { try { const v = localStorage.getItem(LS + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
@@ -15167,13 +16230,21 @@ window.PROTOCOLOS = [
     vit: {},   // sinais vitais digitados (valem para todos os cenários até "Novo paciente")
     sel: {}    // escolhas por cenário: { o: opções, l: listas, c: chips }
   };
+  let busca = '';   // texto da busca de cenários (vazio = lista do contexto)
   const VITAIS = [
     ['PAS', 'PAS'], ['PAD', 'PAD'], ['FC', 'FC'], ['FR', 'FR'], ['SpO2', 'SpO2 %'], ['Tax', 'Tax °C'], ['HGT', 'HGT']
   ];
 
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
   const porId = id => D.cenarios.find(c => c.id === id);
   const doCtx = ctx => D.cenarios.filter(c => c.ctx === ctx);
+  const ctxLabel = id => (D.contextos.find(c => c.id === id) || {}).label || '';
+
+  // link direto: #montador/<id>
+  const idDoHash = () => { const m = location.hash.match(/^#montador\/([\w-]+)$/); return m && porId(m[1]) ? m[1] : null; };
+  const ini = idDoHash();
+  if (ini) { const sc = porId(ini); S.ctx = sc.ctx; S.cen[sc.ctx] = sc.id; }
 
   function selDe(sc) {
     if (!S.sel[sc.id]) {
@@ -15212,16 +16283,19 @@ window.PROTOCOLOS = [
     const v = String(S.vit[k] || '').trim();
     return v || '___';
   }
+  // cond: chip | !chip | opcao=v1,v2 | opcao!=v | lista (algo marcado) | lista.item1,item2 ; unidos por &
   function cond(expr, sc, st) {
     return expr.split('&').every(p => {
       p = p.trim();
       let neg = false;
       if (p.charAt(0) === '!') { neg = true; p = p.slice(1); }
-      let r;
-      const m = p.match(/^([\w-]+)(!?=)([\w,-]+)$/);
-      if (m) {
+      let r, m;
+      if ((m = p.match(/^([\w-]+)(!?=)([\w,-]+)$/))) {
         r = m[3].split(',').includes(st.o[m[1]]);
         if (m[2] === '!=') r = !r;
+      } else if ((m = p.match(/^([\w-]+)\.([\w,-]+)$/))) {
+        const marcados = st.l[m[1]] || [];
+        r = m[2].split(',').some(v => marcados.includes(v));
       } else {
         r = !!st.c[p] || !!(st.l[p] && st.l[p].length);
       }
@@ -15275,11 +16349,11 @@ window.PROTOCOLOS = [
     if (b.cab) out.unshift(b.cab);
     return out.join('\n');
   }
-  function blocosProntos(sc) {
-    const st = selDe(sc);
+  function blocosProntos(sc, st) {
+    st = st || selDe(sc);
     return (sc.blocos || []).map(b => ({ b, tx: textoBloco(b, sc, st) })).filter(x => x.tx);
   }
-  function textoTudo(sc) { return blocosProntos(sc).map(x => x.tx).join('\n\n'); }
+  function textoTudo(sc, st) { return blocosProntos(sc, st).map(x => x.tx).join('\n\n'); }
   function vitaisUsados(sc) {
     const todo = JSON.stringify(sc.blocos || []);
     const usa = new Set();
@@ -15292,6 +16366,7 @@ window.PROTOCOLOS = [
   root.innerHTML =
     '<div class="mt-top">' +
       '<div class="mt-ctx" role="group" aria-label="Contexto"></div>' +
+      '<input type="search" class="mt-busca" placeholder="Buscar cenário" aria-label="Buscar cenário em todos os contextos" autocomplete="off" spellcheck="false">' +
       '<div class="mt-sexo" role="group" aria-label="Sexo do paciente">' +
         '<button type="button" data-sexo="m" title="Masculino">♂</button>' +
         '<button type="button" data-sexo="f" title="Feminino">♀</button>' +
@@ -15302,9 +16377,18 @@ window.PROTOCOLOS = [
       '<div class="mt-panel"></div>' +
     '</div>';
   const elCtx = root.querySelector('.mt-ctx');
+  const elBusca = root.querySelector('.mt-busca');
   const elSexo = root.querySelector('.mt-sexo');
   const elCen = root.querySelector('.mt-cen');
   const elPanel = root.querySelector('.mt-panel');
+  const elView = document.getElementById('view-' + VIEW);
+  const noMontador = () => !!(elView && elView.classList.contains('active'));
+  const linkDe = sc => location.href.split('#')[0] + '#' + VIEW + '/' + sc.id;
+  function marcarLink() {
+    const sc = cenAtual();
+    if (!sc || !noMontador() || location.hash === '#' + VIEW + '/' + sc.id) return;
+    try { history.replaceState(null, '', '#' + VIEW + '/' + sc.id); } catch (e) { /* sem history: ignora */ }
+  }
 
   function cenAtual() {
     const lista = doCtx(S.ctx);
@@ -15312,6 +16396,26 @@ window.PROTOCOLOS = [
     if (!sc || sc.ctx !== S.ctx) sc = lista[0];
     S.cen[S.ctx] = sc && sc.id;
     return sc;
+  }
+  // Busca em todos os contextos: todos os termos precisam aparecer; título vale mais que sinônimo
+  // e começo de palavra vale mais que meio de palavra ("tep" acha TEP antes de tenecteplase).
+  function listaVisivel() {
+    if (!busca.trim()) return doCtx(S.ctx);
+    const termos = norm(busca).split(/\s+/).filter(Boolean);
+    const inicio = (hay, t) => (' ' + hay).includes(' ' + t);
+    return D.cenarios.map((c, i) => {
+      const tit = norm([c.titulo, c.botao].join(' ')).replace(/[^a-z0-9]+/g, ' ');
+      const resto = norm([c.sin, ctxLabel(c.ctx)].join(' '));
+      let pontos = 0;
+      for (const t of termos) {
+        if (inicio(tit, t)) pontos += 4;
+        else if (tit.includes(t)) pontos += 3;
+        else if (inicio(resto, t)) pontos += 2;
+        else if (resto.includes(t)) pontos += 1;
+        else return null;
+      }
+      return { c, pontos, i };
+    }).filter(Boolean).sort((a, b) => b.pontos - a.pontos || a.i - b.i).map(x => x.c);
   }
 
   function renderTopo() {
@@ -15321,17 +16425,25 @@ window.PROTOCOLOS = [
   }
   function renderCenarios() {
     const sc = cenAtual();
-    elCen.innerHTML = doCtx(S.ctx).map(c =>
-      '<button type="button" data-cen="' + c.id + '" aria-pressed="' + (sc && c.id === sc.id) + '">' + esc(c.botao || c.titulo) + '</button>').join('');
+    const lista = listaVisivel();
+    let h = lista.map((c, i) =>
+      '<button type="button" data-cen="' + c.id + '" aria-pressed="' + (sc && c.id === sc.id) + '">' +
+        (i < 10 ? '<span class="mt-k" aria-hidden="true">' + ((i + 1) % 10) + '</span>' : '') +
+        '<span class="mt-cen-t">' + esc(c.botao || c.titulo) + '</span>' +
+        (busca.trim() ? '<span class="mt-cen-c">' + esc(ctxLabel(c.ctx)) + '</span>' : '') +
+      '</button>').join('');
+    if (!lista.length) h = '<p class="mt-vazio">Nenhum cenário com "' + esc(busca.trim()) + '".</p>';
+    h += '<p class="mt-atalhos">Atalhos: 1 a 9 (e 0) abrem o cenário · / busca · Ctrl ou ⌘ + Enter copia tudo</p>';
+    elCen.innerHTML = h;
   }
 
   function grupoOpcao(op, st) {
-    return '<div class="mt-grp"><div class="mt-grp-t">' + esc(op.label) + '</div><div class="mt-chips">' +
+    return '<div class="mt-grp"' + (op.se ? ' data-se="' + esc(op.se) + '"' : '') + '><div class="mt-grp-t">' + esc(op.label) + '</div><div class="mt-chips">' +
       op.valores.map(v => '<button type="button" class="mt-chip mt-seg" data-op="' + op.id + '" data-v="' + esc(v[0]) + '" aria-pressed="' + (st.o[op.id] === v[0]) + '">' + esc(v[1]) + '</button>').join('') +
       '</div></div>';
   }
   function grupoLista(ls, st) {
-    return '<div class="mt-grp"><div class="mt-grp-t">' + esc(ls.label) + '</div><div class="mt-chips">' +
+    return '<div class="mt-grp"' + (ls.se ? ' data-se="' + esc(ls.se) + '"' : '') + '><div class="mt-grp-t">' + esc(ls.label) + '</div><div class="mt-chips">' +
       ls.itens.map(it => '<button type="button" class="mt-chip" data-ls="' + ls.id + '" data-v="' + esc(it[0]) + '" aria-pressed="' + st.l[ls.id].includes(it[0]) + '">' + esc(it[1]) + '</button>').join('') +
       '</div></div>';
   }
@@ -15341,7 +16453,8 @@ window.PROTOCOLOS = [
     if (!sc) { elPanel.innerHTML = ''; return; }
     const st = selDe(sc);
     const usa = sc.vitais === false ? new Set() : vitaisUsados(sc);
-    let h = '<h3>' + esc(sc.titulo) + '</h3>';
+    let h = '<div class="mt-h"><h3>' + esc(sc.titulo) + '</h3>' +
+      '<button type="button" class="btn-ghost mt-link" title="Copia o endereço que abre direto este cenário">🔗 Link</button></div>';
 
     if (usa.size) {
       h += '<div class="mt-vit">';
@@ -15361,7 +16474,7 @@ window.PROTOCOLOS = [
       (sc.listas || []).forEach(ls => { h += grupoLista(ls, st); });
       if ((sc.chips || []).length) {
         h += '<div class="mt-grp"><div class="mt-grp-t">Achados e ajustes</div><div class="mt-chips">' +
-          sc.chips.map(ch => '<button type="button" class="mt-chip" data-chip="' + ch.id + '" aria-pressed="' + !!st.c[ch.id] + '">' + esc(ch.label) + '</button>').join('') +
+          sc.chips.map(ch => '<button type="button" class="mt-chip" data-chip="' + ch.id + '"' + (ch.se ? ' data-se="' + esc(ch.se) + '"' : '') + ' aria-pressed="' + !!st.c[ch.id] + '">' + esc(ch.label) + '</button>').join('') +
           '</div></div>';
       }
       h += '</div>';
@@ -15371,16 +16484,28 @@ window.PROTOCOLOS = [
       h += '<details class="mt-info"><summary>ⓘ Por quê — não entra na cópia</summary><p>' + esc(sc.info) + '</p></details>';
     }
 
+    h += '<div class="mt-alertas" role="status" hidden></div>';
     h += '<div class="mt-blocos"></div>';
     h += '<button type="button" class="mt-tudo">Copiar tudo</button>';
     elPanel.innerHTML = h;
     renderTexto();
+    marcarLink();
   }
 
   function renderTexto() {
     const sc = cenAtual();
     if (!sc) return;
-    const prontos = blocosProntos(sc);
+    const st = selDe(sc);
+    // grupos e chips que dependem de outra escolha
+    elPanel.querySelectorAll('[data-se]').forEach(el => { el.hidden = !cond(el.dataset.se, sc, st); });
+    // avisos (não entram na cópia)
+    const elA = elPanel.querySelector('.mt-alertas');
+    if (elA) {
+      const al = (sc.alertas || []).filter(a => cond(a[0], sc, st));
+      elA.innerHTML = al.map(a => '<p>⚠️ ' + esc(a[1]) + '</p>').join('');
+      elA.hidden = !al.length;
+    }
+    const prontos = blocosProntos(sc, st);
     const el = elPanel.querySelector('.mt-blocos');
     if (el) {
       el.innerHTML = prontos.map((x, i) =>
@@ -15401,10 +16526,22 @@ window.PROTOCOLOS = [
 
   function renderTudo() { renderTopo(); renderCenarios(); renderPainel(); }
 
+  // Abre um cenário (clique, teclado, busca, link ou busca global).
+  function abrir(id, rolar) {
+    const sc = porId(id); if (!sc) return;
+    S.ctx = sc.ctx; S.cen[sc.ctx] = sc.id; store.set('ctx', S.ctx);
+    if (busca) { busca = ''; elBusca.value = ''; }
+    renderTudo();
+    if (rolar && window.matchMedia && window.matchMedia('(max-width: 860px)').matches) {
+      elPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
   // ---------- eventos ----------
   elCtx.addEventListener('click', e => {
     const b = e.target.closest('[data-ctx]'); if (!b) return;
     S.ctx = b.dataset.ctx; store.set('ctx', S.ctx);
+    if (busca) { busca = ''; elBusca.value = ''; }
     renderTudo();
   });
   elSexo.addEventListener('click', e => {
@@ -15414,10 +16551,15 @@ window.PROTOCOLOS = [
   });
   elCen.addEventListener('click', e => {
     const b = e.target.closest('[data-cen]'); if (!b) return;
-    S.cen[S.ctx] = b.dataset.cen;
-    renderCenarios(); renderPainel();
-    if (window.matchMedia && window.matchMedia('(max-width: 860px)').matches) {
-      elPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    abrir(b.dataset.cen, true);
+  });
+  elBusca.addEventListener('input', () => { busca = elBusca.value; renderCenarios(); });
+  elBusca.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) {
+      const c = listaVisivel()[0];
+      if (c) { e.preventDefault(); abrir(c.id, true); elBusca.blur(); }
+    } else if (e.key === 'Escape') {
+      busca = ''; elBusca.value = ''; renderCenarios(); elBusca.blur();
     }
   });
   elPanel.addEventListener('click', e => {
@@ -15442,6 +16584,8 @@ window.PROTOCOLOS = [
       if (x && window.copyText) window.copyText(x.tx);
     } else if (b.classList.contains('mt-tudo')) {
       if (window.copyText) window.copyText(textoTudo(sc));
+    } else if (b.classList.contains('mt-link')) {
+      if (window.copyText) window.copyText(linkDe(sc));
     } else if (b.classList.contains('mt-novo')) {
       S.vit = {}; S.sel = {};
       renderPainel();
@@ -15454,20 +16598,56 @@ window.PROTOCOLOS = [
     renderTexto();
   });
 
+  // Teclado (só com a aba aberta): 1 a 9 e 0 abrem o cenário da lista, / vai para a busca,
+  // Ctrl ou ⌘ + Enter copia tudo (inclusive com o cursor num campo).
+  document.addEventListener('keydown', e => {
+    if (!noMontador() || e.altKey || e.defaultPrevented) return;
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      const sc = cenAtual();
+      if (sc && window.copyText) { e.preventDefault(); window.copyText(textoTudo(sc)); }
+      return;
+    }
+    const t = e.target;
+    if (e.ctrlKey || e.metaKey || (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))) return;
+    if (e.key === '/') { e.preventDefault(); elBusca.focus(); elBusca.select(); return; }
+    if (/^[0-9]$/.test(e.key)) {
+      const c = listaVisivel()[e.key === '0' ? 9 : +e.key - 1];
+      if (c) { e.preventDefault(); abrir(c.id, false); }
+    }
+  });
+
+  // Mantém o endereço apontando para o cenário aberto quando a aba é mostrada.
+  if (elView && window.MutationObserver) {
+    new MutationObserver(() => { if (noMontador()) marcarLink(); }).observe(elView, { attributes: true, attributeFilter: ['class'] });
+  }
+  // Link colado com a página já aberta.
+  window.addEventListener('hashchange', () => {
+    const id = idDoHash(); if (!id) return;
+    if (window.cardioGoView) window.cardioGoView(VIEW);
+    abrir(id, false);
+  });
+
   // Abre um cenário pelo id (usado pela busca global).
-  window.cardioMontadorAbrir = function (id) {
-    const sc = porId(id); if (!sc) return;
-    S.ctx = sc.ctx; S.cen[sc.ctx] = sc.id; store.set('ctx', S.ctx);
-    renderTudo();
+  window.cardioMontadorAbrir = function (id) { abrir(id, true); };
+  // Para testes e para outras abas: texto completo de um cenário. Sem "escolhas", usa as da tela;
+  // com escolhas ({o, l, c} parciais), calcula sem mexer no que está na tela.
+  window.cardioMontadorTexto = function (id, escolhas) {
+    const sc = porId(id || S.cen[S.ctx]); if (!sc) return '';
+    if (!escolhas) return textoTudo(sc);
+    const base = selDe(sc);
+    const st = {
+      o: Object.assign({}, base.o, escolhas.o),
+      l: Object.assign({}, base.l, escolhas.l),
+      c: Object.assign({}, base.c, escolhas.c)
+    };
+    return textoTudo(sc, st);
   };
-  // Para testes e para outras abas: texto completo de um cenário com as escolhas atuais.
-  window.cardioMontadorTexto = function (id) { const sc = porId(id || S.cen[S.ctx]); return sc ? textoTudo(sc) : ''; };
 
   renderTudo();
 })();
 
 </script>
-<script>
+  <script>
 // Navegação em hubs (2 níveis) + busca global + utilidades compartilhadas
 (function () {
   const HUBS = [
@@ -15513,7 +16693,7 @@ window.PROTOCOLOS = [
   }
   window.cardioGoView = showView;
 
-  const initial = (location.hash || '#paciente').slice(1);
+  const initial = (location.hash || '#paciente').slice(1).split('/')[0];
   showView(viewHub[initial] ? initial : 'paciente');
 
   // ---------------- Busca global ----------------
