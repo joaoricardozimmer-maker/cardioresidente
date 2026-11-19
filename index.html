@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta name="cardio-build" content="2026-11-18 22:49" />
+  <meta name="cardio-build" content="2026-11-19 00:05" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CardioResidente — Ferramentas para o residente de cardiologia</title>
@@ -1047,6 +1047,23 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
   .ed-sit { padding: 7px 11px; font-size: 13px; }
 }
 
+/* ---------- Arrumação da navegação (nov/2026) ---------- */
+/* No celular os 4 grupos dividem a largura: ícone em cima, nome embaixo, sem rolar para os lados */
+@media (max-width: 600px) {
+  .hubs { gap: 0; padding: 0 4px; }
+  .hub { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 8px 2px 9px; font-size: 13px; }
+  .hub-ic { font-size: 17px; line-height: 1.15; }
+  .subtab { padding: 5px 11px; }
+}
+/* Texto de abertura de cada aba: 2 linhas no celular; tocar nele abre o texto inteiro */
+@media (max-width: 600px) {
+  .view > .hero h2 { font-size: 20px; margin-bottom: 4px; }
+  .view > .hero p { font-size: 14px; line-height: 1.5; margin-bottom: 16px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; cursor: pointer; }
+  .view > .hero.aberto p { display: block; overflow: visible; }
+}
+.footer-sobre { color: var(--accent-soft); font-weight: 600; font-size: 13px; text-decoration: none; }
+.footer-sobre:hover { text-decoration: underline; }
+
 </style>
 </head>
 <body>
@@ -1129,7 +1146,7 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
     <!-- ============ TRANSCRIÇÃO ============ -->
     <section class="view" id="view-transcricao">
       <div class="hero">
-        <h2>Transcrição de laudos por IA</h2>
+        <h2>Transcrição de laudos</h2>
         <p>Cole o laudo completo, escolha o tipo de exame e receba um resumo padronizado pronto para colar no prontuário. <strong>Laboratoriais do AFIP e ecocardiogramas são lidos só no seu navegador — nunca passam por IA.</strong></p>
       </div>
 
@@ -1137,17 +1154,21 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
         <div>
           <label class="field-label" for="transc-tipo">Tipo de exame</label>
           <select id="transc-tipo">
-            <option value="ecocardiograma">Ecocardiograma</option>
-            <option value="ressonancia">Ressonância cardíaca</option>
-            <option value="ergometria">Teste ergométrico</option>
-            <option value="cintilografia">Cintilografia miocárdica</option>
-            <option value="cateterismo">Cateterismo / Cinecoronariografia</option>
-            <option value="angiotc">Angio-TC de coronárias</option>
-            <option value="doppler">Doppler de carótidas/vertebrais</option>
-            <option value="laboratorio">Exames laboratoriais (AFIP)</option>
-            <option value="balanco">Balanço hídrico</option>
-            <option value="holter">Holter / MAPA</option>
-            <option value="generico">Outro laudo cardiológico</option>
+            <optgroup label="Lidos no navegador, sem IA">
+              <option value="ecocardiograma">Ecocardiograma</option>
+              <option value="laboratorio">Exames laboratoriais (AFIP)</option>
+            </optgroup>
+            <optgroup label="Resumidos por IA">
+              <option value="ressonancia">Ressonância cardíaca</option>
+              <option value="ergometria">Teste ergométrico</option>
+              <option value="cintilografia">Cintilografia miocárdica</option>
+              <option value="cateterismo">Cateterismo / Cinecoronariografia</option>
+              <option value="angiotc">Angio-TC de coronárias</option>
+              <option value="doppler">Doppler de carótidas/vertebrais</option>
+              <option value="balanco">Balanço hídrico</option>
+              <option value="holter">Holter / MAPA</option>
+              <option value="generico">Outro laudo cardiológico</option>
+            </optgroup>
           </select>
 
           <label class="field-label" for="transc-input">Cole o laudo aqui</label>
@@ -1201,7 +1222,7 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
     <section class="view" id="view-evolucoes">
       <div class="hero">
         <h2>Biblioteca anterior</h2>
-        <p><strong>Para o plantão, use a aba Evoluções</strong> (montador por cenário). Esta biblioteca fica disponível até a revisão completa.</p>
+        <p><strong>Para o plantão, use Por setor ou Por cenário.</strong> Esta biblioteca fica disponível até a revisão completa.</p>
         <p>Modelos escritos como texto pronto para colar: já vêm na forma afirmativa, sem colchetes de alternativa nem linhas de traços — o único campo é <code>___</code>. Organizados por setor (plantão, enfermaria, ambulatório e hemodinâmica), com <strong>exame físico normal por cenário e por sistema</strong>, banco de achados alterados, pacotes de conduta e receitas.</p>
       </div>
 
@@ -1345,7 +1366,7 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
         <ul>
           <li><strong>Apoio à decisão, não substitui o julgamento clínico.</strong> Sempre confira condutas nas diretrizes vigentes e individualize para o paciente.</li>
           <li><strong>Privacidade:</strong> evite colar dados que identifiquem o paciente (nome, registro, CPF) nas ferramentas de IA. Use apenas o conteúdo técnico do laudo.</li>
-          <li>A aba <strong>Evidências</strong> traz a Classe de recomendação e o Nível de evidência de cada conduta segundo a diretriz mais atual de cada sociedade (ESC, AHA/ACC, SBC). Os valores foram conferidos nas fontes citadas, mas <strong>confirme sempre no documento original</strong> (aba Diretrizes), pois as diretrizes são atualizadas periodicamente.</li>
+          <li>A aba <strong>Recomendações</strong>, no grupo Conduta, traz a Classe de recomendação e o Nível de evidência de cada conduta segundo a diretriz mais atual de cada sociedade (ESC, AHA/ACC, SBC). Os valores foram conferidos nas fontes citadas, mas <strong>confirme sempre no documento original</strong> (aba Diretrizes), pois as diretrizes são atualizadas periodicamente.</li>
           <li>A aba <strong>Orientações</strong> traz, ao lado de cada recomendação, o ensaio que a sustenta e o tamanho do efeito — inclusive quando o resultado foi neutro (Look AHEAD, SODIUM-HF, SAVE). O objetivo é que você saiba o que pode prometer ao paciente e o que não pode.</li>
         </ul>
         <p class="muted small">Esta ferramenta não armazena os textos digitados em servidores além da chamada necessária à IA para a transcrição dos demais laudos (ressonância, ergometria, cintilografia etc.). Laboratoriais do AFIP e ecocardiogramas não saem do navegador.</p>
@@ -1361,8 +1382,9 @@ select:focus-visible, textarea:focus-visible, .tab:focus-visible {
       Criado por <strong>Dr. João Ricardo Cambruzzi Zimmer</strong> ·
       <a href="https://instagram.com/joaozimmer_" target="_blank" rel="noopener">📷 @joaozimmer_</a>
     </div>
+    <a class="footer-sobre" href="#sobre" data-ir="sobre">ℹ️ Sobre e avisos</a>
     <span class="footer-note">Ferramenta de <strong>apoio à decisão</strong> — não substitui o julgamento clínico nem as diretrizes vigentes. Não insira dados que identifiquem o paciente.</span>
-    <span class="footer-meta">CardioResidente · atualizado em agosto/2026</span>
+    <span class="footer-meta">CardioResidente · atualizado em novembro/2026</span>
   </footer>
 
   <script>
@@ -11122,20 +11144,6 @@ window.GUIAS = [
   // Seleciona o primeiro por padrão
   const first = menu.querySelector('.evol-item');
   if (first) select(parseInt(first.dataset.i, 10), first);
-
-  // Mede o cabeçalho fixo e expõe como --stick-top, para o menu e o editor
-  // grudarem logo abaixo dele. Recalcula em resize porque a barra de hubs quebra
-  // em mais linhas em telas estreitas.
-  const topbar = document.querySelector('.topbar');
-  function medirTopo() {
-    if (!topbar) return;
-    const h = Math.round(topbar.getBoundingClientRect().height);
-    if (h > 0) document.documentElement.style.setProperty('--stick-top', h + 'px');
-  }
-  medirTopo();
-  window.addEventListener('resize', medirTopo);
-  window.addEventListener('load', medirTopo);
-  if (window.ResizeObserver && topbar) new ResizeObserver(medirTopo).observe(topbar);
 })();
 
 </script>
@@ -19599,14 +19607,12 @@ window.PROTOCOLOS = [
 // Navegação em hubs (2 níveis) + busca global + utilidades compartilhadas
 (function () {
   const HUBS = [
-    { id: 'paciente', label: '🧬 Paciente', views: [['paciente', '🧬 Conduta'], ['diagnostico', '🔍 Diagnóstico']] },
-    { id: 'temas', label: '🫀 Temas', views: [['temas', '🫀 Temas']] },
-    { id: 'evidencias', label: '📚 Evidências', views: [['evidencia', '🔎 Recomendações'], ['guias', '📚 Diretrizes'], ['ensaios', '🧪 Ensaios pivotais']] },
-    { id: 'ferramentas', label: '🧮 Ferramentas', views: [['scores', '🧮 Scores'], ['pretest', '🎯 Pré-teste'], ['doses', '💊 Doses']] },
-    { id: 'mbe', label: '📐 MBE', views: [['mbe', '📐 MBE']] },
-    { id: 'plantao', label: '🚨 Plantão', views: [['protocolos', '🚨 Protocolos']] },
-    { id: 'prontuario', label: '📝 Prontuário', views: [['evodia', '🩺 Por setor'], ['montador', '🗂️ Evoluções'], ['transcricao', '📝 Transcrever laudo'], ['orientacoes', '💬 Orientações'], ['evolucoes', '📚 Biblioteca anterior']] },
-    { id: 'sobre', label: 'ℹ️ Sobre', views: [['novidades', '🆕 Atualizações'], ['sobre', 'ℹ️ Sobre']] }
+    { id: 'prontuario', label: '📝 Prontuário', views: [['evodia', '🩺 Por setor'], ['montador', '🗂️ Por cenário'], ['transcricao', '📝 Transcrever laudo'], ['orientacoes', '💬 Orientações'], ['evolucoes', '📚 Biblioteca anterior']] },
+    { id: 'plantao', label: '🚨 Plantão', views: [['protocolos', '🚨 Protocolos'], ['doses', '💊 Doses'], ['scores', '🧮 Scores']] },
+    { id: 'conduta', label: '🧭 Conduta', views: [['paciente', '🧬 Paciente'], ['evidencia', '🔎 Recomendações'], ['diagnostico', '🔍 Diagnóstico'], ['pretest', '🎯 Pré-teste'], ['mbe', '📐 MBE']] },
+    { id: 'estudo', label: '🎓 Estudo', views: [['temas', '🫀 Temas'], ['guias', '📚 Diretrizes'], ['ensaios', '🧪 Ensaios pivotais'], ['novidades', '🆕 Atualizações']] },
+    // Sobre e avisos fica fora da fileira de abas: abre pelo link do rodapé
+    { id: 'sobre', label: 'ℹ️ Sobre', oculto: true, views: [['sobre', 'ℹ️ Sobre']] }
   ];
   const viewHub = {};
   HUBS.forEach(h => h.views.forEach(v => { viewHub[v[0]] = h; }));
@@ -19619,7 +19625,10 @@ window.PROTOCOLOS = [
   function norm(s) { return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
 
   function renderHubs(activeHubId) {
-    hubsEl.innerHTML = HUBS.map(h => '<button class="hub' + (h.id === activeHubId ? ' active' : '') + '" data-hub="' + h.id + '">' + h.label + '</button>').join('');
+    hubsEl.innerHTML = HUBS.filter(h => !h.oculto).map(h => {
+      const k = h.label.indexOf(' ');
+      return '<button class="hub' + (h.id === activeHubId ? ' active' : '') + '" data-hub="' + h.id + '"><span class="hub-ic">' + h.label.slice(0, k) + '</span> <span class="hub-tx">' + h.label.slice(k + 1) + '</span></button>';
+    }).join('');
     hubsEl.querySelectorAll('.hub').forEach(b => b.addEventListener('click', () => {
       const h = HUBS.find(x => x.id === b.dataset.hub);
       showView(h.views[0][0]);
@@ -19641,8 +19650,34 @@ window.PROTOCOLOS = [
   }
   window.cardioGoView = showView;
 
-  const initial = (location.hash || '#paciente').slice(1).split('/')[0];
-  showView(viewHub[initial] ? initial : 'paciente');
+  const initial = (location.hash || '#evodia').slice(1).split('/')[0];
+  showView(viewHub[initial] ? initial : 'evodia');
+
+  // Links internos do rodapé: <a data-ir="sobre">
+  document.querySelectorAll('[data-ir]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); showView(a.dataset.ir); }));
+
+  // Cabeçalho: ao rolar, só a faixa de abas fica presa no topo; logo, "Criado por" e busca sobem com a página.
+  // --stick-top = altura que fica presa, usada pelos painéis fixos da Biblioteca, do Por cenário e do Por setor.
+  const topbar = document.querySelector('.topbar');
+  const faixaAbas = topbar && topbar.querySelector('.tabs-bar');
+  function medirTopo() {
+    if (!topbar) return;
+    const h = Math.round(topbar.getBoundingClientRect().height);
+    if (!(h > 0)) return;
+    const fixo = faixaAbas ? Math.round(faixaAbas.getBoundingClientRect().height) : h;
+    topbar.style.top = (fixo - h) + 'px';
+    document.documentElement.style.setProperty('--stick-top', fixo + 'px');
+  }
+  medirTopo();
+  window.addEventListener('resize', medirTopo);
+  window.addEventListener('load', medirTopo);
+  if (window.ResizeObserver && topbar) new ResizeObserver(medirTopo).observe(topbar);
+
+  // Celular: o texto de abertura de cada aba mostra 2 linhas; tocar nele abre o texto inteiro.
+  document.querySelectorAll('.view > .hero').forEach(h => h.addEventListener('click', e => {
+    if (e.target.closest('a, button, input, select, textarea, summary')) return;
+    h.classList.toggle('aberto');
+  }));
 
   // ---------------- Busca global ----------------
   const gi = document.getElementById('gsearch');
